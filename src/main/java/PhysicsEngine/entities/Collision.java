@@ -1,6 +1,7 @@
 package PhysicsEngine.entities;
 
 import PhysicsEngine.Formulas;
+import PhysicsEngine.Vec2;
 
 public class Collision {
     CollidableObject o1;

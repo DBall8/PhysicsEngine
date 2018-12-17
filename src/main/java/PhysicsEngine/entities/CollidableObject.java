@@ -1,5 +1,7 @@
 package PhysicsEngine.entities;
 
+import PhysicsEngine.Vec2;
+
 public abstract class CollidableObject {
 
     private final static float DEFAULT_RESTITUTION = 0.5f;

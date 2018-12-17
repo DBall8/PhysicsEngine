@@ -2,7 +2,6 @@ package PhysicsEngine;
 
 import PhysicsEngine.entities.CollidableBox;
 import PhysicsEngine.entities.CollidableCircle;
-import PhysicsEngine.entities.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;

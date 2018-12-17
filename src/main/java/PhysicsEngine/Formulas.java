@@ -1,7 +1,5 @@
 package PhysicsEngine;
 
-import PhysicsEngine.entities.Vec2;
-
 public class Formulas {
 
     public static float dotProduct(Vec2 vector1, Vec2 vector2)

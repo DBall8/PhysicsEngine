@@ -1,5 +1,7 @@
 package PhysicsEngine.entities;
 
+import PhysicsEngine.Vec2;
+
 public class CollidableBox extends CollidableObject {
 
     float width;

@@ -1,8 +1,8 @@
-package PhysicsEngine.entities;
+package PhysicsEngine;
 
 public class Vec2 {
-    float x;
-    float y;
+    public float x;
+    public float y;
 
     public Vec2(float x, float y)
     {
