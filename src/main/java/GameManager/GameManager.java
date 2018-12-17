@@ -30,14 +30,14 @@ public class GameManager extends Pane {
 
     public void start(Scene scene){
         this.scene = scene;
-        Player p = new Player(50, 50);
+        Player p = new Player(50, 50, false);
         p.setInput(new UserInputListener(scene));
         addObject(p);
 
-        Player p2 = new Player(100, 100);
+        Player p2 = new Player(100, 100, false);
         addObject(p2);
 
-        Player p3 = new Player(400, 400);
+        Player p3 = new Player(400, 400, true);
         addObject(p3);
 
         Wall wall1 = new Wall(0, 400, 20, 800);
@@ -45,6 +45,12 @@ public class GameManager extends Pane {
 
         Wall wall2 = new Wall(800, 400, 20, 800);
         addObject(wall2);
+
+        Wall wall3 = new Wall(400, 0, 800, 20);
+        addObject(wall3);
+
+        Wall wall4 = new Wall(400, 800, 800, 20);
+        addObject(wall4);
 
         time.play();
     }

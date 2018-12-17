@@ -10,13 +10,14 @@ import javafx.scene.shape.Rectangle;
 public class Player extends Entity{
 
     private final static int RADIUS = 20;
-    private final static boolean CIRCLE = false;
 
+    private boolean circle;
     UserInputListener input;
 
-    public Player(float x, float y)
+    public Player(float x, float y, boolean circle)
     {
-        if(CIRCLE)
+        this.circle = circle;
+        if(circle)
         {
             collisionBox = GameManager.world.addCircle(x, y, RADIUS);
             visuals = new Circle(x, y, RADIUS);
@@ -75,7 +76,7 @@ public class Player extends Entity{
 
     public void draw()
     {
-        if(CIRCLE)
+        if(circle)
         {
             ((Circle)visuals).setCenterX(collisionBox.getX());
             ((Circle)visuals).setCenterY(collisionBox.getY());

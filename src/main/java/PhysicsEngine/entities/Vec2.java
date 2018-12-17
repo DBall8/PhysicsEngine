@@ -16,6 +16,10 @@ public class Vec2 {
         y *= scalar;
     }
 
+    public boolean equals(Vec2 other) {
+        return (x == other.x) && (y == other.y);
+    }
+
     public float magnitude()
     {
         return (float)Math.sqrt(x*x + y*y);

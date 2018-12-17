@@ -65,7 +65,7 @@ public class PhysicsWorld {
                 c.checkCollision(circles.get(j));
             }
             // Have each circle check against each box
-            for(int j=i; j<boxes.size(); j++)
+            for(int j=0; j<boxes.size(); j++)
             {
                 c.checkCollision(boxes.get(j));
             }

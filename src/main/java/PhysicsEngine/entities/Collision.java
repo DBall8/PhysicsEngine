@@ -26,7 +26,7 @@ public class Collision {
         float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 
         // If the relative velocity along the normal is positive, the objects are already moving apart, do nothing
-        if(normalVelocity > 0) return;
+        if(normalVelocity >= 0) return;
 
         // Use the smaller restitution
         float e = Math.min(o2.getRestitution(), o1.getRestitution());
@@ -44,7 +44,9 @@ public class Collision {
         o2.xvelocity += o2.getInvertedMass() * normal.x;
         o2.yvelocity += o2.getInvertedMass() * normal.y;
 
-        System.out.format("VelX: %f, VelY: %f\n", o1.getXvelocity(), o1.getYvelocity());
+//        System.out.println("J: " + j);
+//        System.out.println("NormalVel: " + normalVelocity);
+//        System.out.format("VelX: %f, VelY: %f\n", normal.x, normal.y);
     }
 
     public void setO1(CollidableObject o1){ this.o1 = o1; }
