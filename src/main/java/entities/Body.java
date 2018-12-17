@@ -10,6 +10,7 @@ import javafx.scene.shape.Rectangle;
 public class Body extends Entity{
 
     private final static int RADIUS = 20;
+    private final static int MAX_AXIS_VELOCITY = 20;
 
     private boolean circle;
     UserInputListener input;
@@ -40,10 +41,10 @@ public class Body extends Entity{
         float yvel = collisionBox.getYvelocity();
         float xvel = collisionBox.getXvelocity();
 
-        if(input.isDown() && !input.isUp()){
+        if(input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY){
             yvel += 0.5;
         }
-        else if(!input.isDown() && input.isUp()){
+        else if(!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY){
             yvel -= 0.5;
         }
         else{
@@ -55,10 +56,10 @@ public class Body extends Entity{
             }
         }
 
-        if(input.isRight() && !input.isLeft()){
+        if(input.isRight() && !input.isLeft() && xvel < MAX_AXIS_VELOCITY){
             xvel += 0.5;
         }
-        else if(!input.isRight() && input.isLeft()){
+        else if(!input.isRight() && input.isLeft() && xvel > -MAX_AXIS_VELOCITY){
             xvel -= 0.5;
         }
         else{
