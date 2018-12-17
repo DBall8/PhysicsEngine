@@ -7,14 +7,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
-public class Player extends Entity{
+public class Body extends Entity{
 
     private final static int RADIUS = 20;
 
     private boolean circle;
     UserInputListener input;
 
-    public Player(float x, float y, boolean circle)
+    public Body(float x, float y, boolean circle)
     {
         this.circle = circle;
         if(circle)

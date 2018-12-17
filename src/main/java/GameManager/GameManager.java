@@ -3,7 +3,7 @@ package GameManager;
 import Global.Settings;
 import PhysicsEngine.PhysicsWorld;
 import entities.IObject;
-import entities.Player;
+import entities.Body;
 import entities.Wall;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -30,14 +30,14 @@ public class GameManager extends Pane {
 
     public void start(Scene scene){
         this.scene = scene;
-        Player p = new Player(50, 50, false);
+        Body p = new Body(50, 50, true);
         p.setInput(new UserInputListener(scene));
         addObject(p);
 
-        Player p2 = new Player(100, 100, false);
+        Body p2 = new Body(100, 100, false);
         addObject(p2);
 
-        Player p3 = new Player(400, 400, true);
+        Body p3 = new Body(400, 400, true);
         addObject(p3);
 
         Wall wall1 = new Wall(0, 400, 20, 800);

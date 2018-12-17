@@ -7,7 +7,7 @@ public class CollidableBox extends CollidableObject {
 
     public CollidableBox(Vec2 p, float width, float height)
     {
-        super(p, width * height / 4.0f);
+        super(p, width * height);
         this.width = width;
         this.height = height;
     }

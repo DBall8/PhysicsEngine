@@ -8,7 +8,7 @@ public class CollidableCircle extends CollidableObject {
 
     public CollidableCircle(Vec2 p, float r)
     {
-        super(p, r*r);
+        super(p, (float)(Math.PI * r * r));
         this.radius = r;
     }
 
