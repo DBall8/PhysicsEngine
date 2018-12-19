@@ -12,6 +12,8 @@ public class UserInputListener {
     private boolean left = false;
     private boolean boost = false;
     private boolean mouseDown = false;
+    private boolean mousePressed = false;
+    private boolean mouseReleased = false;
     private float mousex = 0;
     private float mousey = 0;
 
@@ -47,6 +49,23 @@ public class UserInputListener {
         return mouseDown;
     }
 
+    public boolean isMousePressed() {
+        if(mousePressed)
+        {
+            mousePressed = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isMouseReleased() {
+        if(mouseReleased)
+        {
+            mouseReleased = false;
+            return true;
+        }
+        return false;
+    }
 
     public UserInputListener(Scene scene){
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -75,6 +94,7 @@ public class UserInputListener {
             public void handle(MouseEvent event) {
                 if(!mouseDown){
                     mouseDown = true;
+                    mousePressed = true;
                 }
             }
         });
@@ -83,6 +103,7 @@ public class UserInputListener {
             @Override
             public void handle(MouseEvent event) {
                 mouseDown = false;
+                mouseReleased = true;
             }
         });
 

@@ -18,6 +18,8 @@ public class GameManager extends Pane {
     private int width, height;
     GameTime time;
 
+    UserInputListener input;
+
     public static PhysicsWorld world = new PhysicsWorld();
 
     public GameManager(){
@@ -30,8 +32,9 @@ public class GameManager extends Pane {
 
     public void start(Scene scene){
         this.scene = scene;
-        Body p = new Body(50, 50, true);
-        p.setInput(new UserInputListener(scene));
+        Body p = new Body(50, 50, false);
+        input = new UserInputListener(scene);
+        p.setInput(input);
         addObject(p);
 
         Body p2 = new Body(100, 100, false);
@@ -46,10 +49,10 @@ public class GameManager extends Pane {
         Wall wall2 = new Wall(800, 400, 20, 800);
         addObject(wall2);
 
-        Wall wall3 = new Wall(400, 0, 800, 20);
+        Wall wall3 = new Wall(400, 0, 780, 20);
         addObject(wall3);
 
-        Wall wall4 = new Wall(400, 800, 800, 20);
+        Wall wall4 = new Wall(400, 800, 780, 20);
         addObject(wall4);
 
         time.play();
@@ -63,12 +66,26 @@ public class GameManager extends Pane {
             o.update();
         }
 
+        update();
+
         // Run physics engine
         world.update();
 
         // Draw objects at resulting locations
         for(IObject o: objects){
             o.draw();
+        }
+    }
+
+    private void update()
+    {
+        if(input == null) return;
+
+        if(input.isMousePressed())
+        {
+            boolean circle = Math.random() > 0.5;
+            Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle);
+            addObject(newBody);
         }
     }
 

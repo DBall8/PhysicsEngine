@@ -24,6 +24,14 @@ public class CollidableBox extends CollidableObject {
         // Get the normal vector for the boxes' centers
         Vec2 normal = new Vec2(box.position.x - position.x, box.position.y - position.y);
 
+        if(Math.abs(normal.x) < TINY_AMOUNT && Math.abs(normal.y) < TINY_AMOUNT)
+        {
+            normal = new Vec2(0, 1);
+            Collision collision = new Collision(this, box, normal, width/2.0f);
+            collision.applyImpulse();
+            return;
+        }
+
         // Get the boxes x extents (sorta radii)
         float aExtent = width / 2.0f;
         float bExtent = box.width / 2.0f;
@@ -60,6 +68,7 @@ public class CollidableBox extends CollidableObject {
                     {
                         collision.setNormal(new Vec2(0, 1));
                     }
+                    collision.setPenetration(yOverlap);
                 }
                 // If the smaller overlap is on the x axis, use a x normal
                 else
@@ -72,6 +81,7 @@ public class CollidableBox extends CollidableObject {
                     {
                         collision.setNormal(new Vec2(1, 0));
                     }
+                    collision.setPenetration(xOverlap);
                 }
                 // Apply the impulse
                 collision.applyImpulse();

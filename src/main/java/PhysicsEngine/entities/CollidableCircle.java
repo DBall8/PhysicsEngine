@@ -20,16 +20,26 @@ public class CollidableCircle extends CollidableObject {
         float dy = position.y - circle.position.y; // ydistance
 
         // Are they closer than the distance when touching?
-        boolean collided =  (radiusSum * radiusSum) > (dx*dx + dy*dy);
+        float distanceSquared = dx*dx + dy*dy;
+        boolean collided =  (radiusSum * radiusSum) > distanceSquared;
 
         // If no collision happened, do nothing
         if(!collided) return;
 
-        // Get the unit vector between the two circles
-        Vec2 normal = new Vec2(circle.position.x - position.x, circle.position.y - position.y);
-        normal.normalize();
+        Collision collision;
+        if(distanceSquared < TINY_AMOUNT)
+        {
+            Vec2 normal = new Vec2(0, 1);
+            collision = new Collision(this, circle, normal, radius);
+        }
+        else {
+            float penetration = (float) (radiusSum - Math.sqrt(distanceSquared));
+            // Get the unit vector between the two circles
+            Vec2 normal = new Vec2(circle.position.x - position.x, circle.position.y - position.y);
+            normal.normalize();
 
-        Collision collision = new Collision(this, circle, normal);
+            collision = new Collision(this, circle, normal, penetration);
+        }
         collision.applyImpulse();
     }
 
@@ -48,7 +58,7 @@ public class CollidableCircle extends CollidableObject {
                                      Formulas.clamp(-yExtent, yExtent, normal.y));
 
         boolean inside = false;
-
+        // If the normal equals the closest point, then the circle is inside the box
         if(normal.equals(closestPoint))
         {
             inside = true;
@@ -71,17 +81,29 @@ public class CollidableCircle extends CollidableObject {
 
         normal = new Vec2(normal.x - closestPoint.x, normal.y - closestPoint.y);
 
-        float distance = normal.magnitude();
-        distance *= distance;
+        float distanceSquared = normal.getX() * normal.getX() + normal.getY() * normal.getY();
 
-        if((distance > radius * radius) && !inside) return;
+        if((distanceSquared > radius * radius) && !inside) return;
 
-        normal.normalize();
-        if(inside)
+        // If the centers are in the same place
+        Collision collision;
+        if(distanceSquared < TINY_AMOUNT)
         {
-            normal.mult(-1);
+            normal = new Vec2(0, 1);
+            collision = new Collision(this, box, normal, radius);
         }
-        Collision collision = new Collision(this, box, normal);
+        else
+        {
+            float distance = (float)(Math.sqrt(distanceSquared));
+
+            normal.normalize();
+            if(inside)
+            {
+                normal.mult(-1);
+            }
+            collision = new Collision(this, box, normal, radius - distance);
+        }
+
         collision.applyImpulse();
     }
 

@@ -32,6 +32,11 @@ public class Vec2 {
         y /= magnitude;
     }
 
+    public Vec2 copy()
+    {
+        return new Vec2(x, y);
+    }
+
     public float getX()
     {
         return x;

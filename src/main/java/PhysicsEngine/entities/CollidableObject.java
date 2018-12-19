@@ -4,7 +4,9 @@ import PhysicsEngine.Vec2;
 
 public abstract class CollidableObject {
 
+    private final static float MASS_SCALING_FACTOR = 1000.0f;
     private final static float DEFAULT_RESTITUTION = 0.5f;
+    protected final static float TINY_AMOUNT = 0.01f;
 
     Vec2 position;
 
@@ -19,7 +21,7 @@ public abstract class CollidableObject {
         position = p;
         this.xvelocity = 0;
         this.yvelocity = 0;
-        invertedMass = 1.0f / mass;
+        invertedMass = MASS_SCALING_FACTOR / mass;
     }
 
     public void move(float timeStep)

@@ -2,6 +2,7 @@ package entities;
 
 import GameManager.GameManager;
 import GameManager.UserInputListener;
+import Global.Settings;
 import PhysicsEngine.entities.CollidableCircle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -36,38 +37,36 @@ public class Body extends Entity{
     @Override
     public void update(){
 
-        if(input == null) return;
-
         float yvel = collisionBox.getYvelocity();
         float xvel = collisionBox.getXvelocity();
 
-        if(input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY){
-            yvel += 0.5;
+        if(Settings.getGravity() && yvel < MAX_AXIS_VELOCITY)
+        {
+            yvel += 2;
         }
-        else if(!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY){
-            yvel -= 0.5;
-        }
-        else{
-            if(Math.abs(yvel) >= 0.1f) {
-                yvel -= Math.abs(yvel) / yvel * 0.1f;
+        if(input != null) {
+            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
+                yvel += 0.5;
+            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
+                yvel -= 1.5;
+            } else {
+                if (Math.abs(yvel) >= 0.1f) {
+                    yvel -= Math.abs(yvel) / yvel * 0.1f;
+                } else {
+                    yvel = 0;
+                }
             }
-            else {
-                yvel = 0;
-            }
-        }
 
-        if(input.isRight() && !input.isLeft() && xvel < MAX_AXIS_VELOCITY){
-            xvel += 0.5;
-        }
-        else if(!input.isRight() && input.isLeft() && xvel > -MAX_AXIS_VELOCITY){
-            xvel -= 0.5;
-        }
-        else{
-            if(Math.abs(xvel) >= 0.1f) {
-                xvel -= Math.abs(xvel) / xvel * 0.1f;
-            }
-            else{
-                xvel = 0;
+            if (input.isRight() && !input.isLeft() && xvel < MAX_AXIS_VELOCITY) {
+                xvel += 0.5;
+            } else if (!input.isRight() && input.isLeft() && xvel > -MAX_AXIS_VELOCITY) {
+                xvel -= 0.5;
+            } else {
+                if (Math.abs(xvel) >= 0.1f) {
+                    xvel -= Math.abs(xvel) / xvel * 0.1f;
+                } else {
+                    xvel = 0;
+                }
             }
         }
 
