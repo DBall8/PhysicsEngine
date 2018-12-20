@@ -9,12 +9,14 @@ public abstract class CollidableObject {
     protected final static float TINY_AMOUNT = 0.01f;
 
     Vec2 position;
+    Vec2 force;
 
     float xvelocity;
     float yvelocity;
     float volume;
 
     Material material;
+    float mass = 20;
     float invertedMass = 0.05f;
 
     CollidableObject(Vec2 p, Material material, float volume)
@@ -24,12 +26,15 @@ public abstract class CollidableObject {
         this.yvelocity = 0;
         this.material = material;
         this.volume = volume;
+        this.force = new Vec2(0,0);
         if(material.getDensity() == 0)
         {
+            mass = 0;
             invertedMass = 0;
         }
         else {
-            invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
+            mass = material.getDensity() * volume;
+            invertedMass = MASS_SCALING_FACTOR / mass;
         }
     }
 
@@ -39,12 +44,25 @@ public abstract class CollidableObject {
         position.y = position.y + yvelocity * timeStep;
     }
 
+    public void applyForce(Vec2 force)
+    {
+        this.force.add(force);
+    }
+
+    public void resolveForces()
+    {
+        xvelocity += force.x * invertedMass;
+        yvelocity += force.y * invertedMass;
+        this.force.zero();
+    }
+
     public void setXvelocity(float xvel) { this.xvelocity = xvel; }
     public void setYvelocity(float yvel) { this.yvelocity = yvel; }
     public void setMaterial(Material material)
     {
         this.material = material;
-        this.invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
+        mass = material.getDensity() * volume;
+        invertedMass = MASS_SCALING_FACTOR / mass;
     }
 
     public float getRestitution(){ return material.getResitution(); }

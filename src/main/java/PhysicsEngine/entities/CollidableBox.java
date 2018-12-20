@@ -34,7 +34,7 @@ public class CollidableBox extends CollidableObject {
 
         if(Math.abs(normal.x) < TINY_AMOUNT && Math.abs(normal.y) < TINY_AMOUNT)
         {
-            normal = new Vec2(0, 1);
+            normal = new Vec2(0.5f, 0.5f);
             Collision collision = new Collision(this, box, normal, width/2.0f);
             collision.applyImpulse();
             return;

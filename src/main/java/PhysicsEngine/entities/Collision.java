@@ -6,13 +6,14 @@ import PhysicsEngine.Vec2;
 
 public class Collision {
 
-    private final static float POSITION_CORRECTION_PERCENT = 0.8f;
+    private final static float POSITION_CORRECTION_PERCENT = 2.8f;
     private final static float MIN_POSITION_CORRECTION = 0.01f;
 
     CollidableObject o1;
     CollidableObject o2;
     Vec2 normal;
     float penetration;
+    public float penetrationPercent = 0;
 
     Collision(){}
 
@@ -49,11 +50,18 @@ public class Collision {
         Vec2 resolutionVec = normal.copy();
         resolutionVec.mult(j);
 
-        // Update circles' velocities relative to their masses
-        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
-        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
-        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
-        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
+
+        // Add to the object's force totals
+        Vec2 o1Force = resolutionVec.copy();
+        o1Force.mult(-1.0f * o1.getInvertedMass() * (penetration + 1.0f));
+        Vec2 o2Force = resolutionVec.copy();
+        o2Force.mult(o2.getInvertedMass() * (penetration + 1.0f));
+        o1.applyForce(o1Force);
+        o2.applyForce(o2Force);
+//        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
+//        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
+//        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
+//        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
     }
 
     void correctPosition()
@@ -70,13 +78,16 @@ public class Collision {
             correctionAmount = (penetration * (o1.invertedMass + o2.invertedMass)) * POSITION_CORRECTION_PERCENT;
         }
 
+        float o1MassPercent = o1.mass / (o1.mass + o2.mass);
+        float o2MassPercent = o2.mass / (o1.mass + o2.mass);
+
         Vec2 correctionVector = normal.copy();
         correctionVector.mult(correctionAmount);
 //        System.out.printf("Correction x: %f. Correction y: %f\n", correctionVector.x, correctionVector.y);
-        o1.position.x -= o1.getInvertedMass() * correctionVector.x;
-        o1.position.y -= o1.getInvertedMass() * correctionVector.y;
-        o2.position.x += o2.getInvertedMass() * correctionVector.x;
-        o2.position.y += o2.getInvertedMass() * correctionVector.y;
+        o1.position.x -= o1MassPercent * correctionVector.x;
+        o1.position.y -= o1MassPercent * correctionVector.y;
+        o2.position.x += o2MassPercent * correctionVector.x;
+        o2.position.y += o2MassPercent * correctionVector.y;
     }
 
     public void setO1(CollidableObject o1){ this.o1 = o1; }

@@ -36,7 +36,7 @@ public class CollidableCircle extends CollidableObject {
         Collision collision;
         if(distanceSquared < TINY_AMOUNT)
         {
-            Vec2 normal = new Vec2(0, 1);
+            Vec2 normal = new Vec2(0.5f, 0.5f);
             collision = new Collision(this, circle, normal, radius);
         }
         else {
@@ -46,6 +46,7 @@ public class CollidableCircle extends CollidableObject {
             normal.normalize();
 
             collision = new Collision(this, circle, normal, penetration);
+            collision.penetrationPercent = collision.penetrationPercent / radius;
         }
         collision.applyImpulse();
     }
@@ -96,7 +97,7 @@ public class CollidableCircle extends CollidableObject {
         Collision collision;
         if(distanceSquared < TINY_AMOUNT)
         {
-            normal = new Vec2(0, 1);
+            normal = new Vec2(0.5f, 0.5f);
             collision = new Collision(this, box, normal, radius);
         }
         else
@@ -109,6 +110,7 @@ public class CollidableCircle extends CollidableObject {
                 normal.mult(-1);
             }
             collision = new Collision(this, box, normal, radius - distance);
+            collision.penetrationPercent = collision.penetrationPercent / radius;
         }
         collision.applyImpulse();
     }
