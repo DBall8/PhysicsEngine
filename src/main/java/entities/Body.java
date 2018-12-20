@@ -48,7 +48,7 @@ public class Body extends Entity{
             if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
                 yvel += 0.5;
             } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
-                yvel -= 1.5;
+                yvel -= 0.5;
             } else {
                 if (Math.abs(yvel) >= 0.1f) {
                     yvel -= Math.abs(yvel) / yvel * 0.1f;

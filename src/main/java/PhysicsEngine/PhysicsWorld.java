@@ -8,8 +8,16 @@ import java.util.List;
 
 public class PhysicsWorld {
 
+    private final static float FRAMERATE = 120;
+    private final static float TIME_SCALE_FACTOR = 120.0f;
+
+    private final static float TIME_STEP = 1.0f / FRAMERATE;
+    private final static float scaledTimeStep = TIME_STEP * TIME_SCALE_FACTOR;
+
     private List<CollidableCircle> circles = new ArrayList<>();
     private List<CollidableBox> boxes = new ArrayList<>();
+
+    float accumulator = 0;
 
     public PhysicsWorld(){}
 
@@ -27,21 +35,18 @@ public class PhysicsWorld {
         return b;
     }
 
-    public void update(){
-        float timeLeft = 1.00f;
-        float firstCollisionTime;
-        do {
-            // Check if each particle hits the box boundaries (must be done first as it resets collision)
-            firstCollisionTime = checkCollisions(timeLeft);
+    public void update(float time){
+        accumulator += time;
 
-            move(firstCollisionTime);
-
-            timeLeft -= firstCollisionTime;
-
-        }while(timeLeft > 0.01f);
+        while(accumulator >= TIME_STEP)
+        {
+            checkCollisions(scaledTimeStep);
+            move(scaledTimeStep);
+            accumulator -= TIME_STEP;
+        }
     }
 
-    private float checkCollisions(float timeLeft){
+    private float checkCollisions(float time){
 //        float firstCollisionTime = timeLeft; // looks for first collision
 //        float tempTime;
 //        // reset collisions for each player
@@ -80,7 +85,7 @@ public class PhysicsWorld {
             }
         }
 
-        return timeLeft;
+        return time;
     }
 
     private void move(float timeStep)

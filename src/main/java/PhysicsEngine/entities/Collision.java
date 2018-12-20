@@ -1,6 +1,7 @@
 package PhysicsEngine.entities;
 
 import PhysicsEngine.Formulas;
+import PhysicsEngine.PhysicsWorld;
 import PhysicsEngine.Vec2;
 
 public class Collision {
@@ -51,8 +52,6 @@ public class Collision {
         o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
         o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
         o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
-
-        correctPosition();
     }
 
     void correctPosition()

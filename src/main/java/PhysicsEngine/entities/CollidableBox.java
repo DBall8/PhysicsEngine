@@ -28,6 +28,7 @@ public class CollidableBox extends CollidableObject {
         {
             normal = new Vec2(0, 1);
             Collision collision = new Collision(this, box, normal, width/2.0f);
+            collision.correctPosition();
             collision.applyImpulse();
             return;
         }
@@ -84,6 +85,7 @@ public class CollidableBox extends CollidableObject {
                     collision.setPenetration(xOverlap);
                 }
                 // Apply the impulse
+                collision.correctPosition();
                 collision.applyImpulse();
             }
         }

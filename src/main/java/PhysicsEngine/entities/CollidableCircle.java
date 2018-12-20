@@ -40,6 +40,7 @@ public class CollidableCircle extends CollidableObject {
 
             collision = new Collision(this, circle, normal, penetration);
         }
+        collision.correctPosition();
         collision.applyImpulse();
     }
 
@@ -103,7 +104,7 @@ public class CollidableCircle extends CollidableObject {
             }
             collision = new Collision(this, box, normal, radius - distance);
         }
-
+        collision.correctPosition();
         collision.applyImpulse();
     }
 

@@ -26,8 +26,8 @@ public abstract class CollidableObject {
 
     public void move(float timeStep)
     {
-        position.x = position.x + xvelocity * timeStep;
-        position.y = position.y + yvelocity * timeStep;
+        position.x = position.x + xvelocity *  timeStep;
+        position.y = position.y + yvelocity *  timeStep;
     }
 
     public void setXvelocity(float xvel) { this.xvelocity = xvel; }

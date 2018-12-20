@@ -69,7 +69,7 @@ public class GameManager extends Pane {
         update();
 
         // Run physics engine
-        world.update();
+        world.update(1.0f/Settings.getFramerate());
 
         // Draw objects at resulting locations
         for(IObject o: objects){

@@ -2,7 +2,7 @@ package Global;
 
 public class Settings {
 
-    private static final int FRAMERATE = 60;
+    private static final int FRAMERATE = 120;
     private static int WIDTH = 800;
     private static int HEIGHT = 800;
     private static final boolean GRAVITY = false;
