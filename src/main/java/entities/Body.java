@@ -109,6 +109,10 @@ public class Body extends Entity{
         {
             visuals.setFill(Color.LIGHTBLUE);
         }
+        else if(material.equals(Material.Bouncy))
+        {
+            visuals.setFill(Color.PINK);
+        }
     }
 
     public void setInput(UserInputListener input)

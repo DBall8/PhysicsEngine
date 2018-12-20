@@ -85,7 +85,7 @@ public class GameManager extends Pane {
         if(input.isMousePressed())
         {
             boolean circle = Math.random() > 0.5;
-            Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle, Material.Rock);
+            Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle, Material.Bouncy);
             addObject(newBody);
         }
     }
