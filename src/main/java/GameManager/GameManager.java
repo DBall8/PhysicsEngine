@@ -1,6 +1,7 @@
 package GameManager;
 
 import Global.Settings;
+import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsWorld;
 import entities.IObject;
 import entities.Body;
@@ -32,15 +33,15 @@ public class GameManager extends Pane {
 
     public void start(Scene scene){
         this.scene = scene;
-        Body p = new Body(50, 50, false);
+        Body p = new Body(50, 50, false, Material.Wood);
         input = new UserInputListener(scene);
         p.setInput(input);
         addObject(p);
 
-        Body p2 = new Body(100, 100, false);
+        Body p2 = new Body(100, 100, false, Material.Metal);
         addObject(p2);
 
-        Body p3 = new Body(400, 400, true);
+        Body p3 = new Body(400, 400, true, Material.Rock);
         addObject(p3);
 
         Wall wall1 = new Wall(0, 400, 20, 800);
@@ -69,11 +70,11 @@ public class GameManager extends Pane {
         update();
 
         // Run physics engine
-        world.update(1.0f/Settings.getFramerate());
+        float alpha = world.update(1.0f/Settings.getFramerate());
 
         // Draw objects at resulting locations
         for(IObject o: objects){
-            o.draw();
+            o.draw(alpha);
         }
     }
 
@@ -84,7 +85,7 @@ public class GameManager extends Pane {
         if(input.isMousePressed())
         {
             boolean circle = Math.random() > 0.5;
-            Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle);
+            Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle, Material.Rock);
             addObject(newBody);
         }
     }

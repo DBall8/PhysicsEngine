@@ -26,6 +26,8 @@ public class Collision {
 
     void applyImpulse()
     {
+        correctPosition();
+
         // Get the vector formed by the two circles' velocities
         Vec2 relativeVelocity = new Vec2(o2.getXvelocity() - o1.getXvelocity(),
                                          o2.getYvelocity() - o1.getYvelocity());

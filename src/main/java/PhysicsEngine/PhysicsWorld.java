@@ -28,6 +28,13 @@ public class PhysicsWorld {
         return c;
     }
 
+    public CollidableCircle addCircle(float x, float y, float radius, Material material )
+    {
+        CollidableCircle c = new CollidableCircle(new Vec2(x, y), radius, material);
+        circles.add(c);
+        return c;
+    }
+
     public CollidableBox addBox(float centerx, float centery, float width, float height)
     {
         CollidableBox b = new CollidableBox(new Vec2(centerx, centery), width, height);
@@ -35,8 +42,20 @@ public class PhysicsWorld {
         return b;
     }
 
-    public void update(float time){
+    public CollidableBox addBox(float centerx, float centery, float width, float height, Material material)
+    {
+        CollidableBox b = new CollidableBox(new Vec2(centerx, centery), width, height, material);
+        boxes.add(b);
+        return b;
+    }
+
+    public float update(float time){
         accumulator += time;
+
+        if(accumulator > 0.5f)
+        {
+            accumulator = 0.5f;
+        }
 
         while(accumulator >= TIME_STEP)
         {
@@ -44,6 +63,8 @@ public class PhysicsWorld {
             move(scaledTimeStep);
             accumulator -= TIME_STEP;
         }
+
+        return accumulator / TIME_STEP;
     }
 
     private float checkCollisions(float time){

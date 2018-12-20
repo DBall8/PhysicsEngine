@@ -1,6 +1,7 @@
 package entities;
 
 import GameManager.GameManager;
+import PhysicsEngine.Material;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -13,20 +14,18 @@ public class Wall extends Entity{
     {
         if(CIRCLE)
         {
-            collisionBox = GameManager.world.addCircle(x, y, height/2.0f);
-            collisionBox.setMass(0);
+            collisionBox = GameManager.world.addCircle(x, y, height/2.0f, Material.Static);
             visuals = new Circle(x, y, height/2);
         }
         else
         {
-            collisionBox = GameManager.world.addBox(x, y, width, height);
-            collisionBox.setMass(0);
+            collisionBox = GameManager.world.addBox(x, y, width, height, Material.Static);
             visuals = new Rectangle(x - width/2, y - height/2, width, height);
         }
         visuals.setFill(Color.BLACK);
     }
 
-    public void draw()
+    public void draw(float alpha)
     {
         if(CIRCLE)
         {

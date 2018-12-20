@@ -1,5 +1,6 @@
 package PhysicsEngine.entities;
 
+import PhysicsEngine.Material;
 import PhysicsEngine.Vec2;
 
 public class CollidableBox extends CollidableObject {
@@ -9,7 +10,14 @@ public class CollidableBox extends CollidableObject {
 
     public CollidableBox(Vec2 p, float width, float height)
     {
-        super(p, width * height);
+        super(p, Material.Wood, width * height);
+        this.width = width;
+        this.height = height;
+    }
+
+    public CollidableBox(Vec2 p, float width, float height, Material material)
+    {
+        super(p, material, width * height);
         this.width = width;
         this.height = height;
     }
@@ -28,7 +36,6 @@ public class CollidableBox extends CollidableObject {
         {
             normal = new Vec2(0, 1);
             Collision collision = new Collision(this, box, normal, width/2.0f);
-            collision.correctPosition();
             collision.applyImpulse();
             return;
         }
@@ -85,7 +92,6 @@ public class CollidableBox extends CollidableObject {
                     collision.setPenetration(xOverlap);
                 }
                 // Apply the impulse
-                collision.correctPosition();
                 collision.applyImpulse();
             }
         }

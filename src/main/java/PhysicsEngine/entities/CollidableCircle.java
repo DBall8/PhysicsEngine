@@ -1,6 +1,7 @@
 package PhysicsEngine.entities;
 
 import PhysicsEngine.Formulas;
+import PhysicsEngine.Material;
 import PhysicsEngine.Vec2;
 
 public class CollidableCircle extends CollidableObject {
@@ -9,7 +10,13 @@ public class CollidableCircle extends CollidableObject {
 
     public CollidableCircle(Vec2 p, float r)
     {
-        super(p, (float)(Math.PI * r * r));
+        super(p, Material.Wood, (float)(Math.PI * r * r));
+        this.radius = r;
+    }
+
+    public CollidableCircle(Vec2 p, float r, Material material)
+    {
+        super(p, material, (float)(Math.PI * r * r));
         this.radius = r;
     }
 
@@ -40,7 +47,6 @@ public class CollidableCircle extends CollidableObject {
 
             collision = new Collision(this, circle, normal, penetration);
         }
-        collision.correctPosition();
         collision.applyImpulse();
     }
 
@@ -104,7 +110,6 @@ public class CollidableCircle extends CollidableObject {
             }
             collision = new Collision(this, box, normal, radius - distance);
         }
-        collision.correctPosition();
         collision.applyImpulse();
     }
 

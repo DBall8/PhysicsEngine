@@ -11,7 +11,7 @@ public abstract class Entity implements IObject {
 
     Entity(){}
 
-    public abstract void draw();
+    public abstract void draw(float alpha);
 
     public void update(){}
 

@@ -1,50 +1,53 @@
 package PhysicsEngine.entities;
 
+import PhysicsEngine.Material;
 import PhysicsEngine.Vec2;
 
 public abstract class CollidableObject {
 
-    private final static float MASS_SCALING_FACTOR = 1000.0f;
-    private final static float DEFAULT_RESTITUTION = 0.5f;
+    private final static float MASS_SCALING_FACTOR = 100.0f;
     protected final static float TINY_AMOUNT = 0.01f;
 
     Vec2 position;
 
     float xvelocity;
     float yvelocity;
+    float volume;
 
-    float restitution = DEFAULT_RESTITUTION;
+    Material material;
     float invertedMass = 0.05f;
 
-    CollidableObject(Vec2 p, float mass)
+    CollidableObject(Vec2 p, Material material, float volume)
     {
         position = p;
         this.xvelocity = 0;
         this.yvelocity = 0;
-        invertedMass = MASS_SCALING_FACTOR / mass;
+        this.material = material;
+        this.volume = volume;
+        if(material.getDensity() == 0)
+        {
+            invertedMass = 0;
+        }
+        else {
+            invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
+        }
     }
 
     public void move(float timeStep)
     {
-        position.x = position.x + xvelocity *  timeStep;
-        position.y = position.y + yvelocity *  timeStep;
+        position.x = position.x + xvelocity * timeStep;
+        position.y = position.y + yvelocity * timeStep;
     }
 
     public void setXvelocity(float xvel) { this.xvelocity = xvel; }
     public void setYvelocity(float yvel) { this.yvelocity = yvel; }
-    public void setMass(float mass)
+    public void setMaterial(Material material)
     {
-        if(mass == 0)
-        {
-            invertedMass = 0;
-        }
-        else
-        {
-            invertedMass = 1.0f / mass;
-        }
+        this.material = material;
+        this.invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
     }
 
-    public float getRestitution(){ return restitution; }
+    public float getRestitution(){ return material.getResitution(); }
     public float getInvertedMass(){ return invertedMass; }
     public float getX(){ return position.getX(); }
     public float getY(){ return position.getY(); }
