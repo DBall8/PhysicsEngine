@@ -61,18 +61,11 @@ public class Collision {
         if(penetration <= MIN_POSITION_CORRECTION) return;
 
         float correctionAmount;
-        if(o1.invertedMass == 0 || o2.invertedMass == 0)
-        {
-            correctionAmount = penetration;
-        }
-        else
-        {
-            correctionAmount = (penetration * (o1.invertedMass + o2.invertedMass)) * POSITION_CORRECTION_PERCENT;
-        }
+        correctionAmount = (penetration / (o1.invertedMass + o2.invertedMass)) * POSITION_CORRECTION_PERCENT;
 
         Vec2 correctionVector = normal.copy();
         correctionVector.mult(correctionAmount);
-//        System.out.printf("Correction x: %f. Correction y: %f\n", correctionVector.x, correctionVector.y);
+
         o1.position.x -= o1.getInvertedMass() * correctionVector.x;
         o1.position.y -= o1.getInvertedMass() * correctionVector.y;
         o2.position.x += o2.getInvertedMass() * correctionVector.x;

@@ -4,6 +4,7 @@ import GameManager.GameManager;
 import GameManager.UserInputListener;
 import Global.Settings;
 import PhysicsEngine.Material;
+import PhysicsEngine.Vec2;
 import PhysicsEngine.entities.CollidableCircle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -44,7 +45,7 @@ public class Body extends Entity{
 
         if(Settings.getGravity() && yvel < MAX_AXIS_VELOCITY)
         {
-            yvel += 2;
+            collisionBox.applyForce(new Vec2(0, 1));
         }
         if(input != null) {
             if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {

@@ -60,6 +60,7 @@ public class PhysicsWorld {
         while(accumulator >= TIME_STEP)
         {
             checkCollisions(scaledTimeStep);
+            applyForces();
             move(scaledTimeStep);
             accumulator -= TIME_STEP;
         }
@@ -119,6 +120,19 @@ public class PhysicsWorld {
         for(CollidableBox b: boxes)
         {
             b.move(timeStep);
+        }
+    }
+
+    private void applyForces()
+    {
+        for(CollidableCircle c: circles)
+        {
+            c.applyTotalForce();
+        }
+
+        for(CollidableBox b: boxes)
+        {
+            b.applyTotalForce();
         }
     }
 }

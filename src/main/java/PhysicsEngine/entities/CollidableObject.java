@@ -9,6 +9,7 @@ public abstract class CollidableObject {
     protected final static float TINY_AMOUNT = 0.01f;
 
     Vec2 position;
+    Vec2 totalForce;
 
     float xvelocity;
     float yvelocity;
@@ -24,6 +25,7 @@ public abstract class CollidableObject {
         this.yvelocity = 0;
         this.material = material;
         this.volume = volume;
+        this.totalForce = new Vec2(0, 0);
         if(material.getDensity() == 0)
         {
             invertedMass = 0;
@@ -37,6 +39,18 @@ public abstract class CollidableObject {
     {
         position.x = position.x + xvelocity * timeStep;
         position.y = position.y + yvelocity * timeStep;
+    }
+
+    public void applyForce(Vec2 force)
+    {
+        totalForce.add(force);
+    }
+
+    public void applyTotalForce()
+    {
+        xvelocity += invertedMass * totalForce.x;
+        yvelocity += invertedMass * totalForce.y;
+        totalForce.zero();
     }
 
     public void setXvelocity(float xvel) { this.xvelocity = xvel; }

@@ -5,7 +5,7 @@ public class Settings {
     private static final int FRAMERATE = 120;
     private static int WIDTH = 800;
     private static int HEIGHT = 800;
-    private static final boolean GRAVITY = false;
+    private static final boolean GRAVITY = true;
 
     private static class Settings_{
         private static final Settings instance = new Settings();

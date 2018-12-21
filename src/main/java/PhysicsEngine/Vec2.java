@@ -16,6 +16,18 @@ public class Vec2 {
         y *= scalar;
     }
 
+    public void add(Vec2 other)
+    {
+        x += other.x;
+        y += other.y;
+    }
+
+    public void zero()
+    {
+        x = 0;
+        y = 0;
+    }
+
     public boolean equals(Vec2 other) {
         return (x == other.x) && (y == other.y);
     }
