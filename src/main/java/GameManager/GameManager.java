@@ -44,16 +44,16 @@ public class GameManager extends Pane {
         Body p3 = new Body(400, 400, true, Material.Rock);
         addObject(p3);
 
-        Wall wall1 = new Wall(0, 400, 20, 800);
+        Wall wall1 = new Wall(-30, 400, 80, 800);
         addObject(wall1);
 
-        Wall wall2 = new Wall(800, 400, 20, 800);
+        Wall wall2 = new Wall(830, 400, 80, 800);
         addObject(wall2);
 
-        Wall wall3 = new Wall(400, 0, 780, 20);
+        Wall wall3 = new Wall(400, -30, 780, 80);
         addObject(wall3);
 
-        Wall wall4 = new Wall(400, 800, 780, 20);
+        Wall wall4 = new Wall(400, 830, 780, 80);
         addObject(wall4);
 
         time.play();
