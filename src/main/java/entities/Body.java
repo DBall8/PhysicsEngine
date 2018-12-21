@@ -14,7 +14,7 @@ public class Body extends Entity{
 
     private final static int RADIUS = 20;
     private final static int MAX_AXIS_VELOCITY = 20;
-    private final static float ACCELERATION = 0.5f * (60.0f / Settings.getFramerate());
+    private final static float ACCELERATION = 1.0f * (60.0f / Settings.getFramerate());
 
     private boolean circle;
     UserInputListener input;
@@ -49,9 +49,9 @@ public class Body extends Entity{
         }
         if(input != null) {
             if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
-                yvel += ACCELERATION;
+                // nothing for now
             } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
-                yvel -= ACCELERATION;
+                collisionBox.applyForce(new Vec2(0,-2));
             } else {
                 if (Math.abs(yvel) >= 0.1f) {
                     yvel -= Math.abs(yvel) / yvel * 0.1f;
@@ -61,9 +61,9 @@ public class Body extends Entity{
             }
 
             if (input.isRight() && !input.isLeft() && xvel < MAX_AXIS_VELOCITY) {
-                xvel += ACCELERATION;
+                collisionBox.applyForce(new Vec2(ACCELERATION, 0));
             } else if (!input.isRight() && input.isLeft() && xvel > -MAX_AXIS_VELOCITY) {
-                xvel -= ACCELERATION;
+                collisionBox.applyForce(new Vec2(-ACCELERATION, 0));
             } else {
                 if (Math.abs(xvel) >= 0.1f) {
                     xvel -= Math.abs(xvel) / xvel * 0.1f;

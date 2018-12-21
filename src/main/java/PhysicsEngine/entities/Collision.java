@@ -49,17 +49,9 @@ public class Collision {
         Vec2 resolutionVec = normal.copy();
         resolutionVec.mult(j);
 
-        Vec2 o1Force = resolutionVec.copy();
-        o1Force.mult(-1.0f);
-        o1.applyForce(o1Force);
-        Vec2 o2Force = resolutionVec.copy();
-        o2.applyForce(o2Force);
-
-        // Update circles' velocities relative to their masses
-//        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
-//        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
-//        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
-//        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
+        o2.applyForce(resolutionVec);
+        resolutionVec.mult(-1.0f);
+        o1.applyForce(resolutionVec);
     }
 
     void correctPosition()
