@@ -53,6 +53,17 @@ public abstract class CollidableObject {
         totalForce.zero();
     }
 
+    public boolean isTouching(CollidableObject object)
+    {
+        if(object instanceof CollidableCircle) {
+            return isTouching((CollidableCircle) object);
+        }
+        else
+        {
+            return isTouching((CollidableBox) object);
+        }
+    }
+
     public void setXvelocity(float xvel) { this.xvelocity = xvel; }
     public void setYvelocity(float yvel) { this.yvelocity = yvel; }
     public void setMaterial(Material material)
@@ -76,6 +87,8 @@ public abstract class CollidableObject {
 
     public abstract void checkCollision(CollidableCircle circle);
     public abstract void checkCollision(CollidableBox box);
+    abstract boolean isTouching(CollidableCircle circle);
+    abstract boolean isTouching(CollidableBox box);
 
     public abstract float getWidth();
     public abstract float getHeight();

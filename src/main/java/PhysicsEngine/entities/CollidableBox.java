@@ -97,6 +97,38 @@ public class CollidableBox extends CollidableObject {
         }
     }
 
+    boolean isTouching(CollidableCircle circle){
+        return circle.isTouching(this);
+    }
+    boolean isTouching(CollidableBox box){
+
+        // Get the normal vector for the boxes' centers
+        Vec2 normal = new Vec2(box.position.x - position.x, box.position.y - position.y);
+        // Get the boxes x extents (sorta radii)
+        float aExtent = width / 2.0f;
+        float bExtent = box.width / 2.0f;
+
+        // Get the box x overlap, which is the sum of the box x radii minus the distance in the x direction
+        float xOverlap = aExtent + bExtent - Math.abs(normal.x);
+
+        // If Overlapping in the x direction
+        if(xOverlap > 0) {
+            // Get the boxes' y extents
+            aExtent = height / 2.0f;
+            bExtent = box.height / 2.0f;
+
+            // Get the y overlap (Sum of their radii minus y distance)
+            float yOverlap = aExtent + bExtent - Math.abs(normal.y);
+
+            // If overlapping y, then both overlapping and a collision has occurred!
+            if (yOverlap > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public float minX(){ return position.x - width/2.0f; }
     public float maxX(){ return position.x + width/2.0f; }
     public float minY(){ return position.y - height/2.0f; }

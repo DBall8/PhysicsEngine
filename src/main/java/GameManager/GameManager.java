@@ -3,11 +3,13 @@ package GameManager;
 import Global.Settings;
 import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsWorld;
-import entities.IObject;
+import PhysicsEngine.Vec2;
 import entities.Body;
+import entities.Entity;
 import entities.Wall;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +17,12 @@ import java.util.List;
 public class GameManager extends Pane {
 
     private Scene scene;
-    private List<IObject> objects = new ArrayList<>();
+    private List<Entity> objects = new ArrayList<>();
     private int width, height;
     GameTime time;
+
+    Entity p1;
+    Entity ground;
 
     UserInputListener input;
 
@@ -37,6 +42,7 @@ public class GameManager extends Pane {
         input = new UserInputListener(scene);
         p.setInput(input);
         addObject(p);
+        p1 = p;
 
         Body p2 = new Body(100, 100, false, Material.Metal);
         addObject(p2);
@@ -55,6 +61,7 @@ public class GameManager extends Pane {
 
         Wall wall4 = new Wall(400, 830, 780, 80);
         addObject(wall4);
+        ground = wall4;
 
         time.play();
     }
@@ -62,7 +69,7 @@ public class GameManager extends Pane {
     public void calculateFrame()
     {
         // Update objects
-        for(IObject o: objects)
+        for(Entity o: objects)
         {
             o.update();
         }
@@ -73,7 +80,7 @@ public class GameManager extends Pane {
         float alpha = world.update(1.0f/Settings.getFramerate());
 
         // Draw objects at resulting locations
-        for(IObject o: objects){
+        for(Entity o: objects){
             o.draw(alpha);
         }
     }
@@ -88,9 +95,14 @@ public class GameManager extends Pane {
             Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle, Material.Bouncy);
             addObject(newBody);
         }
+
+        if(Settings.getGravity() && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
+        {
+            p1.getCollisionBox().applyForce(new Vec2(0, -40));
+        }
     }
 
-    private void addObject(IObject o)
+    private void addObject(Entity o)
     {
         objects.add(o);
         this.getChildren().add(o.getVisuals());

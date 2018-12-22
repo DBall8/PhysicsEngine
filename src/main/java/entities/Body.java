@@ -51,7 +51,7 @@ public class Body extends Entity{
             if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
                 // nothing for now
             } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
-                collisionBox.applyForce(new Vec2(0,-2));
+                //collisionBox.applyForce(new Vec2(0,-2));
             } else {
                 if (Math.abs(yvel) >= 0.1f) {
                     yvel -= Math.abs(yvel) / yvel * 0.1f;

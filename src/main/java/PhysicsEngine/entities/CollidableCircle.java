@@ -52,7 +52,6 @@ public class CollidableCircle extends CollidableObject {
 
     public void checkCollision(CollidableBox box)
     {
-
         // Vector between circle and box centers
         Vec2 normal = new Vec2(box.position.x - position.x,
                                box.position.y - position.y);
@@ -112,6 +111,40 @@ public class CollidableCircle extends CollidableObject {
         }
         collision.applyImpulse();
     }
+    boolean isTouching(CollidableCircle circle){
+        float radiusSum = radius + circle.radius; // distance between the two circles when touching
+        float dx = position.x - circle.position.x; // x distance
+        float dy = position.y - circle.position.y; // ydistance
+
+        // Are they closer than the distance when touching?
+        float distanceSquared = dx*dx + dy*dy;
+        return  (radiusSum * radiusSum) >= distanceSquared;
+    }
+    boolean isTouching(CollidableBox box){
+        // Vector between circle and box centers
+        Vec2 normal = new Vec2(box.position.x - position.x,
+                box.position.y - position.y);
+
+        // Box's centers
+        float xExtent = box.width / 2.0f;
+        float yExtent = box.height / 2.0f;
+
+        Vec2 closestPoint = new Vec2(Formulas.clamp(-xExtent, xExtent, normal.x),
+                Formulas.clamp(-yExtent, yExtent, normal.y));
+
+        // If the normal equals the closest point, then the circle is inside the box
+        if(normal.equals(closestPoint))
+        {
+            return true;
+        }
+
+        normal = new Vec2(normal.x - closestPoint.x, normal.y - closestPoint.y);
+
+        float distanceSquared = normal.getX() * normal.getX() + normal.getY() * normal.getY();
+
+        return distanceSquared < radius * radius;
+    }
+
 
     public float getWidth(){ return radius*2; }
     public float getHeight(){ return radius*2; }
