@@ -19,19 +19,21 @@ public class Body extends Entity{
     private boolean circle;
     UserInputListener input;
 
-    public Body(float x, float y, boolean circle, Material material)
+    public Body(float x, float y, float width, float height, Material material)
     {
-        this.circle = circle;
-        if(circle)
-        {
-            collisionBox = GameManager.world.addCircle(x, y, RADIUS, material);
-            visuals = new Circle(x, y, RADIUS);
-        }
-        else
-        {
-            collisionBox = GameManager.world.addBox(x, y, RADIUS*2, RADIUS*2, material);
-            visuals = new Rectangle(x - RADIUS, y - RADIUS, RADIUS*2, RADIUS*2);
-        }
+        this.circle = false;
+        collisionBox = GameManager.world.addBox(x, y, width, height, material);
+        visuals = new Rectangle(x - width / 2, y - height / 2, width, height);
+
+        setColor(material);
+
+    }
+
+    public Body(float x, float y, float radius, Material material)
+    {
+        this.circle = true;
+        collisionBox = GameManager.world.addCircle(x, y, radius, material);
+        visuals = new Circle(x, y, RADIUS);
 
         setColor(material);
 
@@ -43,38 +45,29 @@ public class Body extends Entity{
         float yvel = collisionBox.getYvelocity();
         float xvel = collisionBox.getXvelocity();
 
-        if(Settings.getGravity() && yvel < MAX_AXIS_VELOCITY)
-        {
-            collisionBox.applyForce(new Vec2(0, 1));
-        }
+        float xaccel = 0;
+        float yaccel = 0;
+
         if(input != null) {
-            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
-                // nothing for now
-            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
-                //collisionBox.applyForce(new Vec2(0,-2));
-            } else {
-                if (Math.abs(yvel) >= 0.1f) {
-                    yvel -= Math.abs(yvel) / yvel * 0.1f;
-                } else {
-                    yvel = 0;
-                }
+            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY && !Settings.getGravity()) {
+                yaccel = ACCELERATION;
+            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY && !Settings.getGravity()) {
+                yaccel = -ACCELERATION;
             }
 
             if (input.isRight() && !input.isLeft() && xvel < MAX_AXIS_VELOCITY) {
-                collisionBox.applyForce(new Vec2(ACCELERATION, 0));
+                xaccel = ACCELERATION;
             } else if (!input.isRight() && input.isLeft() && xvel > -MAX_AXIS_VELOCITY) {
-                collisionBox.applyForce(new Vec2(-ACCELERATION, 0));
-            } else {
-                if (Math.abs(xvel) >= 0.1f) {
-                    xvel -= Math.abs(xvel) / xvel * 0.1f;
-                } else {
-                    xvel = 0;
-                }
+                xaccel = -ACCELERATION;
+            }
+
+            if(input.isBoost())
+            {
+                xaccel *= 20.0f;
             }
         }
 
-        collisionBox.setXvelocity(xvel);
-        collisionBox.setYvelocity(yvel);
+        collisionBox.applyForce(new Vec2(xaccel, yaccel));
     }
 
     public void draw(float alpha)

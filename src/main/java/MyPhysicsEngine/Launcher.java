@@ -11,10 +11,10 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Settings.setWindowSize(800, 800);
+        Settings.setWindowSize(Settings.getWindowWidth(), Settings.getWindowHeight());
         GameManager game = new GameManager();
 
-        Scene scene = new Scene(game, 800, 800);
+        Scene scene = new Scene(game, Settings.getWindowWidth(), Settings.getWindowHeight());
 
         primaryStage.setScene(scene);
         primaryStage.show();

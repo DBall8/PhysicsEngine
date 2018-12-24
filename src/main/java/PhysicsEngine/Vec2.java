@@ -10,16 +10,18 @@ public class Vec2 {
         this.y = y;
     }
 
-    public void mult(float scalar)
+    public Vec2 mult(float scalar)
     {
         x *= scalar;
         y *= scalar;
+        return this;
     }
 
-    public void add(Vec2 other)
+    public Vec2 add(Vec2 other)
     {
         x += other.x;
         y += other.y;
+        return this;
     }
 
     public void zero()
@@ -40,6 +42,7 @@ public class Vec2 {
     public void normalize()
     {
         float magnitude = magnitude();
+        if(magnitude == 0) return;
         x /= magnitude;
         y /= magnitude;
     }

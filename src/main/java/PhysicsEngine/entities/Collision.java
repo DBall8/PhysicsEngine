@@ -42,6 +42,7 @@ public class Collision {
         float e = Math.min(o2.getRestitution(), o1.getRestitution());
 
         // Get the impulse scalar from the normal velocity, the restitution, and the inverted masses
+        // j times normal is normal force
         float j = -(1.0f + e) * normalVelocity;
         j /= o1.getInvertedMass() + o2.getInvertedMass();
 
@@ -49,9 +50,46 @@ public class Collision {
         Vec2 resolutionVec = normal.copy();
         resolutionVec.mult(j);
 
-        o2.applyForce(resolutionVec);
-        resolutionVec.mult(-1.0f);
-        o1.applyForce(resolutionVec);
+        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
+        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
+        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
+        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
+
+        applyFriction(relativeVelocity, j);
+    }
+
+    void applyFriction(Vec2 relativeVelocity, float j)
+    {
+//        float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
+//        j = -1.0f * normalVelocity;
+//        j /= o1.getInvertedMass() + o2.getInvertedMass();
+
+        // Tangent to normal, for the friction force
+        Vec2 tangent = Formulas.vecMult(normal, -1.0f * Formulas.dotProduct(relativeVelocity, normal));
+        tangent = Formulas.vecAdd(relativeVelocity, tangent);
+        tangent.normalize();
+
+        float jF = -1.0f * Formulas.dotProduct(relativeVelocity, tangent);
+        jF /= (o1.getInvertedMass() + o2.getInvertedMass());
+
+        // get the coefficient of friction to use for this collision
+        float mu =  (o1.getStaticFriction() + o2.getStaticFriction()) / 2.0f;
+
+        Vec2 frictionVec;
+        if(Math.abs(jF) < mu * j)
+        {
+            frictionVec = tangent.mult(jF);
+        }
+        else
+        {
+            mu = (o1.getDynamicFriction() + o2.getDynamicFriction()) / 2.0f;
+            frictionVec = tangent.mult(-1.0f * j * mu);
+        }
+
+        o1.xvelocity -= o1.getInvertedMass() * frictionVec.x;
+        o1.yvelocity -= o1.getInvertedMass() * frictionVec.y;
+        o2.xvelocity += o2.getInvertedMass() * frictionVec.x;
+        o2.yvelocity += o2.getInvertedMass() * frictionVec.y;
     }
 
     void correctPosition()

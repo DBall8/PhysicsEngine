@@ -2,21 +2,22 @@ package PhysicsEngine.entities;
 
 import PhysicsEngine.Formulas;
 import PhysicsEngine.Material;
+import PhysicsEngine.PhysicsWorld;
 import PhysicsEngine.Vec2;
 
 public class CollidableCircle extends CollidableObject {
 
     float radius;
 
-    public CollidableCircle(Vec2 p, float r)
+    public CollidableCircle(PhysicsWorld world, Vec2 p, float r)
     {
-        super(p, Material.Wood, (float)(Math.PI * r * r));
+        super(world, p, Material.Wood, (float)(Math.PI * r * r));
         this.radius = r;
     }
 
-    public CollidableCircle(Vec2 p, float r, Material material)
+    public CollidableCircle(PhysicsWorld world, Vec2 p, float r, Material material)
     {
-        super(p, material, (float)(Math.PI * r * r));
+        super(world, p, material, (float)(Math.PI * r * r));
         this.radius = r;
     }
 

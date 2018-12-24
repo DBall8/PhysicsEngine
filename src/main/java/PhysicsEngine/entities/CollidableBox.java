@@ -1,6 +1,7 @@
 package PhysicsEngine.entities;
 
 import PhysicsEngine.Material;
+import PhysicsEngine.PhysicsWorld;
 import PhysicsEngine.Vec2;
 
 public class CollidableBox extends CollidableObject {
@@ -8,16 +9,16 @@ public class CollidableBox extends CollidableObject {
     float width;
     float height;
 
-    public CollidableBox(Vec2 p, float width, float height)
+    public CollidableBox(PhysicsWorld world, Vec2 p, float width, float height)
     {
-        super(p, Material.Wood, width * height);
+        super(world, p, Material.Wood, width * height);
         this.width = width;
         this.height = height;
     }
 
-    public CollidableBox(Vec2 p, float width, float height, Material material)
+    public CollidableBox(PhysicsWorld world, Vec2 p, float width, float height, Material material)
     {
-        super(p, material, width * height);
+        super(world, p, material, width * height);
         this.width = width;
         this.height = height;
     }

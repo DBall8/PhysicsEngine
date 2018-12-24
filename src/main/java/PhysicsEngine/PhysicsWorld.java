@@ -8,43 +8,58 @@ import java.util.List;
 
 public class PhysicsWorld {
 
-    private final static float FRAMERATE = 120;
+    private final static float INITIAL_FRAMERATE = 120;
     private final static float TIME_SCALE_FACTOR = 120.0f;
 
-    private final static float TIME_STEP = 1.0f / FRAMERATE;
-    private final static float scaledTimeStep = TIME_STEP * TIME_SCALE_FACTOR;
+    private final static float TIME_STEP = 1.0f / INITIAL_FRAMERATE;
+    private float scaledTimeStep = TIME_STEP * TIME_SCALE_FACTOR;
+
+    private float collisionPrecision = 50;
 
     private List<CollidableCircle> circles = new ArrayList<>();
     private List<CollidableBox> boxes = new ArrayList<>();
 
     float accumulator = 0;
 
-    public PhysicsWorld(){}
+    private boolean friction = true;
+    private float gravity = 10;
+
+    public PhysicsWorld(float gravity, boolean friction){
+        this.gravity = gravity;
+        this.friction = friction;
+    }
+    public PhysicsWorld(float gravity){
+        this.gravity = gravity;
+    }
+    public PhysicsWorld()
+    {
+
+    }
 
     public CollidableCircle addCircle(float x, float y, float radius)
     {
-        CollidableCircle c = new CollidableCircle(new Vec2(x, y), radius);
+        CollidableCircle c = new CollidableCircle(this, new Vec2(x, y), radius);
         circles.add(c);
         return c;
     }
 
     public CollidableCircle addCircle(float x, float y, float radius, Material material )
     {
-        CollidableCircle c = new CollidableCircle(new Vec2(x, y), radius, material);
+        CollidableCircle c = new CollidableCircle(this, new Vec2(x, y), radius, material);
         circles.add(c);
         return c;
     }
 
     public CollidableBox addBox(float centerx, float centery, float width, float height)
     {
-        CollidableBox b = new CollidableBox(new Vec2(centerx, centery), width, height);
+        CollidableBox b = new CollidableBox(this, new Vec2(centerx, centery), width, height);
         boxes.add(b);
         return b;
     }
 
     public CollidableBox addBox(float centerx, float centery, float width, float height, Material material)
     {
-        CollidableBox b = new CollidableBox(new Vec2(centerx, centery), width, height, material);
+        CollidableBox b = new CollidableBox(this, new Vec2(centerx, centery), width, height, material);
         boxes.add(b);
         return b;
     }
@@ -57,9 +72,11 @@ public class PhysicsWorld {
             accumulator = 0.5f;
         }
 
+        if(Math.abs(gravity) > 0) applyGravity();
+
         while(accumulator >= TIME_STEP)
         {
-            checkCollisions(scaledTimeStep);
+            for(int i=0; i < collisionPrecision; i++) checkCollisions(scaledTimeStep);
             applyForces();
             move(scaledTimeStep);
             accumulator -= TIME_STEP;
@@ -110,6 +127,19 @@ public class PhysicsWorld {
         return time;
     }
 
+    private void applyGravity()
+    {
+        for(CollidableCircle circle: circles)
+        {
+            circle.applyGravity(gravity);
+        }
+
+        for(CollidableBox box: boxes)
+        {
+            box.applyGravity(gravity);
+        }
+    }
+
     private void move(float timeStep)
     {
         for(CollidableCircle c: circles)
@@ -135,4 +165,18 @@ public class PhysicsWorld {
             b.applyTotalForce();
         }
     }
+
+    public void setUpdatesPerFrame(int updates)
+    {
+        float timeStep = 1.0f / updates;
+        scaledTimeStep = timeStep * TIME_SCALE_FACTOR;
+    }
+
+    public void setCollisionPrecision(float precision)
+    {
+        collisionPrecision = precision;
+    }
+
+    public boolean isGravity(){ return Math.abs(gravity) > 0; }
+    public boolean isFriction(){ return friction; }
 }

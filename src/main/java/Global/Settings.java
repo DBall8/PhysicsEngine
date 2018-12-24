@@ -3,8 +3,8 @@ package Global;
 public class Settings {
 
     private static final int FRAMERATE = 120;
-    private static int WIDTH = 800;
-    private static int HEIGHT = 800;
+    private static int WIDTH = 1200;
+    private static int HEIGHT = 900;
     private static final boolean GRAVITY = true;
 
     private static class Settings_{

@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class GameManager extends Pane {
 
@@ -38,28 +39,28 @@ public class GameManager extends Pane {
 
     public void start(Scene scene){
         this.scene = scene;
-        Body p = new Body(50, 50, false, Material.Wood);
+        Body p = new Body(50, 50, 40, 40, Material.Wood);
         input = new UserInputListener(scene);
         p.setInput(input);
         addObject(p);
         p1 = p;
 
-        Body p2 = new Body(100, 100, false, Material.Metal);
+        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
         addObject(p2);
 
-        Body p3 = new Body(400, 400, true, Material.Rock);
+        Body p3 = new Body(400, 50, 20, Material.Rock);
         addObject(p3);
 
-        Wall wall1 = new Wall(-30, 400, 80, 800);
+        Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
         addObject(wall1);
 
-        Wall wall2 = new Wall(830, 400, 80, 800);
+        Wall wall2 = new Wall(Settings.getWindowWidth() + 30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
         addObject(wall2);
 
-        Wall wall3 = new Wall(400, -30, 780, 80);
+        Wall wall3 = new Wall(Settings.getWindowWidth() / 2, -30, Settings.getWindowWidth() - 20, 80);
         addObject(wall3);
 
-        Wall wall4 = new Wall(400, 830, 780, 80);
+        Wall wall4 = new Wall(Settings.getWindowWidth() / 2, Settings.getWindowHeight() + 30, Settings.getWindowWidth() - 20, 80);
         addObject(wall4);
         ground = wall4;
 
@@ -91,9 +92,17 @@ public class GameManager extends Pane {
 
         if(input.isMousePressed())
         {
-            boolean circle = Math.random() > 0.5;
-            Body newBody = new Body(input.getMouseX(), input.getMouseY(), circle, Material.Bouncy);
+            Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, 40, Material.Metal);
             addObject(newBody);
+        }
+
+        if(p1.getCollisionBox().isGrounded())
+        {
+            p1.getVisuals().setFill(Color.RED);
+        }
+        else
+        {
+            p1.getVisuals().setFill(Color.GREEN);
         }
 
         if(Settings.getGravity() && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
