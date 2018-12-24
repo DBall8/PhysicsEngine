@@ -21,8 +21,6 @@ public abstract class CollidableObject {
     float mass;
     float invertedMass = 0.05f;
 
-    boolean isGrounded = false;
-
     PhysicsWorld world;
 
     CollidableObject(PhysicsWorld world, Vec2 p, Material material, float volume)
@@ -52,20 +50,17 @@ public abstract class CollidableObject {
 
     public void applyForce(Vec2 force)
     {
+        force.mult(world.getForceScaleFactor());
         totalForce.add(force);
     }
 
     public void applyGravity(float gravity)
     {
-        totalForce.y += gravity * GRAVITY_SCALAR * mass / (MASS_SCALING_FACTOR );
+        totalForce.y += gravity * GRAVITY_SCALAR * mass / (MASS_SCALING_FACTOR);
     }
 
     public void applyTotalForce()
     {
-        if(world.isGravity() && Math.abs(totalForce.y) < TINY_AMOUNT)
-        {
-            isGrounded = true;
-        }
         xvelocity += invertedMass * totalForce.x;
         yvelocity += invertedMass * totalForce.y;
         totalForce.zero();
@@ -84,7 +79,7 @@ public abstract class CollidableObject {
 
     public boolean isGrounded()
     {
-        return Math.abs(yvelocity) < TINY_AMOUNT;
+        return false;
     }
 
     public void setXvelocity(float xvel) { this.xvelocity = xvel; }

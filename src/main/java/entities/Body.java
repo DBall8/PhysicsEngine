@@ -33,7 +33,7 @@ public class Body extends Entity{
     {
         this.circle = true;
         collisionBox = GameManager.world.addCircle(x, y, radius, material);
-        visuals = new Circle(x, y, RADIUS);
+        visuals = new Circle(x, y, radius);
 
         setColor(material);
 
@@ -49,9 +49,9 @@ public class Body extends Entity{
         float yaccel = 0;
 
         if(input != null) {
-            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY && !Settings.getGravity()) {
+            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY && Settings.getGravity() == 0) {
                 yaccel = ACCELERATION;
-            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY && !Settings.getGravity()) {
+            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY && Settings.getGravity() == 0) {
                 yaccel = -ACCELERATION;
             }
 

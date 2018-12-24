@@ -27,7 +27,7 @@ public class GameManager extends Pane {
 
     UserInputListener input;
 
-    public static PhysicsWorld world = new PhysicsWorld();
+    public static PhysicsWorld world = new PhysicsWorld(Settings.getGravity(), false);
 
     public GameManager(){
         super();
@@ -92,7 +92,7 @@ public class GameManager extends Pane {
 
         if(input.isMousePressed())
         {
-            Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, 40, Material.Metal);
+            Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, Material.Bouncy);
             addObject(newBody);
         }
 
@@ -105,7 +105,7 @@ public class GameManager extends Pane {
             p1.getVisuals().setFill(Color.GREEN);
         }
 
-        if(Settings.getGravity() && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
+        if(Settings.getGravity() > 0 && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
         {
             p1.getCollisionBox().applyForce(new Vec2(0, -40));
         }

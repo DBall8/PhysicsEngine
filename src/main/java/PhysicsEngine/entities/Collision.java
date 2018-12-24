@@ -6,7 +6,7 @@ import PhysicsEngine.Vec2;
 
 public class Collision {
 
-    private final static float POSITION_CORRECTION_PERCENT = 0.8f;
+    private final static float POSITION_CORRECTION_PERCENT = 0.2f;
     private final static float MIN_POSITION_CORRECTION = 0.01f;
 
     CollidableObject o1;

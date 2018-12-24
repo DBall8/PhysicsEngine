@@ -8,13 +8,13 @@ import java.util.List;
 
 public class PhysicsWorld {
 
-    private final static float INITIAL_FRAMERATE = 120;
-    private final static float TIME_SCALE_FACTOR = 120.0f;
+    private final static float INITIAL_FRAMERATE = 120; // default frame rate
+    private final static float TIME_SCALE_FACTOR = 120; // factor for making time run faster and adjusting forces (might need to seperate)
 
-    private final static float TIME_STEP = 1.0f / INITIAL_FRAMERATE;
-    private float scaledTimeStep = TIME_STEP * TIME_SCALE_FACTOR;
-
-    private float collisionPrecision = 50;
+    private final static float TIME_STEP = 1.0f / INITIAL_FRAMERATE; // amount of time to step forward
+    private float scaledTimeStep = TIME_STEP * TIME_SCALE_FACTOR; // scaled time step to speed up moving things along
+    private float collisionPrecision = 50; // How many times it iterates through the collision, stops stacks squashing
+    private float forceScaleFactor = INITIAL_FRAMERATE / TIME_SCALE_FACTOR; // Scale from original update frame rate so scale forces
 
     private List<CollidableCircle> circles = new ArrayList<>();
     private List<CollidableBox> boxes = new ArrayList<>();
@@ -170,12 +170,15 @@ public class PhysicsWorld {
     {
         float timeStep = 1.0f / updates;
         scaledTimeStep = timeStep * TIME_SCALE_FACTOR;
+        forceScaleFactor = updates / TIME_SCALE_FACTOR;
     }
 
     public void setCollisionPrecision(float precision)
     {
         collisionPrecision = precision;
     }
+
+    public float getForceScaleFactor(){ return forceScaleFactor; }
 
     public boolean isGravity(){ return Math.abs(gravity) > 0; }
     public boolean isFriction(){ return friction; }
