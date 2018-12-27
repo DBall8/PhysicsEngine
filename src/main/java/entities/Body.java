@@ -5,7 +5,6 @@ import GameManager.UserInputListener;
 import Global.Settings;
 import PhysicsEngine.Material;
 import PhysicsEngine.Vec2;
-import PhysicsEngine.entities.CollidableCircle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;

@@ -6,6 +6,7 @@ import PhysicsEngine.PhysicsWorld;
 import PhysicsEngine.Vec2;
 import entities.Body;
 import entities.Entity;
+import entities.Ship;
 import entities.Wall;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -39,7 +40,8 @@ public class GameManager extends Pane {
 
     public void start(Scene scene){
         this.scene = scene;
-        Body p = new Body(50, 50, 40, 40, Material.Wood);
+        Ship p = new Ship(50, 50);
+//        Body p = new Body(50, 50, 40, 40, Material.Wood);
         input = new UserInputListener(scene);
         p.setInput(input);
         addObject(p);
