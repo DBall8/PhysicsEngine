@@ -73,7 +73,7 @@ public class PhysicsWorld {
             accumulator = 0.5f;
         }
 
-        if(Math.abs(worldSettings.getGravity()) > 0) applyGravity();
+        applyGravity();
 
         while(accumulator >= TIME_STEP)
         {
