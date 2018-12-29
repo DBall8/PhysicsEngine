@@ -1,4 +1,4 @@
-package PhysicsEngine;
+package PhysicsEngine.math;
 
 public class Vec2 {
     public float x;

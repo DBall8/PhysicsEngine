@@ -1,14 +1,13 @@
 package entities;
 
-import PhysicsEngine.entities.CollidableObject;
+import PhysicsEngine.PhysicsObject;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 
 public abstract class Entity {
 
     Shape visuals;
-    CollidableObject collisionBox;
+    PhysicsObject collisionBox;
 
     Entity(){}
 
@@ -18,7 +17,7 @@ public abstract class Entity {
 
     public Shape getVisuals() { return visuals; }
 
-    public CollidableObject getCollisionBox() {
+    public PhysicsObject getCollisionBox() {
         return collisionBox;
     }
 

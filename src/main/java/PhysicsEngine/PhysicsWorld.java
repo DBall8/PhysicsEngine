@@ -1,65 +1,66 @@
 package PhysicsEngine;
 
-import PhysicsEngine.entities.CollidableBox;
-import PhysicsEngine.entities.CollidableCircle;
+import PhysicsEngine.math.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhysicsWorld {
 
-    private final static float INITIAL_FRAMERATE = 120; // default frame rate
+    private final static int INITIAL_FRAMERATE = 120; // default frame rate
+    private final static float INITIAL_COLLISION_PRECISION = 50;
     private final static float TIME_SCALE_FACTOR = 120; // factor for making time run faster and adjusting forces (might need to seperate)
 
     private final static float TIME_STEP = 1.0f / INITIAL_FRAMERATE; // amount of time to step forward
-    private float scaledTimeStep = TIME_STEP * TIME_SCALE_FACTOR; // scaled time step to speed up moving things along
-    private float collisionPrecision = 50; // How many times it iterates through the collision, stops stacks squashing
-    private float forceScaleFactor = INITIAL_FRAMERATE / TIME_SCALE_FACTOR; // Scale from original update frame rate so scale forces
 
-    private List<CollidableCircle> circles = new ArrayList<>();
-    private List<CollidableBox> boxes = new ArrayList<>();
+    private List<PhysicsCircle> circles = new ArrayList<>();
+    private List<PhysicsBox> boxes = new ArrayList<>();
 
-    float accumulator = 0;
+    private float accumulator = 0;
 
-    private boolean friction = true;
-    private float gravity = 10;
+    private WorldSettings worldSettings = new WorldSettings();
 
     public PhysicsWorld(float gravity, boolean friction){
-        this.gravity = gravity;
-        this.friction = friction;
+        worldSettings.setGravity(gravity);
+        worldSettings.setFriction(friction);
+        setCollisionPrecision(INITIAL_COLLISION_PRECISION);
+        setUpdatesPerFrame(INITIAL_FRAMERATE);
     }
     public PhysicsWorld(float gravity){
-        this.gravity = gravity;
+        worldSettings.setGravity(gravity);
+        setCollisionPrecision(INITIAL_COLLISION_PRECISION);
+        setUpdatesPerFrame(INITIAL_FRAMERATE);
     }
     public PhysicsWorld()
     {
-
+        setCollisionPrecision(INITIAL_COLLISION_PRECISION);
+        setUpdatesPerFrame(INITIAL_FRAMERATE);
     }
 
-    public CollidableCircle addCircle(float x, float y, float radius)
+    public PhysicsCircle addCircle(float x, float y, float radius)
     {
-        CollidableCircle c = new CollidableCircle(this, new Vec2(x, y), radius);
+        PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius);
         circles.add(c);
         return c;
     }
 
-    public CollidableCircle addCircle(float x, float y, float radius, Material material )
+    public PhysicsCircle addCircle(float x, float y, float radius, Material material )
     {
-        CollidableCircle c = new CollidableCircle(this, new Vec2(x, y), radius, material);
+        PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius, material);
         circles.add(c);
         return c;
     }
 
-    public CollidableBox addBox(float centerx, float centery, float width, float height)
+    public PhysicsBox addBox(float centerx, float centery, float width, float height)
     {
-        CollidableBox b = new CollidableBox(this, new Vec2(centerx, centery), width, height);
+        PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height);
         boxes.add(b);
         return b;
     }
 
-    public CollidableBox addBox(float centerx, float centery, float width, float height, Material material)
+    public PhysicsBox addBox(float centerx, float centery, float width, float height, Material material)
     {
-        CollidableBox b = new CollidableBox(this, new Vec2(centerx, centery), width, height, material);
+        PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height, material);
         boxes.add(b);
         return b;
     }
@@ -72,13 +73,13 @@ public class PhysicsWorld {
             accumulator = 0.5f;
         }
 
-        if(Math.abs(gravity) > 0) applyGravity();
+        if(Math.abs(worldSettings.getGravity()) > 0) applyGravity();
 
         while(accumulator >= TIME_STEP)
         {
-            for(int i=0; i < collisionPrecision; i++) checkCollisions(scaledTimeStep);
+            for(int i=0; i < worldSettings.getCollisionPrecision(); i++) checkCollisions(worldSettings.getScaledTimeStep());
             applyForces();
-            move(scaledTimeStep);
+            move(worldSettings.getScaledTimeStep());
             accumulator -= TIME_STEP;
         }
 
@@ -101,7 +102,7 @@ public class PhysicsWorld {
 
         for(int i=0; i<circles.size(); i++)
         {
-            CollidableCircle c =  circles.get(i);
+            PhysicsCircle c =  circles.get(i);
             // Have each circle check against each circle further down the list
             for(int j=i+1; j<circles.size(); j++)
             {
@@ -117,7 +118,7 @@ public class PhysicsWorld {
         // Check each box against all other boxes further down the list
         for(int i=0; i<boxes.size()-1; i++)
         {
-            CollidableBox b =  boxes.get(i);
+            PhysicsBox b =  boxes.get(i);
             for(int j=i+1; j<boxes.size(); j++)
             {
                 b.checkCollision(boxes.get(j));
@@ -129,25 +130,25 @@ public class PhysicsWorld {
 
     private void applyGravity()
     {
-        for(CollidableCircle circle: circles)
+        for(PhysicsCircle circle: circles)
         {
-            circle.applyGravity(gravity);
+            circle.applyGravity();
         }
 
-        for(CollidableBox box: boxes)
+        for(PhysicsBox box: boxes)
         {
-            box.applyGravity(gravity);
+            box.applyGravity();
         }
     }
 
     private void move(float timeStep)
     {
-        for(CollidableCircle c: circles)
+        for(PhysicsCircle c: circles)
         {
             c.move(timeStep);
         }
 
-        for(CollidableBox b: boxes)
+        for(PhysicsBox b: boxes)
         {
             b.move(timeStep);
         }
@@ -155,12 +156,12 @@ public class PhysicsWorld {
 
     private void applyForces()
     {
-        for(CollidableCircle c: circles)
+        for(PhysicsCircle c: circles)
         {
             c.applyTotalForce();
         }
 
-        for(CollidableBox b: boxes)
+        for(PhysicsBox b: boxes)
         {
             b.applyTotalForce();
         }
@@ -169,17 +170,22 @@ public class PhysicsWorld {
     public void setUpdatesPerFrame(int updates)
     {
         float timeStep = 1.0f / updates;
-        scaledTimeStep = timeStep * TIME_SCALE_FACTOR;
-        forceScaleFactor = updates / TIME_SCALE_FACTOR;
+        worldSettings.setScaledTimeStep(timeStep * TIME_SCALE_FACTOR);
+        worldSettings.setForceScaleFactor(updates / TIME_SCALE_FACTOR);
     }
 
     public void setCollisionPrecision(float precision)
     {
-        collisionPrecision = precision;
+        worldSettings.setCollisionPrecision(precision);
     }
 
-    public float getForceScaleFactor(){ return forceScaleFactor; }
+    public void setGravityDirection(float xcomponent, float ycomponent)
+    {
+        Vec2 gravity = new Vec2(xcomponent, ycomponent);
+        gravity.normalize();
+        worldSettings.setGravityDirection(gravity);
+    }
 
-    public boolean isGravity(){ return Math.abs(gravity) > 0; }
-    public boolean isFriction(){ return friction; }
+    public void setGravity(float gravity){ worldSettings.setGravity(gravity); }
+    public void setFriction(boolean friction){ worldSettings.setFriction(friction); }
 }

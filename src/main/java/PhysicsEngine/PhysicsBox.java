@@ -1,34 +1,32 @@
-package PhysicsEngine.entities;
+package PhysicsEngine;
 
-import PhysicsEngine.Material;
-import PhysicsEngine.PhysicsWorld;
-import PhysicsEngine.Vec2;
+import PhysicsEngine.math.Vec2;
 
-public class CollidableBox extends CollidableObject {
+public class PhysicsBox extends PhysicsObject {
 
     float width;
     float height;
 
-    public CollidableBox(PhysicsWorld world, Vec2 p, float width, float height)
+    PhysicsBox(WorldSettings worldSettings, Vec2 p, float width, float height)
     {
-        super(world, p, Material.Wood, width * height);
+        super(worldSettings, p, Material.Wood, width * height);
         this.width = width;
         this.height = height;
     }
 
-    public CollidableBox(PhysicsWorld world, Vec2 p, float width, float height, Material material)
+    PhysicsBox(WorldSettings worldSettings, Vec2 p, float width, float height, Material material)
     {
-        super(world, p, material, width * height);
+        super(worldSettings, p, material, width * height);
         this.width = width;
         this.height = height;
     }
 
-    public void checkCollision(CollidableCircle circle)
+    void checkCollision(PhysicsCircle circle)
     {
         circle.checkCollision(this);
     }
 
-    public void checkCollision(CollidableBox box){
+    void checkCollision(PhysicsBox box){
 
         // Get the normal vector for the boxes' centers
         Vec2 normal = new Vec2(box.position.x - position.x, box.position.y - position.y);
@@ -98,10 +96,10 @@ public class CollidableBox extends CollidableObject {
         }
     }
 
-    boolean isTouching(CollidableCircle circle){
+    public boolean isTouching(PhysicsCircle circle){
         return circle.isTouching(this);
     }
-    boolean isTouching(CollidableBox box){
+    public boolean isTouching(PhysicsBox box){
 
         // Get the normal vector for the boxes' centers
         Vec2 normal = new Vec2(box.position.x - position.x, box.position.y - position.y);
@@ -130,10 +128,6 @@ public class CollidableBox extends CollidableObject {
         return false;
     }
 
-    public float minX(){ return position.x - width/2.0f; }
-    public float maxX(){ return position.x + width/2.0f; }
-    public float minY(){ return position.y - height/2.0f; }
-    public float maxY(){ return position.y + height/2.0f; }
     public float getWidth(){ return width; }
     public float getHeight(){ return height; }
 }

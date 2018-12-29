@@ -1,4 +1,4 @@
-package PhysicsEngine;
+package PhysicsEngine.math;
 
 public class Formulas {
 
@@ -25,5 +25,15 @@ public class Formulas {
     public static Vec2 vecAdd(Vec2 v, float scalar)
     {
         return new Vec2(v.x + scalar, v.y + scalar);
+    }
+
+    public static float getXComponent(float magnitude, float angleInRadians)
+    {
+        return (float)(magnitude * Math.sin(angleInRadians));
+    }
+
+    public static float getYComponent(float magnitude, float angleInRadians)
+    {
+        return (float)(-1.0f * magnitude * Math.cos(angleInRadians));
     }
 }

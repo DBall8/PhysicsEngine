@@ -1,27 +1,25 @@
-package PhysicsEngine.entities;
+package PhysicsEngine;
 
-import PhysicsEngine.Formulas;
-import PhysicsEngine.Material;
-import PhysicsEngine.PhysicsWorld;
-import PhysicsEngine.Vec2;
+import PhysicsEngine.math.Formulas;
+import PhysicsEngine.math.Vec2;
 
-public class CollidableCircle extends CollidableObject {
+public class PhysicsCircle extends PhysicsObject {
 
-    float radius;
+    private float radius;
 
-    public CollidableCircle(PhysicsWorld world, Vec2 p, float r)
+    PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r)
     {
-        super(world, p, Material.Wood, (float)(Math.PI * r * r));
+        super(worldSettings, p, Material.Wood, (float)(Math.PI * r * r));
         this.radius = r;
     }
 
-    public CollidableCircle(PhysicsWorld world, Vec2 p, float r, Material material)
+    PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r, Material material)
     {
-        super(world, p, material, (float)(Math.PI * r * r));
+        super(worldSettings, p, material, (float)(Math.PI * r * r));
         this.radius = r;
     }
 
-    public void checkCollision(CollidableCircle circle)
+    void checkCollision(PhysicsCircle circle)
     {
         float radiusSum = radius + circle.radius; // distance between the two circles when touching
         float dx = position.x - circle.position.x; // x distance
@@ -51,11 +49,11 @@ public class CollidableCircle extends CollidableObject {
         collision.applyImpulse();
     }
 
-    public void checkCollision(CollidableBox box)
+    void checkCollision(PhysicsBox box)
     {
         // Vector between circle and box centers
-        Vec2 normal = new Vec2(box.position.x - position.x,
-                               box.position.y - position.y);
+        Vec2 normal = new Vec2(box.getX() - position.x,
+                               box.getY() - position.y);
 
         // Box's centers
         float xExtent = box.width / 2.0f;
@@ -112,7 +110,7 @@ public class CollidableCircle extends CollidableObject {
         }
         collision.applyImpulse();
     }
-    boolean isTouching(CollidableCircle circle){
+    public boolean isTouching(PhysicsCircle circle){
         float radiusSum = radius + circle.radius; // distance between the two circles when touching
         float dx = position.x - circle.position.x; // x distance
         float dy = position.y - circle.position.y; // ydistance
@@ -121,10 +119,10 @@ public class CollidableCircle extends CollidableObject {
         float distanceSquared = dx*dx + dy*dy;
         return  (radiusSum * radiusSum) >= distanceSquared;
     }
-    boolean isTouching(CollidableBox box){
+    public boolean isTouching(PhysicsBox box){
         // Vector between circle and box centers
-        Vec2 normal = new Vec2(box.position.x - position.x,
-                box.position.y - position.y);
+        Vec2 normal = new Vec2(box.getHeight() - position.x,
+                box.getY() - position.y);
 
         // Box's centers
         float xExtent = box.width / 2.0f;
@@ -145,10 +143,4 @@ public class CollidableCircle extends CollidableObject {
 
         return distanceSquared < radius * radius;
     }
-
-
-    public float getWidth(){ return radius*2; }
-    public float getHeight(){ return radius*2; }
-
-
 }

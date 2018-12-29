@@ -4,7 +4,7 @@ import GameManager.GameManager;
 import GameManager.UserInputListener;
 import Global.Settings;
 import PhysicsEngine.Material;
-import PhysicsEngine.Vec2;
+import PhysicsEngine.PhysicsBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -48,9 +48,9 @@ public class Body extends Entity{
         float yaccel = 0;
 
         if(input != null) {
-            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY && Settings.getGravity() == 0) {
+            if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
                 yaccel = ACCELERATION;
-            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY && Settings.getGravity() == 0) {
+            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
                 yaccel = -ACCELERATION;
             }
 
@@ -66,7 +66,7 @@ public class Body extends Entity{
             }
         }
 
-        collisionBox.applyForce(new Vec2(xaccel, yaccel));
+        collisionBox.applyForce(xaccel, yaccel);
     }
 
     public void draw(float alpha)
@@ -80,8 +80,8 @@ public class Body extends Entity{
         }
         else
         {
-            float x = collisionBox.getX() - collisionBox.getWidth()/2 + (alpha * collisionBox.getXvelocity());
-            float y = collisionBox.getY() - collisionBox.getHeight()/2 + (alpha * collisionBox.getYvelocity());
+            float x = collisionBox.getX() - ((PhysicsBox)collisionBox).getWidth()/2 + (alpha * collisionBox.getXvelocity());
+            float y = collisionBox.getY() - ((PhysicsBox)collisionBox).getHeight()/2 + (alpha * collisionBox.getYvelocity());
             ((Rectangle)visuals).setX(x);
             ((Rectangle)visuals).setY(y);
         }

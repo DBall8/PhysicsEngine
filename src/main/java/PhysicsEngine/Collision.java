@@ -1,22 +1,21 @@
-package PhysicsEngine.entities;
+package PhysicsEngine;
 
-import PhysicsEngine.Formulas;
-import PhysicsEngine.PhysicsWorld;
-import PhysicsEngine.Vec2;
+import PhysicsEngine.math.Formulas;
+import PhysicsEngine.math.Vec2;
 
-public class Collision {
+class Collision {
 
     private final static float POSITION_CORRECTION_PERCENT = 0.2f;
     private final static float MIN_POSITION_CORRECTION = 0.01f;
 
-    CollidableObject o1;
-    CollidableObject o2;
+    PhysicsObject o1;
+    PhysicsObject o2;
     Vec2 normal;
     float penetration;
 
     Collision(){}
 
-    Collision(CollidableObject o1, CollidableObject o2, Vec2 normal, float penetration)
+    Collision(PhysicsObject o1, PhysicsObject o2, Vec2 normal, float penetration)
     {
         this.o1 = o1;
         this.o2 = o2;
@@ -97,7 +96,7 @@ public class Collision {
         if(penetration <= MIN_POSITION_CORRECTION) return;
 
         float correctionAmount;
-        correctionAmount = (penetration / (o1.invertedMass + o2.invertedMass)) * POSITION_CORRECTION_PERCENT;
+        correctionAmount = (penetration / (o1.getInvertedMass() + o2.getInvertedMass())) * POSITION_CORRECTION_PERCENT;
 
         Vec2 correctionVector = normal.copy();
         correctionVector.mult(correctionAmount);
@@ -108,8 +107,8 @@ public class Collision {
         o2.position.y += o2.getInvertedMass() * correctionVector.y;
     }
 
-    public void setO1(CollidableObject o1){ this.o1 = o1; }
-    public void setO2(CollidableObject o2){ this.o2 = o2; }
+    public void setO1(PhysicsObject o1){ this.o1 = o1; }
+    public void setO2(PhysicsObject o2){ this.o2 = o2; }
     public void setNormal(Vec2 normal){ this.normal = normal; }
     public void setPenetration(float penetration){ this.penetration = penetration; }
 }

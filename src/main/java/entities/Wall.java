@@ -2,6 +2,7 @@ package entities;
 
 import GameManager.GameManager;
 import PhysicsEngine.Material;
+import PhysicsEngine.PhysicsBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -34,8 +35,8 @@ public class Wall extends Entity{
         }
         else
         {
-            ((Rectangle)visuals).setX(collisionBox.getX() - collisionBox.getWidth()/2);
-            ((Rectangle)visuals).setY(collisionBox.getY() - collisionBox.getHeight()/2);
+            ((Rectangle)visuals).setX(collisionBox.getX() - ((PhysicsBox)collisionBox).getWidth()/2);
+            ((Rectangle)visuals).setY(collisionBox.getY() - ((PhysicsBox)collisionBox).getHeight()/2);
         }
 
     }
