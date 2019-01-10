@@ -10,6 +10,10 @@ public abstract class PhysicsObject{
     protected final static float TINY_AMOUNT = 0.01f;
 
     Vec2 position;
+    float orientation = 0;//(float)(Math.PI/4); // radians
+    float angularVelocity;
+
+    float torque;
     Vec2 totalForce;
 
     float xvelocity;
@@ -112,6 +116,7 @@ public abstract class PhysicsObject{
     public float getY(){ return position.getY(); }
     public float getXvelocity() { return xvelocity; }
     public float getYvelocity() { return yvelocity; }
+    public float getOrientation() { return orientation; }
     float getStaticFriction() { return material.getStaticFriction(); }
     float getDynamicFriction() { return material.getDynamicFriction(); }
     public float getMass() { return mass; }

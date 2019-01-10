@@ -55,7 +55,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(50, 50, 40, 40, Material.Wood);
+            Body b = new Body(20, 20, 40, 40, Material.Wood);
             b.setInput(input);
             p = b;
         }
@@ -114,18 +114,9 @@ public class GameManager extends Pane {
             addObject(newBody);
         }
 
-        if(p1.getCollisionBox().isGrounded())
-        {
-            p1.getVisuals().setFill(Color.RED);
-        }
-        else
-        {
-            p1.getVisuals().setFill(Color.GREEN);
-        }
-
         if(Settings.getGravity() > 0 && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
         {
-            p1.getCollisionBox().applyForce(0, -40);
+            p1.getCollisionBox().applyForce(0, -20);
         }
     }
 

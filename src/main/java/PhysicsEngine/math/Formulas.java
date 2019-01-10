@@ -36,4 +36,9 @@ public class Formulas {
     {
         return (float)(-1.0f * magnitude * Math.cos(angleInRadians));
     }
+
+    public static float cross(Vec2 v1, Vec2 v2)
+    {
+        return (v1.getX() * v2.getY()) - (v2.getX() * v1.getY());
+    }
 }

@@ -26,7 +26,7 @@ public class Ship extends Entity {
         });
         shape.setFill(Color.ORANGE);
 
-        visuals = shape;
+        visuals.getChildren().add(shape);
     }
 
     @Override

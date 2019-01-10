@@ -1,12 +1,13 @@
 package entities;
 
 import PhysicsEngine.PhysicsObject;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 
 public abstract class Entity {
 
-    Shape visuals;
+    Group visuals = new Group();
     PhysicsObject collisionBox;
 
     Entity(){}
@@ -15,14 +16,10 @@ public abstract class Entity {
 
     public void update(){}
 
-    public Shape getVisuals() { return visuals; }
+    public Group getVisuals() { return visuals; }
 
     public PhysicsObject getCollisionBox() {
         return collisionBox;
     }
 
-    public void setColor(Color color)
-    {
-        visuals.setFill(color);
-    }
 }

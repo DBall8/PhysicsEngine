@@ -5,9 +5,11 @@ import GameManager.UserInputListener;
 import Global.Settings;
 import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsBox;
+import PhysicsEngine.PhysicsCircle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 public class Body extends Entity{
 
@@ -15,27 +17,41 @@ public class Body extends Entity{
     private final static int MAX_AXIS_VELOCITY = 20;
     private final static float ACCELERATION = 1.0f * (60.0f / Settings.getFramerate());
 
+    private final static float ORIENT_SIZE = 2;
+
     private boolean circle;
     UserInputListener input;
+
+    Shape shape;
 
     public Body(float x, float y, float width, float height, Material material)
     {
         this.circle = false;
         collisionBox = GameManager.world.addBox(x, y, width, height, material);
-        visuals = new Rectangle(x - width / 2, y - height / 2, width, height);
+        shape = new Rectangle(0, 0, width, height);
 
         setColor(material);
 
+        Rectangle orient = new Rectangle(ORIENT_SIZE, height/2);
+        orient.setX(width/2 - ORIENT_SIZE/2);
+        orient.setFill(Color.BLACK);
+
+        visuals.getChildren().addAll(shape, orient);
     }
 
     public Body(float x, float y, float radius, Material material)
     {
         this.circle = true;
         collisionBox = GameManager.world.addCircle(x, y, radius, material);
-        visuals = new Circle(x, y, radius);
+        shape = new Circle(0 + radius, 0 + radius, radius);
 
         setColor(material);
 
+        Rectangle orient = new Rectangle(ORIENT_SIZE, radius);
+        orient.setX(radius - ORIENT_SIZE/2);
+        orient.setFill(Color.BLACK);
+
+        visuals.getChildren().addAll(shape, orient);
     }
 
     @Override
@@ -71,40 +87,48 @@ public class Body extends Entity{
 
     public void draw(float alpha)
     {
+
+        float x, y;
         if(circle)
         {
-            float x = collisionBox.getX() + (alpha * collisionBox.getXvelocity());
-            float y = collisionBox.getY() + (alpha * collisionBox.getYvelocity());
-            ((Circle)visuals).setCenterX(x);
-            ((Circle)visuals).setCenterY(y);
+            x = collisionBox.getX() - ((PhysicsCircle)collisionBox).getRadius() + (alpha * collisionBox.getXvelocity());
+            y = collisionBox.getY() - ((PhysicsCircle)collisionBox).getRadius() + (alpha * collisionBox.getYvelocity());
         }
         else
         {
-            float x = collisionBox.getX() - ((PhysicsBox)collisionBox).getWidth()/2 + (alpha * collisionBox.getXvelocity());
-            float y = collisionBox.getY() - ((PhysicsBox)collisionBox).getHeight()/2 + (alpha * collisionBox.getYvelocity());
-            ((Rectangle)visuals).setX(x);
-            ((Rectangle)visuals).setY(y);
+            x = collisionBox.getX() - ((PhysicsBox)collisionBox).getWidth()/2 + (alpha * collisionBox.getXvelocity());
+            y = collisionBox.getY() - ((PhysicsBox)collisionBox).getHeight()/2 + (alpha * collisionBox.getYvelocity());
         }
 
+        visuals.setTranslateX(x);
+        visuals.setTranslateY(y);
+
+        visuals.setRotate(collisionBox.getOrientation() * 180 / Math.PI);
+
+    }
+
+    public void setColor(Color color)
+    {
+        shape.setFill(color);
     }
 
     public void setColor(Material material)
     {
         if(material.equals(Material.Wood))
         {
-            visuals.setFill(Color.GREEN);
+            shape.setFill(Color.GREEN);
         }
         else if(material.equals(Material.Rock))
         {
-            visuals.setFill(Color.BROWN);
+            shape.setFill(Color.BROWN);
         }
         else if(material.equals(Material.Metal))
         {
-            visuals.setFill(Color.LIGHTBLUE);
+            shape.setFill(Color.LIGHTBLUE);
         }
         else if(material.equals(Material.Bouncy))
         {
-            visuals.setFill(Color.PINK);
+            shape.setFill(Color.PINK);
         }
     }
 

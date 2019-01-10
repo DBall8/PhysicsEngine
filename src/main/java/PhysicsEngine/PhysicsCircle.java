@@ -143,4 +143,6 @@ public class PhysicsCircle extends PhysicsObject {
 
         return distanceSquared < radius * radius;
     }
+
+    public float getRadius(){ return radius; }
 }
