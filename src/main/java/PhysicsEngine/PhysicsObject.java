@@ -10,11 +10,12 @@ public abstract class PhysicsObject{
     protected final static float TINY_AMOUNT = 0.01f;
 
     Vec2 position;
-    float orientation = 0;//(float)(Math.PI/4); // radians
-    float angularVelocity;
-
-    float torque;
     Vec2 totalForce;
+
+    float orientation;
+    float angularVelocity;
+    float torque;
+
 
     float xvelocity;
     float yvelocity;
@@ -30,6 +31,9 @@ public abstract class PhysicsObject{
     {
         this.worldSettings = worldSettings;
         position = p;
+        this.angularVelocity = 0;
+        this.orientation = 0;
+        this.torque = 0;
         this.xvelocity = 0;
         this.yvelocity = 0;
         this.material = material;

@@ -1,5 +1,7 @@
 package PhysicsEngine;
 
+import PhysicsEngine.math.MalformedPolygonException;
+import PhysicsEngine.math.Polygon;
 import PhysicsEngine.math.Vec2;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public class PhysicsWorld {
 
     private List<PhysicsCircle> circles = new ArrayList<>();
     private List<PhysicsBox> boxes = new ArrayList<>();
+    private List<PhysicsPolygon> polygons = new ArrayList<>();
 
     private float accumulator = 0;
 
@@ -63,6 +66,50 @@ public class PhysicsWorld {
         PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height, material);
         boxes.add(b);
         return b;
+    }
+
+    public PhysicsPolygon addPolygon(float centerx, float centery, Vec2[] points)
+    {
+        try
+        {
+            PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points));
+            polygons.add(p);
+            return p;
+        }
+        catch (MalformedPolygonException e)
+        {
+            System.err.println("ERROR: Points do not form a valid polygon.");
+            return null;
+        }
+    }
+
+    public PhysicsPolygon addPolygon(float centerx, float centery, Vec2[] points, Material material)
+    {
+        try
+        {
+            PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points), material);
+            polygons.add(p);
+            return p;
+        }
+        catch (MalformedPolygonException e)
+        {
+            System.err.println("ERROR: Points do not form a valid polygon.");
+            return null;
+        }
+    }
+
+    public PhysicsPolygon addPolygon(float centerx, float centery, Polygon polygon)
+    {
+        PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
+        polygons.add(p);
+        return p;
+    }
+
+    public PhysicsPolygon addPolygon(float centerx, float centery, Polygon polygon, Material material)
+    {
+        PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon, material);
+        polygons.add(p);
+        return p;
     }
 
     public float update(float time){

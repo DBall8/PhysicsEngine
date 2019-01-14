@@ -2,6 +2,8 @@ package PhysicsEngine.math;
 
 public class Formulas {
 
+    static final float TWO_PI = (float)(2.0 * Math.PI);
+
     public static float dotProduct(Vec2 vector1, Vec2 vector2)
     {
         return (vector1.getX() * vector2.getX()) + (vector1.getY() * vector2.getY());
@@ -40,5 +42,21 @@ public class Formulas {
     public static float cross(Vec2 v1, Vec2 v2)
     {
         return (v1.getX() * v2.getY()) - (v2.getX() * v1.getY());
+    }
+
+    public static float normalizeAngle(float angleInRads)
+    {
+
+        while(angleInRads < 0)
+        {
+            angleInRads += TWO_PI;
+        }
+
+        while(angleInRads > TWO_PI)
+        {
+            angleInRads -= TWO_PI;
+        }
+
+        return angleInRads;
     }
 }

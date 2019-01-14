@@ -12,7 +12,13 @@ public abstract class Entity {
 
     Entity(){}
 
-    public abstract void draw(float alpha);
+    public void draw(float alpha)
+    {
+        visuals.setTranslateX(collisionBox.getX() + (alpha * collisionBox.getXvelocity()));
+        visuals.setTranslateY(collisionBox.getY() + (alpha * collisionBox.getYvelocity()));
+
+        visuals.setRotate(collisionBox.getOrientation() * 180 / Math.PI);
+    }
 
     public void update(){}
 

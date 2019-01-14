@@ -19,21 +19,20 @@ public class Body extends Entity{
 
     private final static float ORIENT_SIZE = 2;
 
-    private boolean circle;
     UserInputListener input;
 
     Shape shape;
 
+    Body(){}
+
     public Body(float x, float y, float width, float height, Material material)
     {
-        this.circle = false;
         collisionBox = GameManager.world.addBox(x, y, width, height, material);
-        shape = new Rectangle(0, 0, width, height);
+        shape = new Rectangle(-width/2, -height/2, width, height);
 
         setColor(material);
 
-        Rectangle orient = new Rectangle(ORIENT_SIZE, height/2);
-        orient.setX(width/2 - ORIENT_SIZE/2);
+        Rectangle orient = new Rectangle(-ORIENT_SIZE/2, -height/2, ORIENT_SIZE, height/2);
         orient.setFill(Color.BLACK);
 
         visuals.getChildren().addAll(shape, orient);
@@ -41,14 +40,12 @@ public class Body extends Entity{
 
     public Body(float x, float y, float radius, Material material)
     {
-        this.circle = true;
         collisionBox = GameManager.world.addCircle(x, y, radius, material);
-        shape = new Circle(0 + radius, 0 + radius, radius);
+        shape = new Circle(0, 0, radius);
 
         setColor(material);
 
-        Rectangle orient = new Rectangle(ORIENT_SIZE, radius);
-        orient.setX(radius - ORIENT_SIZE/2);
+        Rectangle orient = new Rectangle(-ORIENT_SIZE/2, -radius, ORIENT_SIZE, radius);
         orient.setFill(Color.BLACK);
 
         visuals.getChildren().addAll(shape, orient);
@@ -83,28 +80,6 @@ public class Body extends Entity{
         }
 
         collisionBox.applyForce(xaccel, yaccel);
-    }
-
-    public void draw(float alpha)
-    {
-
-        float x, y;
-        if(circle)
-        {
-            x = collisionBox.getX() - ((PhysicsCircle)collisionBox).getRadius() + (alpha * collisionBox.getXvelocity());
-            y = collisionBox.getY() - ((PhysicsCircle)collisionBox).getRadius() + (alpha * collisionBox.getYvelocity());
-        }
-        else
-        {
-            x = collisionBox.getX() - ((PhysicsBox)collisionBox).getWidth()/2 + (alpha * collisionBox.getXvelocity());
-            y = collisionBox.getY() - ((PhysicsBox)collisionBox).getHeight()/2 + (alpha * collisionBox.getYvelocity());
-        }
-
-        visuals.setTranslateX(x);
-        visuals.setTranslateY(y);
-
-        visuals.setRotate(collisionBox.getOrientation() * 180 / Math.PI);
-
     }
 
     public void setColor(Color color)
