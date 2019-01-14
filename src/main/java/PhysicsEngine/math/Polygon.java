@@ -100,7 +100,7 @@ public class Polygon {
 //        pointDistSum /= setPoints.length;
 //        float estimatedVolume = (float)(Math.PI * pointDistSum);
 //        estimatedVolume = estimatedVolume * (setPoints.length * VOLUME_ESTIMATE_FACTOR / 100.0f);
-        //System.out.println(estimatedVolume);
+        System.out.println(estimatedVolume);
         return estimatedVolume;
     }
 

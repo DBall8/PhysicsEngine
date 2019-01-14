@@ -89,25 +89,37 @@ public class GameManager extends Pane {
                 new Vec2(0, 0),
         });
 
-        /*
-        new Vec2(20, 0),
-        new Vec2(20, 20),
-        new Vec2(0, 20),
-        new Vec2(0, 0),
-        */
-
         addObject(polyBody);
 
         PhysicsPolygon pp = (PhysicsPolygon)(polyBody.getCollisionBox());
         Polygon poly = pp.getPolygon();
 
-        PolygonBody polyBody2 = new PolygonBody(450, 450, poly.copy());
+        PolygonBody polyBody2 = new PolygonBody(600, 100, new Vec2[]{
+                new Vec2(10, 0),
+                new Vec2(10, 10),
+                //new Vec2(0, 10),
+                new Vec2(0, 0),
+        });
         addObject(polyBody2);
 
-        PolygonBody polyBody3 = new PolygonBody(500, 500, poly.copy());
+        PolygonBody polyBody3 = new PolygonBody(500, 500, new Vec2[]{
+                new Vec2(100, 0),
+                new Vec2(100, 100),
+                new Vec2(0, 100),
+                new Vec2(0, 0),
+        });
         addObject(polyBody3);
 
-        PolygonBody polyBody4 = new PolygonBody(550, 550, poly.copy());
+        PolygonBody polyBody4 = new PolygonBody(100, 600, new Vec2[]{
+                new Vec2(0, 0),
+                new Vec2(15, 5),
+                new Vec2(20, 20),
+                new Vec2(15, 35),
+                new Vec2(0, 40),
+                new Vec2(-15, 35),
+                new Vec2(-20, 20),
+                new Vec2(-15, 5),
+        });
         addObject(polyBody4);
 
 //        PhysicsPolygon polygon = world.addPolygon(400, 400, new Vec2[]{
