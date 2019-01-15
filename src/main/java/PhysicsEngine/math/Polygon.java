@@ -15,7 +15,7 @@ public class Polygon {
 
 
     public Polygon(Vec2[] points) throws MalformedPolygonException{
-        if(points.length <= 0) throw(new MalformedPolygonException());
+        if(points.length <= 0) throw(new MalformedPolygonException("Points do not form a valid polygon."));
         this.setPoints = points;
         this.points = new Vec2[setPoints.length];
         centerAtOrigin();
@@ -38,6 +38,42 @@ public class Polygon {
             }
         }
         return support;
+    }
+
+    public float findAxisOfLeastSeperation(Polygon b)
+    {
+        float bestDist = -Float.MAX_VALUE;
+        Vec2 bestFace;
+
+        for(int i=0; i<points.length; i++)
+        {
+
+            Vec2 face;
+            if(i == points.length-1)
+            {
+                face = new Vec2(points[0].getX() - points[i].getX(),
+                        points[0].getY() - points[i].getY());
+            }
+            else
+            {
+                face = new Vec2(points[i+1].getX() - points[i].getX(),
+                        points[i+1].getY() - points[i].getY());
+            }
+            face.normalize();
+
+            Vec2 bSupport = b.getSupportPoint(face.mult(-1.0f));
+            Vec2 aSupport = points[i];
+
+            float sepDistance = Formulas.dotProduct(bSupport, aSupport);
+
+            if(sepDistance > bestDist)
+            {
+                bestDist = sepDistance;
+                bestFace = face;
+            }
+        }
+
+        return bestDist;
     }
 
     private void centerAtOrigin(){

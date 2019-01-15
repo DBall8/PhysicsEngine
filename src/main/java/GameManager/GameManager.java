@@ -24,6 +24,7 @@ public class GameManager extends Pane {
 
     Entity p1;
     Entity ground;
+    PolygonBody testPoly;
 
     UserInputListener input;
 
@@ -110,7 +111,7 @@ public class GameManager extends Pane {
         });
         addObject(polyBody3);
 
-        PolygonBody polyBody4 = new PolygonBody(100, 600, new Vec2[]{
+        testPoly = new PolygonBody(100, 600, new Vec2[]{
                 new Vec2(0, 0),
                 new Vec2(15, 5),
                 new Vec2(20, 20),
@@ -120,40 +121,7 @@ public class GameManager extends Pane {
                 new Vec2(-20, 20),
                 new Vec2(-15, 5),
         });
-        addObject(polyBody4);
-
-//        PhysicsPolygon polygon = world.addPolygon(400, 400, new Vec2[]{
-//                new Vec2(10, 0),
-//                new Vec2(20, 10),
-//                new Vec2(10, 20),
-//                new Vec2(0, 10),
-//        });
-
-        PhysicsPolygon polygon2 = world.addPolygon(400, 400, new Vec2[]{
-                new Vec2(10, 0),
-                new Vec2(10, 10),
-                //new Vec2(0, 10),
-                new Vec2(0, 0),
-        });
-
-        PhysicsPolygon polygon3 = world.addPolygon(400, 400, new Vec2[]{
-                new Vec2(100, 0),
-                new Vec2(100, 100),
-                new Vec2(0, 100),
-                new Vec2(0, 0),
-        });
-
-        PhysicsPolygon polygon4 = world.addPolygon(400, 400, new Vec2[]{
-                new Vec2(0, 0),
-                new Vec2(12, 12),
-                new Vec2(20, 20),
-                new Vec2(12, 22),
-                new Vec2(20, 40),
-                new Vec2(0, 22),
-                new Vec2(-20, 20),
-                new Vec2(-12, 12),
-
-        });
+        addObject(testPoly);
 
         time.play();
     }
@@ -190,6 +158,15 @@ public class GameManager extends Pane {
         if(Settings.getGravity() > 0 && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
         {
             p1.getCollisionBox().applyForce(0, -20);
+        }
+
+        if(testPoly.getCollisionBox().isTouching(p1.getCollisionBox()))
+        {
+            ((Body)p1).setColor(Color.DARKGREEN);
+        }
+        else
+        {
+            ((Body)p1).setColor(Color.GREEN);
         }
     }
 

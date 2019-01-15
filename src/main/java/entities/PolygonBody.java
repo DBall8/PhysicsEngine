@@ -5,7 +5,9 @@ import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsPolygon;
 import PhysicsEngine.math.Vec2;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 
 public class PolygonBody extends Body {
     public PolygonBody(float x, float y, Vec2[] points) {
@@ -23,7 +25,11 @@ public class PolygonBody extends Body {
         shape = new Polygon(polyPoints);
         shape.setFill(Color.ORANGE);
 
-        visuals.getChildren().addAll(shape);
+        Line orient = new Line(0,0,points[0].getX(), points[0].getY());
+        orient.setStrokeWidth(ORIENT_SIZE);
+        orient.setFill(Color.BLACK);
+
+        visuals.getChildren().addAll(shape, orient);
     }
 
     public PolygonBody(float x, float y, PhysicsEngine.math.Polygon polygon) {

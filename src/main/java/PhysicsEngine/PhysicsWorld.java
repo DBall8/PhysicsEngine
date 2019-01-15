@@ -147,6 +147,28 @@ public class PhysicsWorld {
 
         // Check each circle against all other objects
 
+        for(int i=0; i<polygons.size(); i++)
+        {
+            PhysicsPolygon p =  polygons.get(i);
+            // Have each polygon check against each polygon further down the list
+            for(int j=i+1; j<polygons.size(); j++)
+            {
+                p.checkCollision(polygons.get(j));
+            }
+
+            // Have each polygon check against each circle
+            for(int j=0; j<circles.size(); j++)
+            {
+                p.checkCollision(circles.get(j));
+            }
+
+            // Have each polygon check against each box
+            for(int j=0; j<boxes.size(); j++)
+            {
+                p.checkCollision(boxes.get(j));
+            }
+        }
+
         for(int i=0; i<circles.size(); i++)
         {
             PhysicsCircle c =  circles.get(i);
@@ -182,6 +204,11 @@ public class PhysicsWorld {
             circle.applyGravity();
         }
 
+        for(PhysicsPolygon polygon: polygons)
+        {
+            polygon.applyGravity();
+        }
+
         for(PhysicsBox box: boxes)
         {
             box.applyGravity();
@@ -195,6 +222,11 @@ public class PhysicsWorld {
             c.move(timeStep);
         }
 
+        for(PhysicsPolygon polygon: polygons)
+        {
+            polygon.move(timeStep);
+        }
+
         for(PhysicsBox b: boxes)
         {
             b.move(timeStep);
@@ -206,6 +238,11 @@ public class PhysicsWorld {
         for(PhysicsCircle c: circles)
         {
             c.applyTotalForce();
+        }
+
+        for(PhysicsPolygon polygon: polygons)
+        {
+            polygon.applyTotalForce();
         }
 
         for(PhysicsBox b: boxes)

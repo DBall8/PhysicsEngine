@@ -26,6 +26,11 @@ public class PhysicsBox extends PhysicsObject {
         circle.checkCollision(this);
     }
 
+    void checkCollision(PhysicsPolygon polygon)
+    {
+
+    }
+
     void checkCollision(PhysicsBox box){
 
         // Get the normal vector for the boxes' centers
@@ -96,6 +101,7 @@ public class PhysicsBox extends PhysicsObject {
         }
     }
 
+    public boolean isTouching(PhysicsPolygon polygon){ return polygon.isTouching(this); }
     public boolean isTouching(PhysicsCircle circle){
         return circle.isTouching(this);
     }

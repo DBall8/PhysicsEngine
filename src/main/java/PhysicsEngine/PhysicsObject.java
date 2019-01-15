@@ -91,9 +91,13 @@ public abstract class PhysicsObject{
         if(object instanceof PhysicsCircle) {
             return isTouching((PhysicsCircle) object);
         }
-        else
+        else if(object instanceof PhysicsBox)
         {
             return isTouching((PhysicsBox) object);
+        }
+        else
+        {
+            return isTouching((PhysicsPolygon) object);
         }
     }
 
@@ -132,7 +136,9 @@ public abstract class PhysicsObject{
     }
 
     abstract void checkCollision(PhysicsCircle circle);
+    abstract void checkCollision(PhysicsPolygon polygon);
     abstract void checkCollision(PhysicsBox box);
     public abstract boolean isTouching(PhysicsCircle circle);
     public abstract boolean isTouching(PhysicsBox box);
+    public abstract boolean isTouching(PhysicsPolygon polygon);
 }

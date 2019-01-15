@@ -110,6 +110,15 @@ public class PhysicsCircle extends PhysicsObject {
         }
         collision.applyImpulse();
     }
+
+    @Override
+    void checkCollision(PhysicsPolygon polygon)
+    {
+
+    }
+
+    public boolean isTouching(PhysicsPolygon polygon){ return false; }
+
     public boolean isTouching(PhysicsCircle circle){
         float radiusSum = radius + circle.radius; // distance between the two circles when touching
         float dx = position.x - circle.position.x; // x distance
