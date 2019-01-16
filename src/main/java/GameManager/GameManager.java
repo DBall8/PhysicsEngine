@@ -83,45 +83,54 @@ public class GameManager extends Pane {
         addObject(wall4);
         ground = wall4;
 
-        PolygonBody polyBody = new PolygonBody(400, 400, new Vec2[]{
-                new Vec2(40, 0),
-                new Vec2(40, 40),
-                new Vec2(0, 40),
-                new Vec2(0, 0),
-        });
+//        PolygonBody polyBody = new PolygonBody(400, 400, new Vec2[]{
+//                new Vec2(40, 0),
+//                new Vec2(40, 40),
+//                new Vec2(0, 40),
+//                new Vec2(0, 0),
+//        });
+//
+//        addObject(polyBody);
 
-        addObject(polyBody);
+//        PhysicsPolygon pp = (PhysicsPolygon)(polyBody.getCollisionBox());
+//        Polygon poly = pp.getPolygon();
+//
+//        PolygonBody polyBody2 = new PolygonBody(600, 100, new Vec2[]{
+//                new Vec2(10, 0),
+//                new Vec2(10, 10),
+//                //new Vec2(0, 10),
+//                new Vec2(0, 0),
+//        });
+//        addObject(polyBody2);
 
-        PhysicsPolygon pp = (PhysicsPolygon)(polyBody.getCollisionBox());
-        Polygon poly = pp.getPolygon();
-
-        PolygonBody polyBody2 = new PolygonBody(600, 100, new Vec2[]{
-                new Vec2(10, 0),
-                new Vec2(10, 10),
-                //new Vec2(0, 10),
-                new Vec2(0, 0),
-        });
-        addObject(polyBody2);
-
-        PolygonBody polyBody3 = new PolygonBody(500, 500, new Vec2[]{
-                new Vec2(100, 0),
-                new Vec2(100, 100),
-                new Vec2(0, 100),
-                new Vec2(0, 0),
-        });
-        addObject(polyBody3);
+//        PolygonBody polyBody3 = new PolygonBody(500, 500, new Vec2[]{
+//                new Vec2(100, 0),
+//                new Vec2(100, 100),
+//                new Vec2(0, 100),
+//                new Vec2(0, 0),
+//        });
+//        addObject(polyBody3);
 
         testPoly = new PolygonBody(100, 600, new Vec2[]{
                 new Vec2(0, 0),
-                new Vec2(15, 5),
-                new Vec2(20, 20),
-                new Vec2(15, 35),
-                new Vec2(0, 40),
-                new Vec2(-15, 35),
-                new Vec2(-20, 20),
-                new Vec2(-15, 5),
+                new Vec2(25, 15),
+                new Vec2(40, 40),
+                new Vec2(25, 55),
+                new Vec2(0, 60),
+                new Vec2(-25, 55),
+                new Vec2(-40, 40),
+                new Vec2(-25, 15),
         });
         addObject(testPoly);
+
+//        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
+//                new Vec2(40, 0),
+//                new Vec2(40, 40),
+//                new Vec2(0, 40),
+//                new Vec2(0, 0),
+//        });
+//
+//        addObject(polyBodyC);
 
         time.play();
     }
@@ -162,7 +171,7 @@ public class GameManager extends Pane {
 
         if(testPoly.getCollisionBox().isTouching(p1.getCollisionBox()))
         {
-            ((Body)p1).setColor(Color.DARKGREEN);
+            ((Body)p1).setColor(Color.CYAN);
         }
         else
         {

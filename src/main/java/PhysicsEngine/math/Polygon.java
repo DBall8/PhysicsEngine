@@ -24,11 +24,11 @@ public class Polygon {
 
     public Vec2 getSupportPoint(Vec2 direction) {
 
-        if(points.length <= 0) System.err.println("POLYGON POINTS NOT CALCULATED");
+        if(setPoints.length <= 0) System.err.println("POLYGON POINTS NOT CALCULATED");
 
         float bestProjection = -Float.MAX_VALUE;
         Vec2 support = null;
-        for(Vec2 point: points)
+        for(Vec2 point: setPoints)
         {
             float projection = Formulas.dotProduct(point, direction);
             if(projection > bestProjection)
@@ -40,41 +40,7 @@ public class Polygon {
         return support;
     }
 
-    public float findAxisOfLeastSeperation(Polygon b)
-    {
-        float bestDist = -Float.MAX_VALUE;
-        Vec2 bestFace;
 
-        for(int i=0; i<points.length; i++)
-        {
-
-            Vec2 face;
-            if(i == points.length-1)
-            {
-                face = new Vec2(points[0].getX() - points[i].getX(),
-                        points[0].getY() - points[i].getY());
-            }
-            else
-            {
-                face = new Vec2(points[i+1].getX() - points[i].getX(),
-                        points[i+1].getY() - points[i].getY());
-            }
-            face.normalize();
-
-            Vec2 bSupport = b.getSupportPoint(face.mult(-1.0f));
-            Vec2 aSupport = points[i];
-
-            float sepDistance = Formulas.dotProduct(bSupport, aSupport);
-
-            if(sepDistance > bestDist)
-            {
-                bestDist = sepDistance;
-                bestFace = face;
-            }
-        }
-
-        return bestDist;
-    }
 
     private void centerAtOrigin(){
 
@@ -136,7 +102,7 @@ public class Polygon {
 //        pointDistSum /= setPoints.length;
 //        float estimatedVolume = (float)(Math.PI * pointDistSum);
 //        estimatedVolume = estimatedVolume * (setPoints.length * VOLUME_ESTIMATE_FACTOR / 100.0f);
-        System.out.println(estimatedVolume);
+        //System.out.println(estimatedVolume);
         return estimatedVolume;
     }
 
@@ -220,7 +186,7 @@ public class Polygon {
         }
     }
 
-    Vec2[] getCalculatedPoints(){ return points; }
+    public Vec2[] getCalculatedPoints(){ return points; }
     public Vec2[] getPoints(){ return setPoints; }
 
     private void printPoints()

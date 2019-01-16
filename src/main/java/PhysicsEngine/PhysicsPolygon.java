@@ -1,5 +1,6 @@
 package PhysicsEngine;
 
+import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.MalformedPolygonException;
 import PhysicsEngine.math.Polygon;
 import PhysicsEngine.math.Vec2;
@@ -51,8 +52,8 @@ public class PhysicsPolygon extends PhysicsObject{
 
     public boolean isTouching(PhysicsPolygon polygon)
     {
-        return this.polygon.findAxisOfLeastSeperation(polygon.getPolygon()) >= 0 ||
-                polygon.getPolygon().findAxisOfLeastSeperation(this.polygon) >= 0;
+        return findAxisOfLeastSeperation(polygon) >= 0 ||
+                polygon.findAxisOfLeastSeperation(this) >= 0;
     }
 
     public boolean isTouching(PhysicsCircle circle)
@@ -70,14 +71,60 @@ public class PhysicsPolygon extends PhysicsObject{
                     new Vec2(box.position.getX() - box.width / 2.0f, box.position.getY() + box.width / 2.0f),
             });
 
-            return this.polygon.findAxisOfLeastSeperation(p) >= 0 ||
-                    p.findAxisOfLeastSeperation(this.polygon) >= 0;
+            PhysicsPolygon polygon = new PhysicsPolygon(worldSettings, box.position, p);
+
+            boolean collided = findAxisOfLeastSeperation(polygon) <= 0 ||
+                    polygon.findAxisOfLeastSeperation(this) <= 0;
+
+            return collided;
         }
         catch (MalformedPolygonException e)
         {
             e.printMessage();
             return false;
         }
+    }
+
+    public float findAxisOfLeastSeperation(PhysicsPolygon b)
+    {
+        float bestDist = -Float.MAX_VALUE;
+        Vec2 bestFace;
+
+        // Move polygon A to be in B's coordinate space (not rotating, might need to)
+        polygon.setTranslation(position.x - b.getX(), position.y - b.getY());
+        Vec2[] polyPoints = polygon.getCalculatedPoints();
+
+        for(int i=0; i<polyPoints.length; i++)
+        {
+            Vec2 face;
+            if(i == polyPoints.length-1)
+            {
+                face = new Vec2(polyPoints[0].getX() - polyPoints[i].getX(),
+                        polyPoints[0].getY() - polyPoints[i].getY());
+            }
+            else
+            {
+                face = new Vec2(polyPoints[i+1].getX() - polyPoints[i].getX(),
+                        polyPoints[i+1].getY() - polyPoints[i].getY());
+            }
+            face.normalize();
+            Vec2 normal = new Vec2(-face.getY(), face.getX());
+
+            Vec2 bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
+            Vec2 aSupport = polygon.getCalculatedPoints()[i];
+
+            float sepDistance = Formulas.dotProduct(normal, new Vec2(bSupport.getX() - aSupport.getX(), bSupport.getY() - aSupport.getY()));
+
+            if(sepDistance > bestDist)
+            {
+                bestDist = sepDistance;
+                bestFace = face;
+            }
+        }
+
+        System.out.println(bestDist);
+
+        return bestDist;
     }
 
     public Polygon getPolygon()
