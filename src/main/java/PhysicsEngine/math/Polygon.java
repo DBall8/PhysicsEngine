@@ -144,16 +144,25 @@ public class Polygon {
         if(setPoints.length <= 0) System.err.println("POLYGON SET POINTS NOT SET");
         if(pointAngles.length <= 0) System.err.println("POLYGON POINT ANGLES NOT CALCULATED");
 
+
         for(int i=0; i<setPoints.length; i++)
         {
-            float mag = setPoints[i].magnitude();
-            float newAngle = pointAngles[i] + rotation;
+            if(rotation != 0) {
+                float mag = setPoints[i].magnitude();
+                float newAngle = pointAngles[i] + rotation;
 
-            //points[i] = setPoints[i].copy();
-            float newx = (float)(mag * Math.sin(newAngle));
-            float newy = (float)(mag * Math.cos(newAngle));
-            //if(newAngle >= Math.PI/4 && newAngle < 3.0f*Math.PI/4) pointAngles[i] += Math.PI;
-            points[i] = new Vec2(newx, newy);
+                //points[i] = setPoints[i].copy();
+                float newx = (float) (mag * Math.sin(newAngle));
+                float newy = (float) (mag * Math.cos(newAngle));
+                //if(newAngle >= Math.PI/4 && newAngle < 3.0f*Math.PI/4) pointAngles[i] += Math.PI;
+                //System.out.format("Old x: %f, new X: %f\n", setPoints[i].x, newx);
+                points[i] = new Vec2(newx, newy);
+            }
+            else
+            {
+                points[i] = setPoints[i];
+            }
+
         }
 
         for(int i=0; i<setPoints.length; i++)

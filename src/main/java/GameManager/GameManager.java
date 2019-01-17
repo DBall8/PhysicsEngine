@@ -113,15 +113,23 @@ public class GameManager extends Pane {
 
         testPoly = new PolygonBody(100, 600, new Vec2[]{
                 new Vec2(0, 0),
-                new Vec2(25, 15),
-                new Vec2(40, 40),
-                new Vec2(25, 55),
-                new Vec2(0, 60),
-                new Vec2(-25, 55),
-                new Vec2(-40, 40),
-                new Vec2(-25, 15),
+                new Vec2(100, 0),
+                new Vec2(100, 100),
+
         });
         addObject(testPoly);
+
+//        testPoly = new PolygonBody(100, 600, new Vec2[]{
+//                new Vec2(0, 0),
+//                new Vec2(25, 15),
+//                new Vec2(40, 40),
+//                new Vec2(25, 55),
+//                new Vec2(0, 60),
+//                new Vec2(-25, 55),
+//                new Vec2(-40, 40),
+//                new Vec2(-25, 15),
+//        });
+//        addObject(testPoly);
 
 //        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
 //                new Vec2(40, 0),

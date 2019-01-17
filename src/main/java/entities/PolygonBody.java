@@ -10,9 +10,12 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
 public class PolygonBody extends Body {
+
+    PhysicsPolygon polygon;
+
     public PolygonBody(float x, float y, Vec2[] points) {
 
-        PhysicsPolygon polygon = GameManager.world.addPolygon(x, y, points);
+        polygon = GameManager.world.addPolygon(x, y, points);
         collisionBox = polygon;
         points = polygon.getPolygon().getPoints();
 
@@ -49,5 +52,22 @@ public class PolygonBody extends Body {
         shape.setFill(Color.ORANGE);
 
         visuals.getChildren().addAll(shape);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+//        Vec2[] points = polygon.getPolygon().getCalculatedPoints();
+//
+//        double[] polyPoints = new double[points.length*2];
+//        for(int i=0; i<points.length; i++)
+//        {
+//            polyPoints[2*i] = (points[i].getX());
+//            polyPoints[2*i + 1] = (points[i].getY());
+//        }
+//        shape = new Polygon(polyPoints);
+//        shape.setFill(Color.ORANGE);
+//
+//        visuals.getChildren().set(0, shape);
     }
 }

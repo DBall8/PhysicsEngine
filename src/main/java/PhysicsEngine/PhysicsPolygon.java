@@ -47,13 +47,18 @@ public class PhysicsPolygon extends PhysicsObject{
 
     void checkCollision(PhysicsPolygon polygon)
     {
-
+//        Collision c1 = findAxisOfLeastSeperation(polygon);
+//        Collision c2 = polygon.findAxisOfLeastSeperation(this);
+//        if(c1.penetration >= 0 || c2.penetration >= 0)
+//        {
+//            if(c1.penetration )
+//        }
     }
 
     public boolean isTouching(PhysicsPolygon polygon)
     {
-        return findAxisOfLeastSeperation(polygon) >= 0 ||
-                polygon.findAxisOfLeastSeperation(this) >= 0;
+        return findAxisOfLeastSeperation(polygon).penetration > 0 &&
+                polygon.findAxisOfLeastSeperation(this).penetration > 0;
     }
 
     public boolean isTouching(PhysicsCircle circle)
@@ -73,8 +78,8 @@ public class PhysicsPolygon extends PhysicsObject{
 
             PhysicsPolygon polygon = new PhysicsPolygon(worldSettings, box.position, p);
 
-            boolean collided = findAxisOfLeastSeperation(polygon) <= 0 ||
-                    polygon.findAxisOfLeastSeperation(this) <= 0;
+            boolean collided = findAxisOfLeastSeperation(polygon).penetration > 0 &&
+                    polygon.findAxisOfLeastSeperation(this).penetration > 0;
 
             return collided;
         }
@@ -85,10 +90,10 @@ public class PhysicsPolygon extends PhysicsObject{
         }
     }
 
-    public float findAxisOfLeastSeperation(PhysicsPolygon b)
+    public Collision findAxisOfLeastSeperation(PhysicsPolygon b)
     {
         float bestDist = -Float.MAX_VALUE;
-        Vec2 bestFace;
+        Vec2 bestFace = null;
 
         // Move polygon A to be in B's coordinate space (not rotating, might need to)
         polygon.setTranslation(position.x - b.getX(), position.y - b.getY());
@@ -108,10 +113,10 @@ public class PhysicsPolygon extends PhysicsObject{
                         polyPoints[i+1].getY() - polyPoints[i].getY());
             }
             face.normalize();
-            Vec2 normal = new Vec2(-face.getY(), face.getX());
+            Vec2 normal = new Vec2(face.getY(), -face.getX());
 
             Vec2 bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
-            Vec2 aSupport = polygon.getCalculatedPoints()[i];
+            Vec2 aSupport = polyPoints[i];
 
             float sepDistance = Formulas.dotProduct(normal, new Vec2(bSupport.getX() - aSupport.getX(), bSupport.getY() - aSupport.getY()));
 
@@ -122,9 +127,10 @@ public class PhysicsPolygon extends PhysicsObject{
             }
         }
 
-        System.out.println(bestDist);
+//        System.out.println(bestDist);
+        Collision collision = new Collision(this, b, bestFace, -bestDist);
 
-        return bestDist;
+        return collision;
     }
 
     public Polygon getPolygon()
