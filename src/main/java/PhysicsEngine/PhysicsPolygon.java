@@ -32,11 +32,22 @@ public class PhysicsPolygon extends PhysicsObject{
     {
         try {
             Polygon p = new Polygon(new Vec2[]{
-                    new Vec2(box.position.getX() - box.width / 2.0f, box.position.getY() - box.width / 2.0f),
-                    new Vec2(box.position.getX() + box.width / 2.0f, box.position.getY() - box.width / 2.0f),
-                    new Vec2(box.position.getX() + box.width / 2.0f, box.position.getY() + box.width / 2.0f),
-                    new Vec2(box.position.getX() - box.width / 2.0f, box.position.getY() + box.width / 2.0f),
+                    new Vec2(-box.width / 2.0f, -box.width / 2.0f),
+                    new Vec2(box.width / 2.0f, -box.width / 2.0f),
+                    new Vec2(box.width / 2.0f, box.width / 2.0f),
+                    new Vec2(-box.width / 2.0f, box.width / 2.0f),
             });
+
+//            PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
+//            Collision c1 = findAxisOfLeastSeperation(boxPoly);
+//            Collision c2 = boxPoly.findAxisOfLeastSeperation(this);
+//            if(c1.penetration >= 0 && c2.penetration >= 0)
+//            {
+//                float penetration = c1.penetration < c2.penetration? c1.penetration: c2.penetration;
+//                Vec2 normal = c1.normal;
+//                Collision collision = new Collision(this, box, normal, penetration);
+//                collision.applyImpulse();
+//            }
 
         }
         catch (MalformedPolygonException e)
@@ -47,12 +58,13 @@ public class PhysicsPolygon extends PhysicsObject{
 
     void checkCollision(PhysicsPolygon polygon)
     {
-//        Collision c1 = findAxisOfLeastSeperation(polygon);
-//        Collision c2 = polygon.findAxisOfLeastSeperation(this);
-//        if(c1.penetration >= 0 || c2.penetration >= 0)
-//        {
-//            if(c1.penetration )
-//        }
+        Collision c1 = findAxisOfLeastSeperation(polygon);
+        Collision c2 = polygon.findAxisOfLeastSeperation(this);
+        if(c1.penetration >= 0 && c2.penetration >= 0)
+        {
+            Collision collision = c1.penetration < c2.penetration? c1: c2;
+            collision.applyImpulse();
+        }
     }
 
     public boolean isTouching(PhysicsPolygon polygon)
@@ -81,6 +93,7 @@ public class PhysicsPolygon extends PhysicsObject{
             boolean collided = findAxisOfLeastSeperation(polygon).penetration > 0 &&
                     polygon.findAxisOfLeastSeperation(this).penetration > 0;
 
+            if(collided) System.out.println("TOUCHING");
             return collided;
         }
         catch (MalformedPolygonException e)

@@ -57,7 +57,7 @@ class Collision {
         applyFriction(relativeVelocity, j);
     }
 
-    void applyFriction(Vec2 relativeVelocity, float j)
+    private void applyFriction(Vec2 relativeVelocity, float j)
     {
 //        float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 //        j = -1.0f * normalVelocity;
@@ -91,7 +91,7 @@ class Collision {
         o2.yvelocity += o2.getInvertedMass() * frictionVec.y;
     }
 
-    void correctPosition()
+    private void correctPosition()
     {
         if(penetration <= MIN_POSITION_CORRECTION) return;
 

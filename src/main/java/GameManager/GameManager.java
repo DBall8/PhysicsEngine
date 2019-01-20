@@ -70,18 +70,18 @@ public class GameManager extends Pane {
         Body p3 = new Body(400, 50, 20, Material.Rock);
         addObject(p3);
 
-        Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
-        addObject(wall1);
-
-        Wall wall2 = new Wall(Settings.getWindowWidth() + 30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
-        addObject(wall2);
-
-        Wall wall3 = new Wall(Settings.getWindowWidth() / 2, -30, Settings.getWindowWidth() - 20, 80);
-        addObject(wall3);
-
-        Wall wall4 = new Wall(Settings.getWindowWidth() / 2, Settings.getWindowHeight() + 30, Settings.getWindowWidth() - 20, 80);
-        addObject(wall4);
-        ground = wall4;
+//        Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
+//        addObject(wall1);
+//
+//        Wall wall2 = new Wall(Settings.getWindowWidth() + 30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
+//        addObject(wall2);
+//
+//        Wall wall3 = new Wall(Settings.getWindowWidth() / 2, -30, Settings.getWindowWidth() - 20, 80);
+//        addObject(wall3);
+//
+//        Wall wall4 = new Wall(Settings.getWindowWidth() / 2, Settings.getWindowHeight() + 30, Settings.getWindowWidth() - 20, 80);
+//        addObject(wall4);
+//        ground = wall4;
 
 //        PolygonBody polyBody = new PolygonBody(400, 400, new Vec2[]{
 //                new Vec2(40, 0),
@@ -111,7 +111,7 @@ public class GameManager extends Pane {
 //        });
 //        addObject(polyBody3);
 
-        testPoly = new PolygonBody(100, 600, new Vec2[]{
+        testPoly = new PolygonBody(600, 600, new Vec2[]{
                 new Vec2(0, 0),
                 new Vec2(100, 0),
                 new Vec2(100, 100),
@@ -177,13 +177,12 @@ public class GameManager extends Pane {
             p1.getCollisionBox().applyForce(0, -20);
         }
 
-        if(testPoly.getCollisionBox().isTouching(p1.getCollisionBox()))
-        {
-            ((Body)p1).setColor(Color.CYAN);
-        }
-        else
-        {
-            ((Body)p1).setColor(Color.GREEN);
+        testPoly.setColor(Color.ORANGE);
+        for(Entity e: objects) {
+            if(e.equals(testPoly)) continue;
+            if (testPoly.getCollisionBox().isTouching(e.getCollisionBox())) {
+                testPoly.setColor(Color.CYAN);
+            }
         }
     }
 
