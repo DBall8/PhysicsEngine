@@ -70,18 +70,18 @@ public class GameManager extends Pane {
         Body p3 = new Body(400, 50, 20, Material.Rock);
         addObject(p3);
 
-//        Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
-//        addObject(wall1);
-//
-//        Wall wall2 = new Wall(Settings.getWindowWidth() + 30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
-//        addObject(wall2);
-//
-//        Wall wall3 = new Wall(Settings.getWindowWidth() / 2, -30, Settings.getWindowWidth() - 20, 80);
-//        addObject(wall3);
-//
-//        Wall wall4 = new Wall(Settings.getWindowWidth() / 2, Settings.getWindowHeight() + 30, Settings.getWindowWidth() - 20, 80);
-//        addObject(wall4);
-//        ground = wall4;
+        Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
+        addObject(wall1);
+
+        Wall wall2 = new Wall(Settings.getWindowWidth() + 30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
+        addObject(wall2);
+
+        Wall wall3 = new Wall(Settings.getWindowWidth() / 2, -30, Settings.getWindowWidth() - 20, 80);
+        addObject(wall3);
+
+        Wall wall4 = new Wall(Settings.getWindowWidth() / 2, Settings.getWindowHeight() + 30, Settings.getWindowWidth() - 20, 80);
+        addObject(wall4);
+        ground = wall4;
 
 //        PolygonBody polyBody = new PolygonBody(400, 400, new Vec2[]{
 //                new Vec2(40, 0),
@@ -118,6 +118,7 @@ public class GameManager extends Pane {
 
         });
         addObject(testPoly);
+        testPoly.setInput(input);
 
 //        testPoly = new PolygonBody(100, 600, new Vec2[]{
 //                new Vec2(0, 0),

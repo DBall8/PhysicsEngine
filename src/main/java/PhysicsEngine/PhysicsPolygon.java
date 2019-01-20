@@ -30,14 +30,14 @@ public class PhysicsPolygon extends PhysicsObject{
 
     void checkCollision(PhysicsBox box)
     {
-        try {
-            Polygon p = new Polygon(new Vec2[]{
-                    new Vec2(-box.width / 2.0f, -box.width / 2.0f),
-                    new Vec2(box.width / 2.0f, -box.width / 2.0f),
-                    new Vec2(box.width / 2.0f, box.width / 2.0f),
-                    new Vec2(-box.width / 2.0f, box.width / 2.0f),
-            });
-
+//        try {
+//            Polygon p = new Polygon(new Vec2[]{
+//                    new Vec2(-box.width / 2.0f, box.height / 2.0f),
+//                    new Vec2(box.width / 2.0f, box.height / 2.0f),
+//                    new Vec2(box.width / 2.0f, -box.height / 2.0f),
+//                    new Vec2(-box.width / 2.0f, -box.height / 2.0f),
+//            });
+//
 //            PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
 //            Collision c1 = findAxisOfLeastSeperation(boxPoly);
 //            Collision c2 = boxPoly.findAxisOfLeastSeperation(this);
@@ -48,12 +48,12 @@ public class PhysicsPolygon extends PhysicsObject{
 //                Collision collision = new Collision(this, box, normal, penetration);
 //                collision.applyImpulse();
 //            }
-
-        }
-        catch (MalformedPolygonException e)
-        {
-            e.printMessage();
-        }
+//
+//        }
+//        catch (MalformedPolygonException e)
+//        {
+//            e.printMessage();
+//        }
     }
 
     void checkCollision(PhysicsPolygon polygon)
@@ -82,10 +82,10 @@ public class PhysicsPolygon extends PhysicsObject{
     {
         try {
             Polygon p = new Polygon(new Vec2[]{
-                    new Vec2(box.position.getX() - box.width / 2.0f, box.position.getY() - box.width / 2.0f),
-                    new Vec2(box.position.getX() + box.width / 2.0f, box.position.getY() - box.width / 2.0f),
-                    new Vec2(box.position.getX() + box.width / 2.0f, box.position.getY() + box.width / 2.0f),
-                    new Vec2(box.position.getX() - box.width / 2.0f, box.position.getY() + box.width / 2.0f),
+                    new Vec2(-box.width / 2.0f, -box.height / 2.0f),
+                    new Vec2(box.width / 2.0f, -box.height / 2.0f),
+                    new Vec2(box.width / 2.0f, box.height / 2.0f),
+                    new Vec2(-box.width / 2.0f, box.height / 2.0f),
             });
 
             PhysicsPolygon polygon = new PhysicsPolygon(worldSettings, box.position, p);
@@ -93,7 +93,7 @@ public class PhysicsPolygon extends PhysicsObject{
             boolean collided = findAxisOfLeastSeperation(polygon).penetration > 0 &&
                     polygon.findAxisOfLeastSeperation(this).penetration > 0;
 
-            if(collided) System.out.println("TOUCHING");
+            //if(collided) System.out.println("TOUCHING");
             return collided;
         }
         catch (MalformedPolygonException e)
@@ -108,8 +108,12 @@ public class PhysicsPolygon extends PhysicsObject{
         float bestDist = -Float.MAX_VALUE;
         Vec2 bestFace = null;
 
+        b.polygon.translateAndRotate(0, 0, b.orientation, true);
+        float relativeX = position.x - b.getX();
+        float relativeY = position.y - b.getY();
+
         // Move polygon A to be in B's coordinate space (not rotating, might need to)
-        polygon.setTranslation(position.x - b.getX(), position.y - b.getY());
+        polygon.translateAndRotate(relativeX, relativeY, orientation ,true);
         Vec2[] polyPoints = polygon.getCalculatedPoints();
 
         for(int i=0; i<polyPoints.length; i++)
@@ -127,6 +131,12 @@ public class PhysicsPolygon extends PhysicsObject{
             }
             face.normalize();
             Vec2 normal = new Vec2(face.getY(), -face.getX());
+            // Make sure the normal is facing outwards
+            Vec2 pointVecFromCenter = new Vec2(polyPoints[i].x - relativeX, polyPoints[i].y - relativeY);
+            if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
+            {
+                normal = new Vec2(-face.getY(), face.getX());
+            }
 
             Vec2 bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
             Vec2 aSupport = polyPoints[i];
@@ -150,4 +160,7 @@ public class PhysicsPolygon extends PhysicsObject{
     {
         return polygon;
     }
+
+    // TODO DELETE THIS
+    public void setOrientation(float o){ this.orientation = o; }
 }

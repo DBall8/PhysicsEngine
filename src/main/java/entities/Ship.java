@@ -2,6 +2,8 @@ package entities;
 
 import GameManager.GameManager;
 import GameManager.UserInputListener;
+import PhysicsEngine.math.MalformedPolygonException;
+import PhysicsEngine.math.Vec2;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
@@ -14,19 +16,30 @@ public class Ship extends Entity {
     private final static float MAX_VELOCITY = 20;
 
     private UserInputListener input;
-    private float angle = 0; // radians
+    protected float angle = 0; // radians
+
+    Ship(){}
 
     public Ship(int x, int y){
-        collisionBox = GameManager.world.addCircle(x, y, WIDTH/2);
-        Polygon shape = new Polygon();
-        shape.getPoints().addAll(new Double[]{
-                (double)WIDTH/2, 0.0,
-                0.0, (double)HEIGHT,
-                (double)WIDTH, (double)HEIGHT
-        });
-        shape.setFill(Color.ORANGE);
+        try {
+            PhysicsEngine.math.Polygon collisionShape = new PhysicsEngine.math.Polygon(new Vec2[]{
+                    new Vec2(-20, -20),
+                    new Vec2(20, -20),
+                    new Vec2(0, 20)
+            });
 
-        visuals.getChildren().add(shape);
+            collisionBox = GameManager.world.addPolygon(x, y, collisionShape);
+            Polygon shape = new Polygon();
+            shape.getPoints().addAll(new Double[]{
+                    (double)WIDTH/2, 0.0,
+                    0.0, (double)HEIGHT,
+                    (double)WIDTH, (double)HEIGHT
+            });
+            shape.setFill(Color.ORANGE);
+
+            visuals.getChildren().add(shape);
+        }
+        catch (MalformedPolygonException e){ e.printMessage(); }
     }
 
     @Override
@@ -34,12 +47,12 @@ public class Ship extends Entity {
         if(input == null) return;
 
         boolean angleChanged = false;
-        if(input.isLeft() && !input.isRight())
+        /*if(input.isLeft() && !input.isRight())
         {
             angle -= RACCEL;
             angleChanged = true;
         }
-        else if(!input.isLeft() && input.isRight())
+        else*/ if(input.isBoost() /*!input.isLeft() && input.isRight()*/)
         {
             angle += RACCEL;
             angleChanged = true;
@@ -57,10 +70,10 @@ public class Ship extends Entity {
             }
         }
 
-        if(input.isUp() && !input.isDown() && collisionBox.getVelocity() < MAX_VELOCITY)
-        {
-            collisionBox.applyForceInDirection(ACCEL, angle);
-        }
+//        if(input.isUp() && !input.isDown() && collisionBox.getVelocity() < MAX_VELOCITY)
+//        {
+//            collisionBox.applyForceInDirection(ACCEL, angle);
+//        }
     }
 
     @Override
@@ -69,7 +82,7 @@ public class Ship extends Entity {
         float y = collisionBox.getY() + (alpha * collisionBox.getYvelocity());
         visuals.setTranslateX(x - WIDTH/2);
         visuals.setTranslateY(y - HEIGHT/2);
-        visuals.setRotate(angle * 180 / Math.PI);
+//        visuals.setRotate(angle * 180 / Math.PI);
     }
 
     public void setInput(UserInputListener input)

@@ -24,11 +24,11 @@ public class Polygon {
 
     public Vec2 getSupportPoint(Vec2 direction) {
 
-        if(setPoints.length <= 0) System.err.println("POLYGON POINTS NOT CALCULATED");
+        if(points.length <= 0) System.err.println("POLYGON POINTS NOT CALCULATED");
 
         float bestProjection = -Float.MAX_VALUE;
         Vec2 support = null;
-        for(Vec2 point: setPoints)
+        for(Vec2 point: points)
         {
             float projection = Formulas.dotProduct(point, direction);
             if(projection > bestProjection)
@@ -39,8 +39,6 @@ public class Polygon {
         }
         return support;
     }
-
-
 
     private void centerAtOrigin(){
 
@@ -153,9 +151,10 @@ public class Polygon {
 
                 //points[i] = setPoints[i].copy();
                 float newx = (float) (mag * Math.sin(newAngle));
-                float newy = (float) (mag * Math.cos(newAngle));
+                float newy = (float) (-mag * Math.cos(newAngle));
                 //if(newAngle >= Math.PI/4 && newAngle < 3.0f*Math.PI/4) pointAngles[i] += Math.PI;
-                //System.out.format("Old x: %f, new X: %f\n", setPoints[i].x, newx);
+//                System.out.format("Old x: %f, new X: %f\n", setPoints[i].x, newx);
+//                System.out.format("Old y: %f, new Y: %f\n\n", setPoints[i].y, newy);
                 points[i] = new Vec2(newx, newy);
             }
             else
