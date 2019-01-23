@@ -30,39 +30,67 @@ public class PhysicsPolygon extends PhysicsObject{
 
     void checkCollision(PhysicsBox box)
     {
-//        try {
-//            Polygon p = new Polygon(new Vec2[]{
-//                    new Vec2(-box.width / 2.0f, box.height / 2.0f),
-//                    new Vec2(box.width / 2.0f, box.height / 2.0f),
-//                    new Vec2(box.width / 2.0f, -box.height / 2.0f),
-//                    new Vec2(-box.width / 2.0f, -box.height / 2.0f),
-//            });
-//
-//            PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
-//            Collision c1 = findAxisOfLeastSeperation(boxPoly);
-//            Collision c2 = boxPoly.findAxisOfLeastSeperation(this);
-//            if(c1.penetration >= 0 && c2.penetration >= 0)
-//            {
-//                float penetration = c1.penetration < c2.penetration? c1.penetration: c2.penetration;
-//                Vec2 normal = c1.normal;
-//                Collision collision = new Collision(this, box, normal, penetration);
-//                collision.applyImpulse();
-//            }
-//
-//        }
-//        catch (MalformedPolygonException e)
-//        {
-//            e.printMessage();
-//        }
+        try {
+            // Create a polygon from the box TODO make this a box member or remove
+            Polygon p = new Polygon(new Vec2[]
+            {
+                    new Vec2(-box.width / 2.0f, box.height / 2.0f),
+                    new Vec2(box.width / 2.0f, box.height / 2.0f),
+                    new Vec2(box.width / 2.0f, -box.height / 2.0f),
+                    new Vec2(-box.width / 2.0f, -box.height / 2.0f),
+            });
+            PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
+
+            if(Float.isNaN(box.position.x) || Float.isNaN(position.x)){
+                System.out.println("HEY");
+            }
+
+            // Check for collisions from each polygon's perspective
+            Collision c1 = findAxisOfLeastSeperation(boxPoly);
+            Collision c2 = boxPoly.findAxisOfLeastSeperation(this);
+            // Collision occurred if both cannot find an axis of seperation
+            if(c1.penetration >= 0 && c2.penetration >= 0)
+            {
+                // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
+                Collision collision;
+                if(c1.penetration < c2.penetration)
+                {
+                    collision = c1;
+                }
+                else
+                {
+                    collision = new Collision(this, box, c2.normal.mult(-1.0f), c2.penetration);
+                }
+                // Apply impulse
+                collision.applyImpulse();
+            }
+
+        }
+        catch (MalformedPolygonException e)
+        {
+            e.printMessage();
+        }
     }
 
     void checkCollision(PhysicsPolygon polygon)
     {
+        // Check for collisions from each polygon's perspective
         Collision c1 = findAxisOfLeastSeperation(polygon);
+        // Collision occurred if both cannot find an axis of seperation
         Collision c2 = polygon.findAxisOfLeastSeperation(this);
         if(c1.penetration >= 0 && c2.penetration >= 0)
         {
-            Collision collision = c1.penetration < c2.penetration? c1: c2;
+            // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
+            Collision collision;
+            if(c1.penetration < c2.penetration)
+            {
+                collision = c1;
+            }
+            else
+            {
+                collision = new Collision(this, polygon, c2.normal.mult(-1.0f), c2.penetration);
+            }
+            // Apply impulse
             collision.applyImpulse();
         }
     }
@@ -146,7 +174,7 @@ public class PhysicsPolygon extends PhysicsObject{
             if(sepDistance > bestDist)
             {
                 bestDist = sepDistance;
-                bestFace = face;
+                bestFace = normal;
             }
         }
 

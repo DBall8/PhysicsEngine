@@ -37,6 +37,9 @@ public class Polygon {
                 bestProjection = projection;
             }
         }
+
+        if(support == null)
+            System.err.println("[[[SUPPORT POINT NOT FOUND]]]");
         return support;
     }
 

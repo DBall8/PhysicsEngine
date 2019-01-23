@@ -120,17 +120,25 @@ public class GameManager extends Pane {
         addObject(testPoly);
         testPoly.setInput(input);
 
-//        testPoly = new PolygonBody(100, 600, new Vec2[]{
-//                new Vec2(0, 0),
-//                new Vec2(25, 15),
-//                new Vec2(40, 40),
-//                new Vec2(25, 55),
-//                new Vec2(0, 60),
-//                new Vec2(-25, 55),
-//                new Vec2(-40, 40),
-//                new Vec2(-25, 15),
-//        });
-//        addObject(testPoly);
+        PolygonBody poly1 = new PolygonBody(100, 600, new Vec2[]{
+                new Vec2(0, 0),
+                new Vec2(25, 15),
+                new Vec2(40, 40),
+                new Vec2(25, 55),
+                new Vec2(0, 60),
+                new Vec2(-25, 55),
+                new Vec2(-40, 40),
+                new Vec2(-25, 15),
+        });
+        addObject(poly1);
+
+        PolygonBody poly2 = new PolygonBody(300, 200, new Vec2[]{
+                new Vec2(0, 0),
+                new Vec2(0, 100),
+                new Vec2(100, 100),
+
+        });
+        addObject(poly2);
 
 //        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
 //                new Vec2(40, 0),
@@ -178,13 +186,13 @@ public class GameManager extends Pane {
             p1.getCollisionBox().applyForce(0, -20);
         }
 
-        testPoly.setColor(Color.ORANGE);
-        for(Entity e: objects) {
-            if(e.equals(testPoly)) continue;
-            if (testPoly.getCollisionBox().isTouching(e.getCollisionBox())) {
-                testPoly.setColor(Color.CYAN);
-            }
-        }
+//        testPoly.setColor(Color.ORANGE);
+//        for(Entity e: objects) {
+//            if(e.equals(testPoly)) continue;
+//            if (testPoly.getCollisionBox().isTouching(e.getCollisionBox())) {
+//                testPoly.setColor(Color.CYAN);
+//            }
+//        }
     }
 
     private void addObject(Entity o)
