@@ -25,6 +25,8 @@ class Collision {
 
     void applyImpulse()
     {
+        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return; // Two infinite mass objects cannot move
+
         correctPosition();
 
         // Get the vector formed by the two circles' velocities
@@ -94,7 +96,6 @@ class Collision {
     private void correctPosition()
     {
         if(penetration <= MIN_POSITION_CORRECTION) return;
-        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return; // something went wrong here
 
         float correctionAmount;
         correctionAmount = (penetration / (o1.getInvertedMass() + o2.getInvertedMass())) * POSITION_CORRECTION_PERCENT;
@@ -106,10 +107,6 @@ class Collision {
         o1.position.y -= o1.getInvertedMass() * correctionVector.y;
         o2.position.x += o2.getInvertedMass() * correctionVector.x;
         o2.position.y += o2.getInvertedMass() * correctionVector.y;
-
-        if(Float.isNaN(o1.position.x) || Float.isNaN(o2.position.x)){
-            System.out.println("HEY");
-        }
     }
 
     public void setO1(PhysicsObject o1){ this.o1 = o1; }

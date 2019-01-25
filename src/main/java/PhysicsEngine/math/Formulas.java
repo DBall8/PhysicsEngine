@@ -3,6 +3,7 @@ package PhysicsEngine.math;
 public class Formulas {
 
     static final float TWO_PI = (float)(2.0 * Math.PI);
+    static final float RAD_TO_DEGREE_FACTOR = (float)(180.0f / Math.PI);
 
     public static float dotProduct(Vec2 vector1, Vec2 vector2)
     {
@@ -58,5 +59,10 @@ public class Formulas {
         }
 
         return angleInRads;
+    }
+
+    public static float toDegrees(float rads)
+    {
+        return rads * RAD_TO_DEGREE_FACTOR;
     }
 }

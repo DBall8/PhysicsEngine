@@ -56,7 +56,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(20, 20, 40, 40, Material.Wood);
+            Body b = new Body(20, 20, 40, /*40,*/ Material.Wood);
             b.setInput(input);
             p = b;
         }

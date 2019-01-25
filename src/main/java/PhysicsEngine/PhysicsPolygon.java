@@ -25,6 +25,85 @@ public class PhysicsPolygon extends PhysicsObject{
 
     void checkCollision(PhysicsCircle circle)
     {
+        float bestDist = -Float.MAX_VALUE;
+        Vec2 bestNormal = null;
+        Vec2 bestFace = null;
+        Vec2 bestPoint1 = null;
+        Vec2 bestPoint2 = null;
+        Vec2 face;
+
+        // Move polygon A to be in the circle's coordinate space, rotated
+        float relativeX = position.x - circle.getX();
+        float relativeY = position.y - circle.getY();
+        polygon.translateAndRotate(relativeX, relativeY, orientation ,true);
+
+        // Now we will use the points from polygon A in polygon B's coordinate space
+        Vec2[] polyPoints = polygon.getCalculatedPoints();
+
+        // Loop through each face and try to see if a seperating line can be drawn
+        for(int i=0; i<polyPoints.length; i++)
+        {
+            // Create a face from the current point and next (and loop back around for last point)
+            Vec2 point1 = polyPoints[i];
+            Vec2 point2 = i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1];
+
+            face = new Vec2(point2.getX() - point1.getX(),
+                    point2.getY() - point1.getY());
+            face.normalize();
+
+            // Get the normal vector of the face
+            Vec2 normal = new Vec2(face.getY(), -face.getX());
+
+            // Check that the normal faces away from the center of the polygon, if not, flip the normal
+            Vec2 pointVecFromCenter = new Vec2(polyPoints[i].x - relativeX, polyPoints[i].y - relativeY);
+            if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
+            {
+                normal.mult(-1.0f);
+            }
+
+            // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
+            // (just use a point from the current face)
+            Vec2 aSupport = polyPoints[i];
+
+            // These two points are in B's coordinate space, so each point is also the vector from B's center
+
+            // Project each point vector along the face normal. This essentially translates to the "distance" in the
+            // direction of the face normal. Therefore, if A's point has a smaller distance from B's center than B, we
+            // know that there is an overlap (quantified by the difference, positive difference is a positive overlap)
+            float sepDistance = Formulas.dotProduct(normal, new Vec2(-aSupport.getX(), -aSupport.getY()));
+
+            // Keep the best overlap and the normal along which it occurred
+            if(sepDistance > bestDist)
+            {
+                bestDist = sepDistance;
+                bestNormal = normal;
+                bestFace = face;
+                bestPoint1 = point1;
+                bestPoint2 = point2;
+            }
+        }
+
+        // If the center of the circle has crossed through the face, we know collision has occurred against the face
+        if(bestDist < 0)
+        {
+            Collision collision = new Collision(this, circle, bestNormal, -bestDist);
+            collision.applyImpulse();
+        }
+
+        // Check the angle of the circle's center against each of the two points in the closest face
+//        float angle1;
+//        float angle2;
+//        {
+//            float proj = Formulas.dotProduct(bestFace, bestPoint1);
+//            float mag = bestPoint1.magnitude();
+//            angle1 = (float) Math.acos(proj / mag);
+//        }
+//        {
+//            float proj = Formulas.dotProduct(bestFace, bestPoint2);
+//            float mag = bestPoint2.magnitude();
+//            angle2 = (float) Math.acos(proj / mag);
+//        }
+//        System.out.println("ONE: " + Formulas.toDegrees(angle1) + " TWO " + Formulas.toDegrees(angle2));
 
     }
 
@@ -134,52 +213,64 @@ public class PhysicsPolygon extends PhysicsObject{
     public Collision findAxisOfLeastSeperation(PhysicsPolygon b)
     {
         float bestDist = -Float.MAX_VALUE;
-        Vec2 bestFace = null;
+        Vec2 bestNormal = null;
+        Vec2 face;
 
+        // Move polygon B to origin = its center, and rotate it to its current rotation
         b.polygon.translateAndRotate(0, 0, b.orientation, true);
+        // Move polygon A to be in B's coordinate space, rotated
         float relativeX = position.x - b.getX();
         float relativeY = position.y - b.getY();
-
-        // Move polygon A to be in B's coordinate space (not rotating, might need to)
         polygon.translateAndRotate(relativeX, relativeY, orientation ,true);
+
+        // Now we will use the points from polygon A in polygon B's coordinate space
         Vec2[] polyPoints = polygon.getCalculatedPoints();
 
+        // Loop through each face and try to see if a seperating line can be drawn
         for(int i=0; i<polyPoints.length; i++)
         {
-            Vec2 face;
-            if(i == polyPoints.length-1)
-            {
-                face = new Vec2(polyPoints[0].getX() - polyPoints[i].getX(),
-                        polyPoints[0].getY() - polyPoints[i].getY());
-            }
-            else
-            {
-                face = new Vec2(polyPoints[i+1].getX() - polyPoints[i].getX(),
-                        polyPoints[i+1].getY() - polyPoints[i].getY());
-            }
+            // Create a face from the current point and next (and loop back around for last point)
+            Vec2 point1 = polyPoints[i];
+            Vec2 point2 = i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1];
+
+            face = new Vec2(point2.getX() - point1.getX(),
+                    point2.getY() - point1.getY());
             face.normalize();
+
+            // Get the normal vector of the face
             Vec2 normal = new Vec2(face.getY(), -face.getX());
-            // Make sure the normal is facing outwards
+
+            // Check that the normal faces away from the center of the polygon, if not, flip the normal
             Vec2 pointVecFromCenter = new Vec2(polyPoints[i].x - relativeX, polyPoints[i].y - relativeY);
             if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
             {
-                normal = new Vec2(-face.getY(), face.getX());
+                normal.mult(-1.0f);
             }
 
+            // Get the point from polygon B that is closest to polygon A along the direction of the face's normal
+            // (Get the support point in the opposite direction of the face normal)
             Vec2 bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
+            // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
+            // (just use a point from the current face)
             Vec2 aSupport = polyPoints[i];
 
+            // These two points are in B's coordinate space, so each point is also the vector from B's center
+
+            // Project each point vector along the face normal. This essentially translates to the "distance" in the
+            // direction of the face normal. Therefore, if A's point has a smaller distance from B's center than B, we
+            // know that there is an overlap (quantified by the difference, positive difference is a positive overlap)
             float sepDistance = Formulas.dotProduct(normal, new Vec2(bSupport.getX() - aSupport.getX(), bSupport.getY() - aSupport.getY()));
 
+            // Keep the best overlap and the normal along which it occurred
             if(sepDistance > bestDist)
             {
                 bestDist = sepDistance;
-                bestFace = normal;
+                bestNormal = normal;
             }
         }
-
 //        System.out.println(bestDist);
-        Collision collision = new Collision(this, b, bestFace, -bestDist);
+        // For now, store this in a collision object
+        Collision collision = new Collision(this, b, bestNormal, -bestDist);
 
         return collision;
     }
