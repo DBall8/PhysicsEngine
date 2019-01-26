@@ -56,7 +56,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(20, 20, 40, /*40,*/ Material.Wood);
+            Body b = new Body(20, 20, 20, /*40,*/ Material.Wood);
             b.setInput(input);
             p = b;
         }
@@ -113,8 +113,9 @@ public class GameManager extends Pane {
 
         testPoly = new PolygonBody(600, 600, new Vec2[]{
                 new Vec2(0, 0),
-                new Vec2(100, 0),
                 new Vec2(100, 100),
+                new Vec2(100, 0),
+
 
         });
         addObject(testPoly);
@@ -140,12 +141,12 @@ public class GameManager extends Pane {
         });
         addObject(poly2);
 
-//        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
-//                new Vec2(40, 0),
-//                new Vec2(40, 40),
-//                new Vec2(0, 40),
-//                new Vec2(0, 0),
-//        });
+        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
+                new Vec2(40, 0),
+                new Vec2(40, 40),
+                new Vec2(0, 40),
+                new Vec2(0, 0),
+        });
 //
 //        addObject(polyBodyC);
 

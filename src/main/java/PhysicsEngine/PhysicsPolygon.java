@@ -90,21 +90,51 @@ public class PhysicsPolygon extends PhysicsObject{
             collision.applyImpulse();
         }
 
-        // Check the angle of the circle's center against each of the two points in the closest face
-//        float angle1;
-//        float angle2;
-//        {
-//            float proj = Formulas.dotProduct(bestFace, bestPoint1);
-//            float mag = bestPoint1.magnitude();
-//            angle1 = (float) Math.acos(proj / mag);
-//        }
-//        {
-//            float proj = Formulas.dotProduct(bestFace, bestPoint2);
-//            float mag = bestPoint2.magnitude();
-//            angle2 = (float) Math.acos(proj / mag);
-//        }
-//        System.out.println("ONE: " + Formulas.toDegrees(angle1) + " TWO " + Formulas.toDegrees(angle2));
+        // Project the circle's center and each of the two points along the direction of the face. Then subtract each
+        // point's projection from the circle's to see if the circle is before or past each point in the face's direction
+        // Project(circlePos - pointPos) is the same as Project(-pointPos) because the circle is the origin
+        float proj1 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint1, -1.0f));
+        float proj2 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint2, -1.0f));
 
+        float radiusSquared = circle.getRadius() * circle.getRadius();
+
+        // Projection of point 1 is negative, therefore point 1 is the closest to the circle
+        if(proj1 < 0)
+        {
+            // Check for collision with point 1
+            float distSquared = (bestPoint1.x * bestPoint1.x) + (bestPoint1.y * bestPoint1.y);
+            if(distSquared < radiusSquared){
+                // COLLISION
+                float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
+                bestPoint1.normalize();
+                Collision collision = new Collision(circle, this, bestPoint1, penetration);
+                collision.applyImpulse();
+            }
+        }
+        // Projection of point 1 is positive but point 2 is negative, circle is between both points and is closest to the face
+        else if(proj1 > 0 && proj2 < 0)
+        {
+            // Check for collision with face
+            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1);
+            if(dist < circle.getRadius())
+            {
+                Collision collision = new Collision(circle, this, bestNormal, circle.getRadius() - dist);
+                collision.applyImpulse();
+            }
+        }
+        else if(proj2 > 0)
+        {
+            // Check for collision with point 2
+            float distSquared = (bestPoint2.x * bestPoint2.x) + (bestPoint2.y * bestPoint2.y);
+            if(distSquared < radiusSquared){
+                // COLLISION
+                float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
+                bestPoint2.normalize();
+                Collision collision = new Collision(circle, this, bestPoint2, penetration);
+                collision.applyImpulse();
+
+            }
+        }
     }
 
     void checkCollision(PhysicsBox box)
@@ -119,10 +149,6 @@ public class PhysicsPolygon extends PhysicsObject{
                     new Vec2(-box.width / 2.0f, -box.height / 2.0f),
             });
             PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
-
-            if(Float.isNaN(box.position.x) || Float.isNaN(position.x)){
-                System.out.println("HEY");
-            }
 
             // Check for collisions from each polygon's perspective
             Collision c1 = findAxisOfLeastSeperation(boxPoly);
