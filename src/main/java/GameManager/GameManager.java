@@ -44,9 +44,6 @@ public class GameManager extends Pane {
         this.scene = scene;
         input = new UserInputListener(scene);
 
-        PhysicsWorld world = new PhysicsWorld();
-        PhysicsCircle circle = world.addCircle(10, 10, 10);
-
         Entity p;
         if(Settings.isShip())
         {
@@ -141,12 +138,12 @@ public class GameManager extends Pane {
         });
         addObject(poly2);
 
-        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
-                new Vec2(40, 0),
-                new Vec2(40, 40),
-                new Vec2(0, 40),
-                new Vec2(0, 0),
-        });
+//        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
+//                new Vec2(40, 0),
+//                new Vec2(40, 40),
+//                new Vec2(0, 40),
+//                new Vec2(0, 0),
+//        });
 //
 //        addObject(polyBodyC);
 

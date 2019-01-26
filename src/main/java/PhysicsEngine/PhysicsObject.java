@@ -53,9 +53,6 @@ public abstract class PhysicsObject{
     {
         position.x = position.x + xvelocity * timeStep;
         position.y = position.y + yvelocity * timeStep;
-        if(Float.isNaN(position.x)){
-            System.out.println("HEY");
-        }
     }
 
     void applyGravity()

@@ -24,6 +24,13 @@ public class Vec2 {
         return this;
     }
 
+    public Vec2 add(float x, float y)
+    {
+        this.x += x;
+        this.y += y;
+        return this;
+    }
+
     public void zero()
     {
         x = 0;

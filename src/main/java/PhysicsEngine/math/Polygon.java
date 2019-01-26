@@ -20,6 +20,10 @@ public class Polygon {
         this.points = new Vec2[setPoints.length];
         centerAtOrigin();
         findPointAngles();
+        for(int i=0; i< points.length; i++)
+        {
+            this.points[i] = this.setPoints[i].copy();
+        }
     }
 
     public Vec2 getSupportPoint(Vec2 direction) {
@@ -109,9 +113,8 @@ public class Polygon {
 
     public void setTranslation(float x, float y)
     {
+        translatePoints(x - translation.x, y - translation.y);
         translation = new Vec2(x, y);
-
-        recalcPoints();
     }
 
     public void setRotation(float r, boolean radians)
@@ -121,23 +124,43 @@ public class Polygon {
             r *= Math.PI / 180.0;
         }
 
-        this.rotation = Formulas.normalizeAngle(r);
-
-        recalcPoints();
+        r = Formulas.normalizeAngle(r);
+        if(this.rotation != r) {
+            rotatePointsTo(r);
+            this.rotation = r;
+        }
     }
 
     public void translateAndRotate(float x, float y, float r, boolean radians)
     {
-        if(!radians)
+        setRotation(r, radians);
+        setTranslation(x, y);
+    }
+
+    private void translatePoints(float x, float y)
+    {
+        if(x == 0 && y == 0) return;
+        for(int i=0; i<points.length; i++)
         {
-            r *= Math.PI / 180.0;
+            points[i].add(x, y);
         }
+    }
 
-        this.rotation = Formulas.normalizeAngle(r);
+    private void rotatePointsTo(float angleRads)
+    {
+        for(int i=0; i<points.length; i++)
+        {
+            float mag = setPoints[i].magnitude();
+            float newAngle = pointAngles[i] + angleRads;
 
-        translation = new Vec2(x, y);
-
-        recalcPoints();
+                //points[i] = setPoints[i].copy();
+            float newx = (float) (mag * Math.sin(newAngle));
+            float newy = (float) (-mag * Math.cos(newAngle));
+            //if(newAngle >= Math.PI/4 && newAngle < 3.0f*Math.PI/4) pointAngles[i] += Math.PI;
+//          System.out.format("Old x: %f, new X: %f\n", setPoints[i].x, newx);
+//          System.out.format("Old y: %f, new Y: %f\n\n", setPoints[i].y, newy);
+            points[i] = new Vec2(newx + translation.x, newy + translation.y);
+        }
     }
 
     private void recalcPoints()

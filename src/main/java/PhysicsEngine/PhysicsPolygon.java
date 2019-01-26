@@ -78,8 +78,8 @@ public class PhysicsPolygon extends PhysicsObject{
                 bestDist = sepDistance;
                 bestNormal = normal;
                 bestFace = face;
-                bestPoint1 = point1;
-                bestPoint2 = point2;
+                bestPoint1 = point1.copy();
+                bestPoint2 = point2.copy();
             }
         }
 
@@ -226,7 +226,6 @@ public class PhysicsPolygon extends PhysicsObject{
             boolean collided = findAxisOfLeastSeperation(polygon).penetration > 0 &&
                     polygon.findAxisOfLeastSeperation(this).penetration > 0;
 
-            //if(collided) System.out.println("TOUCHING");
             return collided;
         }
         catch (MalformedPolygonException e)
