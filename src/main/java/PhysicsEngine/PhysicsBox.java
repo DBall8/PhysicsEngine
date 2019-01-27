@@ -2,6 +2,9 @@ package PhysicsEngine;
 
 import PhysicsEngine.math.Vec2;
 
+/**
+ * Class used for calculation collisions for axis bound boxes
+ */
 class PhysicsBox extends PhysicsObject {
 
     float width;
@@ -21,14 +24,14 @@ class PhysicsBox extends PhysicsObject {
         this.height = height;
     }
 
+    void checkCollision(PhysicsPolygon polygon)
+    {
+        polygon.checkCollision(this);
+    }
+
     void checkCollision(PhysicsCircle circle)
     {
         circle.checkCollision(this);
-    }
-
-    void checkCollision(PhysicsPolygon polygon)
-    {
-
     }
 
     void checkCollision(PhysicsBox box){
@@ -133,7 +136,4 @@ class PhysicsBox extends PhysicsObject {
 
         return false;
     }
-
-    public float getWidth(){ return width; }
-    public float getHeight(){ return height; }
 }

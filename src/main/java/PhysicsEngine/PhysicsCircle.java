@@ -3,6 +3,9 @@ package PhysicsEngine;
 import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.Vec2;
 
+/**
+ * Class for calculating collisions for a circle
+ */
 class PhysicsCircle extends PhysicsObject {
 
     private float radius;
@@ -17,6 +20,12 @@ class PhysicsCircle extends PhysicsObject {
     {
         super(worldSettings, p, material, (float)(Math.PI * r * r));
         this.radius = r;
+    }
+
+    @Override
+    void checkCollision(PhysicsPolygon polygon)
+    {
+        polygon.checkCollision(this);
     }
 
     void checkCollision(PhysicsCircle circle)
@@ -111,12 +120,6 @@ class PhysicsCircle extends PhysicsObject {
         collision.applyImpulse();
     }
 
-    @Override
-    void checkCollision(PhysicsPolygon polygon)
-    {
-        polygon.checkCollision(this);
-    }
-
     public boolean isTouching(PhysicsPolygon polygon){
         return polygon.isTouching(this);
     }
@@ -132,7 +135,7 @@ class PhysicsCircle extends PhysicsObject {
     }
     public boolean isTouching(PhysicsBox box){
         // Vector between circle and box centers
-        Vec2 normal = new Vec2(box.getHeight() - position.x,
+        Vec2 normal = new Vec2(box.getX() - position.x,
                 box.getY() - position.y);
 
         // Box's centers
