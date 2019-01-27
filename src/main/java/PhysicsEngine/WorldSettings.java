@@ -2,7 +2,7 @@ package PhysicsEngine;
 
 import PhysicsEngine.math.Vec2;
 
-class WorldSettings {
+public class WorldSettings {
 
     private float scaledTimeStep = 1.0f/120.0f; // scaled time step to speed up moving things along
     private float collisionPrecision = 1; // How many times it iterates through the collision, stops stacks squashing

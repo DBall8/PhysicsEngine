@@ -125,8 +125,12 @@ public class PhysicsWorld {
 
         while(accumulator >= TIME_STEP)
         {
-            for(int i=0; i < worldSettings.getCollisionPrecision(); i++) checkCollisions(worldSettings.getScaledTimeStep());
-            applyForces();
+            for(int i=0; i < worldSettings.getCollisionPrecision(); i++)
+            {
+                checkCollisions(worldSettings.getScaledTimeStep());
+                applyForces();
+            }
+
             move(worldSettings.getScaledTimeStep());
             accumulator -= TIME_STEP;
         }

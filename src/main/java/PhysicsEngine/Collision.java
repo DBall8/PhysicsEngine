@@ -51,10 +51,12 @@ class Collision {
         Vec2 resolutionVec = normal.copy();
         resolutionVec.mult(j);
 
-        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
-        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
-        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
-        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
+        o1.applyForce(-resolutionVec.x, -resolutionVec.y);
+        o2.applyForce(resolutionVec.x, resolutionVec.y);
+//        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
+//        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
+//        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
+//        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
 
         applyFriction(relativeVelocity, j);
     }
@@ -87,10 +89,12 @@ class Collision {
             frictionVec = tangent.mult(-1.0f * j * mu);
         }
 
-        o1.xvelocity -= o1.getInvertedMass() * frictionVec.x;
-        o1.yvelocity -= o1.getInvertedMass() * frictionVec.y;
-        o2.xvelocity += o2.getInvertedMass() * frictionVec.x;
-        o2.yvelocity += o2.getInvertedMass() * frictionVec.y;
+        o1.applyForce(-frictionVec.x, -frictionVec.y);
+        o2.applyForce(frictionVec.x, frictionVec.y);
+//        o1.xvelocity -= o1.getInvertedMass() * frictionVec.x;
+//        o1.yvelocity -= o1.getInvertedMass() * frictionVec.y;
+//        o2.xvelocity += o2.getInvertedMass() * frictionVec.x;
+//        o2.yvelocity += o2.getInvertedMass() * frictionVec.y;
     }
 
     private void correctPosition()

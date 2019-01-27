@@ -3,19 +3,22 @@ package PhysicsEngine;
 import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.Vec2;
 
+/**
+ * Base class for calculation collisions between objects
+ */
 public abstract class PhysicsObject{
 
-    public final static float MASS_SCALING_FACTOR = 100.0f;
-    private final static float GRAVITY_SCALAR = 0.01f;
-    protected final static float TINY_AMOUNT = 0.01f;
+    public final static float MASS_SCALING_FACTOR = 100.0f; // Scale for making masses closer to velocities for less
+                                                            // floating point errors
+    private final static float GRAVITY_SCALAR = 0.01f; // Scale for making gravity seem normal at about 10 units
+    protected final static float TINY_AMOUNT = 0.01f; // A value to consider "close enough"
 
-    Vec2 position;
-    Vec2 totalForce;
+    Vec2 position; // Position of the object
+    Vec2 totalForce; // Sum of all forces currently acting on the object
 
-    float orientation;
+    float orientation; // current angle (in radians)
     float angularVelocity;
     float torque;
-
 
     float xvelocity;
     float yvelocity;
