@@ -46,12 +46,14 @@ public class Vec2 {
         return (float)Math.sqrt(x*x + y*y);
     }
 
-    public void normalize()
+    public Vec2 normalize()
     {
         float magnitude = magnitude();
-        if(magnitude == 0) return;
+        if(magnitude == 0) return this;
         x /= magnitude;
         y /= magnitude;
+
+        return this;
     }
 
     public Vec2 copy()

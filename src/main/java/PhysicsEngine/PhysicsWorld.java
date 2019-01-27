@@ -1,6 +1,7 @@
 package PhysicsEngine;
 
 import PhysicsEngine.math.MalformedPolygonException;
+import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Polygon;
 import PhysicsEngine.math.Vec2;
 
@@ -68,7 +69,7 @@ public class PhysicsWorld {
         return b;
     }
 
-    public PhysicsPolygon addPolygon(float centerx, float centery, Vec2[] points)
+    public PhysicsPolygon addPolygon(float centerx, float centery, Point[] points)
     {
         try
         {
@@ -83,7 +84,7 @@ public class PhysicsWorld {
         }
     }
 
-    public PhysicsPolygon addPolygon(float centerx, float centery, Vec2[] points, Material material)
+    public PhysicsPolygon addPolygon(float centerx, float centery, Point[] points, Material material)
     {
         try
         {

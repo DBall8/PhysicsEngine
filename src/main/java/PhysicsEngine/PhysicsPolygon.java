@@ -1,9 +1,7 @@
 package PhysicsEngine;
 
-import PhysicsEngine.math.Formulas;
-import PhysicsEngine.math.MalformedPolygonException;
-import PhysicsEngine.math.Polygon;
-import PhysicsEngine.math.Vec2;
+import PhysicsEngine.math.*;
+import org.omg.PortableServer.POA;
 
 public class PhysicsPolygon extends PhysicsObject{
 
@@ -28,8 +26,8 @@ public class PhysicsPolygon extends PhysicsObject{
         float bestDist = -Float.MAX_VALUE;
         Vec2 bestNormal = null;
         Vec2 bestFace = null;
-        Vec2 bestPoint1 = null;
-        Vec2 bestPoint2 = null;
+        Point bestPoint1 = null;
+        Point bestPoint2 = null;
         Vec2 face;
 
         // Move polygon A to be in the circle's coordinate space, rotated
@@ -38,14 +36,14 @@ public class PhysicsPolygon extends PhysicsObject{
         polygon.translateAndRotate(relativeX, relativeY, orientation ,true);
 
         // Now we will use the points from polygon A in polygon B's coordinate space
-        Vec2[] polyPoints = polygon.getCalculatedPoints();
+        Point[] polyPoints = polygon.getCalculatedPoints();
 
         // Loop through each face and try to see if a seperating line can be drawn
         for(int i=0; i<polyPoints.length; i++)
         {
             // Create a face from the current point and next (and loop back around for last point)
-            Vec2 point1 = polyPoints[i];
-            Vec2 point2 = i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1];
+            Point point1 = polyPoints[i];
+            Point point2 = (i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1]);
 
             face = new Vec2(point2.getX() - point1.getX(),
                     point2.getY() - point1.getY());
@@ -55,7 +53,7 @@ public class PhysicsPolygon extends PhysicsObject{
             Vec2 normal = new Vec2(face.getY(), -face.getX());
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
-            Vec2 pointVecFromCenter = new Vec2(polyPoints[i].x - relativeX, polyPoints[i].y - relativeY);
+            Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
             if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
             {
                 normal.mult(-1.0f);
@@ -63,7 +61,7 @@ public class PhysicsPolygon extends PhysicsObject{
 
             // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
             // (just use a point from the current face)
-            Vec2 aSupport = polyPoints[i];
+            Point aSupport = polyPoints[i];
 
             // These two points are in B's coordinate space, so each point is also the vector from B's center
 
@@ -93,8 +91,8 @@ public class PhysicsPolygon extends PhysicsObject{
         // Project the circle's center and each of the two points along the direction of the face. Then subtract each
         // point's projection from the circle's to see if the circle is before or past each point in the face's direction
         // Project(circlePos - pointPos) is the same as Project(-pointPos) because the circle is the origin
-        float proj1 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint1, -1.0f));
-        float proj2 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint2, -1.0f));
+        float proj1 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint1.getVec(), -1.0f));
+        float proj2 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint2.getVec(), -1.0f));
 
         float radiusSquared = circle.getRadius() * circle.getRadius();
 
@@ -102,12 +100,12 @@ public class PhysicsPolygon extends PhysicsObject{
         if(proj1 < 0)
         {
             // Check for collision with point 1
-            float distSquared = (bestPoint1.x * bestPoint1.x) + (bestPoint1.y * bestPoint1.y);
+            float distSquared = (bestPoint1.getX() * bestPoint1.getX()) + (bestPoint1.getY() * bestPoint1.getY());
             if(distSquared < radiusSquared){
                 // COLLISION
                 float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
-                bestPoint1.normalize();
-                Collision collision = new Collision(circle, this, bestPoint1, penetration);
+                Vec2 normal = bestPoint1.getVec().normalize();
+                Collision collision = new Collision(circle, this, normal, penetration);
                 collision.applyImpulse();
             }
         }
@@ -115,7 +113,7 @@ public class PhysicsPolygon extends PhysicsObject{
         else if(proj1 > 0 && proj2 < 0)
         {
             // Check for collision with face
-            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1);
+            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1.getVec());
             if(dist < circle.getRadius())
             {
                 Collision collision = new Collision(circle, this, bestNormal, circle.getRadius() - dist);
@@ -125,12 +123,12 @@ public class PhysicsPolygon extends PhysicsObject{
         else if(proj2 > 0)
         {
             // Check for collision with point 2
-            float distSquared = (bestPoint2.x * bestPoint2.x) + (bestPoint2.y * bestPoint2.y);
+            float distSquared = (bestPoint2.getX() * bestPoint2.getX()) + (bestPoint2.getY() * bestPoint2.getY());
             if(distSquared < radiusSquared){
                 // COLLISION
                 float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
-                bestPoint2.normalize();
-                Collision collision = new Collision(circle, this, bestPoint2, penetration);
+                Vec2 normal = bestPoint2.getVec().normalize();
+                Collision collision = new Collision(circle, this, normal, penetration);
                 collision.applyImpulse();
 
             }
@@ -141,12 +139,12 @@ public class PhysicsPolygon extends PhysicsObject{
     {
         try {
             // Create a polygon from the box TODO make this a box member or remove
-            Polygon p = new Polygon(new Vec2[]
+            Polygon p = new Polygon(new Point[]
             {
-                    new Vec2(-box.width / 2.0f, box.height / 2.0f),
-                    new Vec2(box.width / 2.0f, box.height / 2.0f),
-                    new Vec2(box.width / 2.0f, -box.height / 2.0f),
-                    new Vec2(-box.width / 2.0f, -box.height / 2.0f),
+                    new Point(-box.width / 2.0f, box.height / 2.0f),
+                    new Point(box.width / 2.0f, box.height / 2.0f),
+                    new Point(box.width / 2.0f, -box.height / 2.0f),
+                    new Point(-box.width / 2.0f, -box.height / 2.0f),
             });
             PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
 
@@ -214,11 +212,11 @@ public class PhysicsPolygon extends PhysicsObject{
     public boolean isTouching(PhysicsBox box)
     {
         try {
-            Polygon p = new Polygon(new Vec2[]{
-                    new Vec2(-box.width / 2.0f, -box.height / 2.0f),
-                    new Vec2(box.width / 2.0f, -box.height / 2.0f),
-                    new Vec2(box.width / 2.0f, box.height / 2.0f),
-                    new Vec2(-box.width / 2.0f, box.height / 2.0f),
+            Polygon p = new Polygon(new Point[]{
+                    new Point(-box.width / 2.0f, -box.height / 2.0f),
+                    new Point(box.width / 2.0f, -box.height / 2.0f),
+                    new Point(box.width / 2.0f, box.height / 2.0f),
+                    new Point(-box.width / 2.0f, box.height / 2.0f),
             });
 
             PhysicsPolygon polygon = new PhysicsPolygon(worldSettings, box.position, p);
@@ -249,14 +247,14 @@ public class PhysicsPolygon extends PhysicsObject{
         polygon.translateAndRotate(relativeX, relativeY, orientation ,true);
 
         // Now we will use the points from polygon A in polygon B's coordinate space
-        Vec2[] polyPoints = polygon.getCalculatedPoints();
+        Point[] polyPoints = polygon.getCalculatedPoints();
 
         // Loop through each face and try to see if a seperating line can be drawn
         for(int i=0; i<polyPoints.length; i++)
         {
             // Create a face from the current point and next (and loop back around for last point)
-            Vec2 point1 = polyPoints[i];
-            Vec2 point2 = i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1];
+            Point point1 = polyPoints[i];
+            Point point2 = i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1];
 
             face = new Vec2(point2.getX() - point1.getX(),
                     point2.getY() - point1.getY());
@@ -266,7 +264,7 @@ public class PhysicsPolygon extends PhysicsObject{
             Vec2 normal = new Vec2(face.getY(), -face.getX());
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
-            Vec2 pointVecFromCenter = new Vec2(polyPoints[i].x - relativeX, polyPoints[i].y - relativeY);
+            Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
             if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
             {
                 normal.mult(-1.0f);
@@ -274,10 +272,10 @@ public class PhysicsPolygon extends PhysicsObject{
 
             // Get the point from polygon B that is closest to polygon A along the direction of the face's normal
             // (Get the support point in the opposite direction of the face normal)
-            Vec2 bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
+            Point bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
             // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
             // (just use a point from the current face)
-            Vec2 aSupport = polyPoints[i];
+            Point aSupport = polyPoints[i];
 
             // These two points are in B's coordinate space, so each point is also the vector from B's center
 

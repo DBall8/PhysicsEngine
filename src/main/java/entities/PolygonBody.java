@@ -2,6 +2,7 @@ package entities;
 
 import GameManager.GameManager;
 import PhysicsEngine.PhysicsPolygon;
+import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Vec2;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -13,7 +14,7 @@ public class PolygonBody extends Ship {
     Shape shape;
     Color color = Color.ORANGE;
 
-    public PolygonBody(float x, float y, Vec2[] points) {
+    public PolygonBody(float x, float y, Point[] points) {
 
         polygon = GameManager.world.addPolygon(x, y, points);
         collisionBox = polygon;
@@ -40,7 +41,7 @@ public class PolygonBody extends Ship {
 
         collisionBox = GameManager.world.addPolygon(x, y, polygon);
 
-        Vec2[] points = polygon.getPoints();
+        Point[] points = polygon.getPoints();
 
         double[] polyPoints = new double[points.length*2];
         for(int i=0; i<points.length; i++)
@@ -65,7 +66,7 @@ public class PolygonBody extends Ship {
         PhysicsEngine.math.Polygon p = polygon.getPolygon();
         //p.setTranslation(0,0);
         p.translateAndRotate(polygon.getX(), polygon.getY(), angle, true);
-        Vec2[] points = p.getCalculatedPoints();
+        Point[] points = p.getCalculatedPoints();
 
         double[] polyPoints = new double[points.length*2];
         for(int i=0; i<points.length; i++)

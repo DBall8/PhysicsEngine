@@ -3,6 +3,7 @@ package entities;
 import GameManager.GameManager;
 import GameManager.UserInputListener;
 import PhysicsEngine.math.MalformedPolygonException;
+import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Vec2;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -22,10 +23,10 @@ public class Ship extends Entity {
 
     public Ship(int x, int y){
         try {
-            PhysicsEngine.math.Polygon collisionShape = new PhysicsEngine.math.Polygon(new Vec2[]{
-                    new Vec2(-20, -20),
-                    new Vec2(20, -20),
-                    new Vec2(0, 20)
+            PhysicsEngine.math.Polygon collisionShape = new PhysicsEngine.math.Polygon(new Point[]{
+                    new Point(-20, -20),
+                    new Point(20, -20),
+                    new Point(0, 20)
             });
 
             collisionBox = GameManager.world.addPolygon(x, y, collisionShape);

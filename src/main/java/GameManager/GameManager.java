@@ -5,6 +5,7 @@ import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsCircle;
 import PhysicsEngine.PhysicsPolygon;
 import PhysicsEngine.PhysicsWorld;
+import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Polygon;
 import PhysicsEngine.math.Vec2;
 import entities.*;
@@ -80,11 +81,11 @@ public class GameManager extends Pane {
         addObject(wall4);
         ground = wall4;
 
-//        PolygonBody polyBody = new PolygonBody(400, 400, new Vec2[]{
-//                new Vec2(40, 0),
-//                new Vec2(40, 40),
-//                new Vec2(0, 40),
-//                new Vec2(0, 0),
+//        PolygonBody polyBody = new PolygonBody(400, 400, new Point[]{
+//                new Point(40, 0),
+//                new Point(40, 40),
+//                new Point(0, 40),
+//                new Point(0, 0),
 //        });
 //
 //        addObject(polyBody);
@@ -92,57 +93,57 @@ public class GameManager extends Pane {
 //        PhysicsPolygon pp = (PhysicsPolygon)(polyBody.getCollisionBox());
 //        Polygon poly = pp.getPolygon();
 //
-//        PolygonBody polyBody2 = new PolygonBody(600, 100, new Vec2[]{
-//                new Vec2(10, 0),
-//                new Vec2(10, 10),
-//                //new Vec2(0, 10),
-//                new Vec2(0, 0),
+//        PolygonBody polyBody2 = new PolygonBody(600, 100, new Point[]{
+//                new Point(10, 0),
+//                new Point(10, 10),
+//                //new Point(0, 10),
+//                new Point(0, 0),
 //        });
 //        addObject(polyBody2);
 
-//        PolygonBody polyBody3 = new PolygonBody(500, 500, new Vec2[]{
-//                new Vec2(100, 0),
-//                new Vec2(100, 100),
-//                new Vec2(0, 100),
-//                new Vec2(0, 0),
+//        PolygonBody polyBody3 = new PolygonBody(500, 500, new Point[]{
+//                new Point(100, 0),
+//                new Point(100, 100),
+//                new Point(0, 100),
+//                new Point(0, 0),
 //        });
 //        addObject(polyBody3);
 
-        testPoly = new PolygonBody(600, 600, new Vec2[]{
-                new Vec2(0, 0),
-                new Vec2(100, 100),
-                new Vec2(100, 0),
+        testPoly = new PolygonBody(600, 600, new Point[]{
+                new Point(0, 0),
+                new Point(100, 100),
+                new Point(100, 0),
 
 
         });
         addObject(testPoly);
         testPoly.setInput(input);
 
-        PolygonBody poly1 = new PolygonBody(100, 600, new Vec2[]{
-                new Vec2(0, 0),
-                new Vec2(25, 15),
-                new Vec2(40, 40),
-                new Vec2(25, 55),
-                new Vec2(0, 60),
-                new Vec2(-25, 55),
-                new Vec2(-40, 40),
-                new Vec2(-25, 15),
+        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
+                new Point(0, 0),
+                new Point(25, 15),
+                new Point(40, 40),
+                new Point(25, 55),
+                new Point(0, 60),
+                new Point(-25, 55),
+                new Point(-40, 40),
+                new Point(-25, 15),
         });
         addObject(poly1);
 
-        PolygonBody poly2 = new PolygonBody(300, 200, new Vec2[]{
-                new Vec2(0, 0),
-                new Vec2(0, 100),
-                new Vec2(100, 100),
+        PolygonBody poly2 = new PolygonBody(300, 200, new Point[]{
+                new Point(0, 0),
+                new Point(0, 100),
+                new Point(100, 100),
 
         });
         addObject(poly2);
 
-//        PolygonBody polyBodyC = new PolygonBody(420, 420, new Vec2[]{
-//                new Vec2(40, 0),
-//                new Vec2(40, 40),
-//                new Vec2(0, 40),
-//                new Vec2(0, 0),
+//        PolygonBody polyBodyC = new PolygonBody(420, 420, new Point[]{
+//                new Point(40, 0),
+//                new Point(40, 40),
+//                new Point(0, 40),
+//                new Point(0, 0),
 //        });
 //
 //        addObject(polyBodyC);
