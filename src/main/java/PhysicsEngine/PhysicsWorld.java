@@ -41,35 +41,35 @@ public class PhysicsWorld {
         setUpdatesPerFrame(INITIAL_FRAMERATE);
     }
 
-    public PhysicsCircle addCircle(float x, float y, float radius)
+    public PhysicsObject addCircle(float x, float y, float radius)
     {
         PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius);
         circles.add(c);
         return c;
     }
 
-    public PhysicsCircle addCircle(float x, float y, float radius, Material material )
+    public PhysicsObject addCircle(float x, float y, float radius, Material material )
     {
         PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius, material);
         circles.add(c);
         return c;
     }
 
-    public PhysicsBox addBox(float centerx, float centery, float width, float height)
+    public PhysicsObject addBox(float centerx, float centery, float width, float height)
     {
         PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height);
         boxes.add(b);
         return b;
     }
 
-    public PhysicsBox addBox(float centerx, float centery, float width, float height, Material material)
+    public PhysicsObject addBox(float centerx, float centery, float width, float height, Material material)
     {
         PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height, material);
         boxes.add(b);
         return b;
     }
 
-    public PhysicsPolygon addPolygon(float centerx, float centery, Point[] points)
+    public PhysicsObject addPolygon(float centerx, float centery, Point[] points)
     {
         try
         {
@@ -84,7 +84,7 @@ public class PhysicsWorld {
         }
     }
 
-    public PhysicsPolygon addPolygon(float centerx, float centery, Point[] points, Material material)
+    public PhysicsObject addPolygon(float centerx, float centery, Point[] points, Material material)
     {
         try
         {
@@ -99,14 +99,14 @@ public class PhysicsWorld {
         }
     }
 
-    public PhysicsPolygon addPolygon(float centerx, float centery, Polygon polygon)
+    public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
         polygons.add(p);
         return p;
     }
 
-    public PhysicsPolygon addPolygon(float centerx, float centery, Polygon polygon, Material material)
+    public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon, Material material)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon, material);
         polygons.add(p);

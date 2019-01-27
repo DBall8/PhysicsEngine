@@ -3,7 +3,7 @@ package PhysicsEngine;
 import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.Vec2;
 
-public class PhysicsCircle extends PhysicsObject {
+class PhysicsCircle extends PhysicsObject {
 
     private float radius;
 

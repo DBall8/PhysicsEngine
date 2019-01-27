@@ -1,5 +1,8 @@
 package PhysicsEngine.math;
 
+/**
+ * Class used for tracking a vector. Can be modified.
+ */
 public class Vec2 {
     public float x;
     public float y;

@@ -1,9 +1,7 @@
 package PhysicsEngine;
 
 import PhysicsEngine.math.*;
-import org.omg.PortableServer.POA;
-
-public class PhysicsPolygon extends PhysicsObject{
+class PhysicsPolygon extends PhysicsObject{
 
     Polygon polygon;
 
@@ -302,7 +300,4 @@ public class PhysicsPolygon extends PhysicsObject{
     {
         return polygon;
     }
-
-    // TODO DELETE THIS
-    public void setOrientation(float o){ this.orientation = o; }
 }

@@ -4,8 +4,6 @@ import GameManager.GameManager;
 import GameManager.UserInputListener;
 import Global.Settings;
 import PhysicsEngine.Material;
-import PhysicsEngine.PhysicsBox;
-import PhysicsEngine.PhysicsCircle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;

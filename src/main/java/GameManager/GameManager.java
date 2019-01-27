@@ -2,16 +2,11 @@ package GameManager;
 
 import Global.Settings;
 import PhysicsEngine.Material;
-import PhysicsEngine.PhysicsCircle;
-import PhysicsEngine.PhysicsPolygon;
 import PhysicsEngine.PhysicsWorld;
 import PhysicsEngine.math.Point;
-import PhysicsEngine.math.Polygon;
-import PhysicsEngine.math.Vec2;
 import entities.*;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,8 @@
 package PhysicsEngine.math;
 
+/**
+ * Class used for storing points. Cannot be modified once created
+ */
 public class Point {
 
     private float x;

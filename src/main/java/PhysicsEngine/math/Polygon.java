@@ -1,7 +1,9 @@
 package PhysicsEngine.math;
 
-import org.omg.PortableServer.POA;
 
+/**
+ * Class used for calculating the points of a polygon
+ */
 public class Polygon {
 
     private static final float VOLUME_ESTIMATE_FACTOR = 18.0f; // Fudge factor for estimating volume

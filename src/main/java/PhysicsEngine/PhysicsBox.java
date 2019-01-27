@@ -2,7 +2,7 @@ package PhysicsEngine;
 
 import PhysicsEngine.math.Vec2;
 
-public class PhysicsBox extends PhysicsObject {
+class PhysicsBox extends PhysicsObject {
 
     float width;
     float height;

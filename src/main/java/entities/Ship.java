@@ -16,6 +16,8 @@ public class Ship extends Entity {
     private final static float ACCEL = 0.5f;
     private final static float MAX_VELOCITY = 20;
 
+    protected final static float ORIENT_SIZE = 2;
+
     private UserInputListener input;
     protected float angle = 0; // radians
 

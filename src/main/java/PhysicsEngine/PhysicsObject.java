@@ -141,4 +141,8 @@ public abstract class PhysicsObject{
     public abstract boolean isTouching(PhysicsCircle circle);
     public abstract boolean isTouching(PhysicsBox box);
     public abstract boolean isTouching(PhysicsPolygon polygon);
+
+    // DEBUG TODO REMOVE
+    // TODO DELETE THIS
+    public void setOrientation(float o){ this.orientation = o; }
 }
