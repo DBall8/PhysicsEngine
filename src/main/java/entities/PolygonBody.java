@@ -1,6 +1,7 @@
 package entities;
 
 import GameManager.GameManager;
+import PhysicsEngine.Material;
 import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.Point;
 import javafx.scene.paint.Color;
@@ -95,5 +96,14 @@ public class PolygonBody extends Ship {
     public void setColor(Color color)
     {
         this.color = color;
+    }
+
+    public void setMaterial(Material material)
+    {
+        collisionBox.setMaterial(material);
+    }
+
+    public void setRotation(float angle){
+        this.angle = angle;
     }
 }

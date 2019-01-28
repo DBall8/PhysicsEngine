@@ -1,10 +1,19 @@
 package PhysicsEngine.math;
 
+/**
+ * Class for formulas for global use
+ */
 public class Formulas {
 
     static final float TWO_PI = (float)(2.0 * Math.PI);
-    static final float RAD_TO_DEGREE_FACTOR = (float)(180.0f / Math.PI);
+    static final float RAD_TO_DEGREE_FACTOR = (float)(180.0f / Math.PI); // Factor for converting between radians and degrees
 
+    /**
+     * Finds the dot product of two vectors
+     * @param vector1
+     * @param vector2
+     * @return
+     */
     public static float dotProduct(Vec2 vector1, Vec2 vector2)
     {
         return (vector1.getX() * vector2.getX()) + (vector1.getY() * vector2.getY());

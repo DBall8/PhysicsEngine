@@ -171,7 +171,17 @@ public class GameManager extends Pane {
 
         if(input.isMousePressed())
         {
-            Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, 40, Material.Rock);
+            //Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, 40, Material.Rock);
+            //addObject(newBody);
+
+            PolygonBody newBody = new PolygonBody(input.getMouseX(), input.getMouseY(), new Point[]{
+                    new Point(0, 0),
+                    new Point(50, 50),
+                    new Point(50, 0),
+            });
+            newBody.setMaterial(Material.Rock);
+            float randAngle = (float)(Math.random()*2.0f*Math.PI);
+            newBody.setRotation(randAngle);
             addObject(newBody);
         }
 
