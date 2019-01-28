@@ -162,39 +162,6 @@ class PhysicsPolygon extends PhysicsObject{
         }
     }
 
-    void checkCollision(PhysicsBox box) {
-        try {
-            // Create a polygon from the box TODO make this a box member or remove
-            Polygon p = new Polygon(new Point[]
-                    {
-                            new Point(-box.width / 2.0f, box.height / 2.0f),
-                            new Point(box.width / 2.0f, box.height / 2.0f),
-                            new Point(box.width / 2.0f, -box.height / 2.0f),
-                            new Point(-box.width / 2.0f, -box.height / 2.0f),
-                    });
-            PhysicsPolygon boxPoly = new PhysicsPolygon(worldSettings, box.position, p);
-
-            // Check for collisions from each polygon's perspective
-            Collision c1 = findAxisOfLeastSeperation(boxPoly);
-            Collision c2 = boxPoly.findAxisOfLeastSeperation(this);
-            // Collision occurred if both cannot find an axis of seperation
-            if (c1.penetration >= 0 && c2.penetration >= 0) {
-                // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
-                Collision collision;
-                if (c1.penetration < c2.penetration) {
-                    collision = c1;
-                } else {
-                    collision = new Collision(this, box, c2.normal.mult(-1.0f), c2.penetration);
-                }
-                // Apply impulse
-                collision.applyImpulse();
-            }
-
-        } catch (MalformedPolygonException e) {
-            e.printMessage();
-        }
-    }
-
     public boolean isTouching(PhysicsPolygon polygon)
     {
         return findAxisOfLeastSeperation(polygon).penetration > 0 &&
@@ -307,30 +274,6 @@ class PhysicsPolygon extends PhysicsObject{
         }
 
         return false;
-    }
-
-    public boolean isTouching(PhysicsBox box)
-    {
-        try {
-            Polygon p = new Polygon(new Point[]{
-                    new Point(-box.width / 2.0f, -box.height / 2.0f),
-                    new Point(box.width / 2.0f, -box.height / 2.0f),
-                    new Point(box.width / 2.0f, box.height / 2.0f),
-                    new Point(-box.width / 2.0f, box.height / 2.0f),
-            });
-
-            PhysicsPolygon polygon = new PhysicsPolygon(worldSettings, box.position, p);
-
-            boolean collided = findAxisOfLeastSeperation(polygon).penetration > 0 &&
-                    polygon.findAxisOfLeastSeperation(this).penetration > 0;
-
-            return collided;
-        }
-        catch (MalformedPolygonException e)
-        {
-            e.printMessage();
-            return false;
-        }
     }
 
     public Collision findAxisOfLeastSeperation(PhysicsPolygon b)

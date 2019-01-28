@@ -64,16 +64,42 @@ public class PhysicsWorld {
 
     public PhysicsObject addBox(float centerx, float centery, float width, float height)
     {
-        PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height);
-        objects.add(b);
-        return b;
+        try {
+            Polygon polygon = new Polygon(new Point[]{
+                    new Point(0, 0),
+                    new Point(width, 0),
+                    new Point(width, height),
+                    new Point(0, height),
+            });
+            PhysicsPolygon b = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
+            objects.add(b);
+            return b;
+        }
+        catch (MalformedPolygonException e)
+        {
+            e.printMessage();
+            return null;
+        }
     }
 
     public PhysicsObject addBox(float centerx, float centery, float width, float height, Material material)
     {
-        PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height, material);
-        objects.add(b);
-        return b;
+        try {
+            Polygon polygon = new Polygon(new Point[]{
+                    new Point(0, 0),
+                    new Point(width, 0),
+                    new Point(width, height),
+                    new Point(0, height),
+            });
+            PhysicsPolygon b = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon, material);
+            objects.add(b);
+            return b;
+        }
+        catch (MalformedPolygonException e)
+        {
+            e.printMessage();
+            return null;
+        }
     }
 
     public PhysicsObject addPolygon(float centerx, float centery, Point[] points)

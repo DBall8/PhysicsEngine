@@ -100,9 +100,6 @@ public abstract class PhysicsObject{
             case CIRCLE:
                 checkCollision((PhysicsCircle) object);
                 break;
-            case BOX:
-                checkCollision((PhysicsBox) object);
-                break;
             default:
                 System.err.println("INVALID OBJECT TYPE in check collision.");
         }
@@ -116,8 +113,6 @@ public abstract class PhysicsObject{
                 return isTouching((PhysicsPolygon) object);
             case CIRCLE:
                 return isTouching((PhysicsCircle) object);
-            case BOX:
-                return isTouching((PhysicsBox) object);
             default:
                 System.err.println("INVALID OBJECT TYPE in isTouching.");
                 return false;
@@ -161,15 +156,12 @@ public abstract class PhysicsObject{
 
     abstract void checkCollision(PhysicsCircle circle);
     abstract void checkCollision(PhysicsPolygon polygon);
-    abstract void checkCollision(PhysicsBox box);
     public abstract boolean isTouching(PhysicsCircle circle);
-    public abstract boolean isTouching(PhysicsBox box);
     public abstract boolean isTouching(PhysicsPolygon polygon);
 
     protected enum ShapeType{
         POLYGON,
         CIRCLE,
-        BOX,
         INVALID
     }
 
