@@ -13,15 +13,20 @@ class PhysicsCircle extends PhysicsObject {
     PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r)
     {
         super(worldSettings, p, Material.Wood, (float)(Math.PI * r * r));
-        shapeType = ShapeType.CIRCLE;
-        this.radius = r;
+        commonInit(r);
     }
 
     PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r, Material material)
     {
         super(worldSettings, p, material, (float)(Math.PI * r * r));
+        commonInit(r);
+    }
+
+    private void commonInit(float r)
+    {
         shapeType = ShapeType.CIRCLE;
         this.radius = r;
+        this.broadPhaseRadius = r;
     }
 
     @Override
@@ -73,6 +78,8 @@ class PhysicsCircle extends PhysicsObject {
         float distanceSquared = dx*dx + dy*dy;
         return  (radiusSum * radiusSum) >= distanceSquared;
     }
+
+    float findMaxRadius(){ return  radius; }
 
     public float getRadius(){ return radius; }
 }

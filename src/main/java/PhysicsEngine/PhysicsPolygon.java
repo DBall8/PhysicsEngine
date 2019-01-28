@@ -12,17 +12,21 @@ class PhysicsPolygon extends PhysicsObject{
     PhysicsPolygon(WorldSettings worldSettings, Vec2 p, Polygon polygon)
     {
         super(worldSettings, p, Material.Wood, polygon.estimateVolume());
-        shapeType = ShapeType.POLYGON;
-        this.polygon = polygon;
-        polygon.setTranslation(p.getX(), p.getY());
+        commonInit(p, polygon);
     }
 
     PhysicsPolygon(WorldSettings worldSettings, Vec2 p, Polygon polygon, Material material)
     {
         super(worldSettings, p, material, polygon.estimateVolume());
+        commonInit(p, polygon);
+    }
+
+    private void commonInit(Vec2 p, Polygon polygon)
+    {
         shapeType = ShapeType.POLYGON;
         this.polygon = polygon;
         polygon.setTranslation(p.getX(), p.getY());
+        broadPhaseRadius = findMaxRadius();
     }
 
     void checkCollision(PhysicsPolygon polygon)
@@ -339,6 +343,25 @@ class PhysicsPolygon extends PhysicsObject{
         Collision collision = new Collision(this, b, bestNormal, -bestDist);
 
         return collision;
+    }
+
+    /**
+     * Finds the distance of the point furthest from the polygon's center
+     * @return the distance of the furthest point
+     */
+    float findMaxRadius()
+    {
+        float greatestRadius = 0;
+        Point[] points = polygon.getPoints();
+        for(Point point: points)
+        {
+            float r = point.getVec().magnitude();
+            if(r > greatestRadius)
+            {
+                greatestRadius = r;
+            }
+        }
+        return greatestRadius;
     }
 
     public Polygon getPolygon()

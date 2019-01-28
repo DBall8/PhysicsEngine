@@ -21,6 +21,7 @@ public class PhysicsWorld {
 
     // List of all physics objects to simulate
     private List<PhysicsObject> objects = new ArrayList<>();
+    private List<BroadPair> broadPhase = new ArrayList<>();
 
     // Value for accumulating needed physics updates
     private float accumulator = 0;
@@ -207,19 +208,44 @@ public class PhysicsWorld {
 //        }
 //        return firstCollisionTime;
 
-        // Check each object against all other objects further down the list
-        // This prevents checking A vs B and then B vs A again later
+        // Empty broadPhase list
+        broadPhase.clear();
+
+        // Check each collision pair using a circle around the entire shape. If the circles collide, save it as a
+        // potential collision to check
         for(int i=0; i<objects.size(); i++)
         {
-            PhysicsObject o = objects.get(i);
+            PhysicsObject o1 = objects.get(i);
             // Have each polygon check against each polygon further down the list
             for(int j=i+1; j<objects.size(); j++)
             {
-                o.checkCollision(objects.get(j));
+                PhysicsObject o2 = objects.get(j);
+                if(broadCheck(o1, o2)){
+                    broadPhase.add(new BroadPair(o1, o2));
+                }
             }
         }
 
+        // Check each object against all other objects further down the list
+        // This prevents checking A vs B and then B vs A again later
+        for(int i=0; i<broadPhase.size(); i++)
+        {
+            BroadPair potentialCollision = broadPhase.get(i);
+            potentialCollision.object1.checkCollision(potentialCollision.object2);
+        }
+
         return time;
+    }
+
+    boolean broadCheck(PhysicsObject o1, PhysicsObject o2)
+    {
+        float radiusSum = o1.broadPhaseRadius + o2.broadPhaseRadius; // distance between the two circles when touching
+        float dx = o1.getX() - o2.getX(); // x distance
+        float dy = o1.getY() - o2.getY(); // ydistance
+
+        // Are they closer than the distance when touching?
+        float distanceSquared = dx*dx + dy*dy;
+        return  distanceSquared <= (radiusSum * radiusSum);
     }
 
     /**
@@ -280,4 +306,15 @@ public class PhysicsWorld {
 
     public void setGravity(float gravity){ worldSettings.setGravity(gravity); }
     public void setFriction(boolean friction){ worldSettings.setFriction(friction); }
+
+    private class BroadPair{
+        PhysicsObject object1;
+        PhysicsObject object2;
+
+        BroadPair(PhysicsObject object1, PhysicsObject object2)
+        {
+            this.object1 = object1;
+            this.object2 = object2;
+        }
+    }
 }

@@ -27,6 +27,7 @@ public abstract class PhysicsObject{
     Material material;
     float mass;
     float invertedMass = 0.05f;
+    float broadPhaseRadius = 0; // Radius at the furthest point from the shape's center
 
     ShapeType shapeType = ShapeType.INVALID;
     WorldSettings worldSettings;
@@ -145,6 +146,7 @@ public abstract class PhysicsObject{
     public float getOrientation() { return orientation; }
     float getStaticFriction() { return material.getStaticFriction(); }
     float getDynamicFriction() { return material.getDynamicFriction(); }
+    abstract float findMaxRadius();
     private ShapeType getShapeType() { return shapeType; }
     public float getMass() { return mass; }
     public float getVelocity()
