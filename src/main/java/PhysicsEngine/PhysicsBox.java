@@ -13,6 +13,7 @@ class PhysicsBox extends PhysicsObject {
     PhysicsBox(WorldSettings worldSettings, Vec2 p, float width, float height)
     {
         super(worldSettings, p, Material.Wood, width * height);
+        shapeType = ShapeType.BOX;
         this.width = width;
         this.height = height;
     }
@@ -20,6 +21,7 @@ class PhysicsBox extends PhysicsObject {
     PhysicsBox(WorldSettings worldSettings, Vec2 p, float width, float height, Material material)
     {
         super(worldSettings, p, material, width * height);
+        shapeType = ShapeType.BOX;
         this.width = width;
         this.height = height;
     }

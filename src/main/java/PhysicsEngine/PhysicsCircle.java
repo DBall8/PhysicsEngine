@@ -13,12 +13,14 @@ class PhysicsCircle extends PhysicsObject {
     PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r)
     {
         super(worldSettings, p, Material.Wood, (float)(Math.PI * r * r));
+        shapeType = ShapeType.CIRCLE;
         this.radius = r;
     }
 
     PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r, Material material)
     {
         super(worldSettings, p, material, (float)(Math.PI * r * r));
+        shapeType = ShapeType.CIRCLE;
         this.radius = r;
     }
 

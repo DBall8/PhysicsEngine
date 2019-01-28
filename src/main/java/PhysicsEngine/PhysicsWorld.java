@@ -8,6 +8,9 @@ import PhysicsEngine.math.Vec2;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class for containing all physics calculations for a set of objects with a set of settings.
+ */
 public class PhysicsWorld {
 
     private final static int INITIAL_FRAMERATE = 120; // default frame rate
@@ -16,14 +19,16 @@ public class PhysicsWorld {
 
     private final static float TIME_STEP = 1.0f / INITIAL_FRAMERATE; // amount of time to step forward
 
-    private List<PhysicsCircle> circles = new ArrayList<>();
-    private List<PhysicsBox> boxes = new ArrayList<>();
-    private List<PhysicsPolygon> polygons = new ArrayList<>();
+    // List of all physics objects to simulate
+    private List<PhysicsObject> objects = new ArrayList<>();
 
+    // Value for accumulating needed physics updates
     private float accumulator = 0;
 
+    // Class for holding the various settings used in this world, such as gravity strength etc.
     private WorldSettings worldSettings = new WorldSettings();
 
+    // CONSTRUCTORS ----------------------------------------------------------------------------------------------------
     public PhysicsWorld(float gravity, boolean friction){
         worldSettings.setGravity(gravity);
         worldSettings.setFriction(friction);
@@ -40,32 +45,34 @@ public class PhysicsWorld {
         setCollisionPrecision(INITIAL_COLLISION_PRECISION);
         setUpdatesPerFrame(INITIAL_FRAMERATE);
     }
+    // -----------------------------------------------------------------------------------------------------------------
 
+    // Object creation methods -----------------------------------------------------------------------------------------
     public PhysicsObject addCircle(float x, float y, float radius)
     {
         PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius);
-        circles.add(c);
+        objects.add(c);
         return c;
     }
 
     public PhysicsObject addCircle(float x, float y, float radius, Material material )
     {
         PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius, material);
-        circles.add(c);
+        objects.add(c);
         return c;
     }
 
     public PhysicsObject addBox(float centerx, float centery, float width, float height)
     {
         PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height);
-        boxes.add(b);
+        objects.add(b);
         return b;
     }
 
     public PhysicsObject addBox(float centerx, float centery, float width, float height, Material material)
     {
         PhysicsBox b = new PhysicsBox(worldSettings, new Vec2(centerx, centery), width, height, material);
-        boxes.add(b);
+        objects.add(b);
         return b;
     }
 
@@ -74,7 +81,7 @@ public class PhysicsWorld {
         try
         {
             PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points));
-            polygons.add(p);
+            objects.add(p);
             return p;
         }
         catch (MalformedPolygonException e)
@@ -89,7 +96,7 @@ public class PhysicsWorld {
         try
         {
             PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points), material);
-            polygons.add(p);
+            objects.add(p);
             return p;
         }
         catch (MalformedPolygonException e)
@@ -102,42 +109,66 @@ public class PhysicsWorld {
     public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
-        polygons.add(p);
+        objects.add(p);
         return p;
     }
 
     public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon, Material material)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon, material);
-        polygons.add(p);
+        objects.add(p);
         return p;
     }
+    // -----------------------------------------------------------------------------------------------------------------
 
+    // Physics calculation methods -------------------------------------------------------------------------------------
+
+    /**
+     * Updates all object's positions and state
+     * @param time the time step forward to calculate
+     * @return returns an alpha value to show the remaining portion of a time step not calculated, to use for estimating
+     * positions outside of the physics engine to allow for smoother animations
+     */
     public float update(float time){
+        // add the time step to the accumulator
         accumulator += time;
 
+        // If the accumulator has risen to large, cap it at 0.5
         if(accumulator > 0.5f)
         {
             accumulator = 0.5f;
         }
 
+        // First apply the force of gravity on every object
         applyGravity();
 
+        // As long as enough "time" is left in the accumulator "tank", consume a timestep's worth and update the world
         while(accumulator >= TIME_STEP)
         {
+            // Check for all collisions and update, but repeat multiple times to allow impulses to propogate through
+            // (Mostly needed for large stacks of objects)
             for(int i=0; i < worldSettings.getCollisionPrecision(); i++)
             {
                 checkCollisions(worldSettings.getScaledTimeStep());
                 applyForces();
             }
 
+            // Update each object's position
             move(worldSettings.getScaledTimeStep());
+            // Take the "time" from the accumulator "tank"
             accumulator -= TIME_STEP;
         }
 
+        // If there is still "time" left in the accumulator but not enough for a full time step, return a value to use
+        // to guess each movement forward to allow for smoother animations
         return accumulator / TIME_STEP;
     }
 
+    /**
+     * Have each object check for a collision between all other objects
+     * @param time UNUSED - needed for continuous collision detection
+     * @return UNUSED
+     */
     private float checkCollisions(float time){
 //        float firstCollisionTime = timeLeft; // looks for first collision
 //        float tempTime;
@@ -150,112 +181,58 @@ public class PhysicsWorld {
 //        }
 //        return firstCollisionTime;
 
-        // Check each circle against all other objects
-
-        for(int i=0; i<polygons.size(); i++)
+        // Check each object against all other objects further down the list
+        // This prevents checking A vs B and then B vs A again later
+        for(int i=0; i<objects.size(); i++)
         {
-            PhysicsPolygon p =  polygons.get(i);
+            PhysicsObject o = objects.get(i);
             // Have each polygon check against each polygon further down the list
-            for(int j=i+1; j<polygons.size(); j++)
+            for(int j=i+1; j<objects.size(); j++)
             {
-                p.checkCollision(polygons.get(j));
-            }
-
-            // Have each polygon check against each circle
-            for(int j=0; j<circles.size(); j++)
-            {
-                p.checkCollision(circles.get(j));
-            }
-
-            // Have each polygon check against each box
-            for(int j=0; j<boxes.size(); j++)
-            {
-                p.checkCollision(boxes.get(j));
-            }
-        }
-
-        for(int i=0; i<circles.size(); i++)
-        {
-            PhysicsCircle c =  circles.get(i);
-            // Have each circle check against each circle further down the list
-            for(int j=i+1; j<circles.size(); j++)
-            {
-                c.checkCollision(circles.get(j));
-            }
-            // Have each circle check against each box
-            for(int j=0; j<boxes.size(); j++)
-            {
-                c.checkCollision(boxes.get(j));
-            }
-        }
-
-        // Check each box against all other boxes further down the list
-        for(int i=0; i<boxes.size()-1; i++)
-        {
-            PhysicsBox b =  boxes.get(i);
-            for(int j=i+1; j<boxes.size(); j++)
-            {
-                b.checkCollision(boxes.get(j));
+                o.checkCollision(objects.get(j));
             }
         }
 
         return time;
     }
 
+    /**
+     * Apply gravity to all objects
+     */
     private void applyGravity()
     {
-        for(PhysicsCircle circle: circles)
+        for(PhysicsObject object: objects)
         {
-            circle.applyGravity();
-        }
-
-        for(PhysicsPolygon polygon: polygons)
-        {
-            polygon.applyGravity();
-        }
-
-        for(PhysicsBox box: boxes)
-        {
-            box.applyGravity();
+            object.applyGravity();
         }
     }
 
+    /**
+     * Move all objects by the given time step
+     * @param timeStep the portion of time to move the objects by
+     */
     private void move(float timeStep)
     {
-        for(PhysicsCircle c: circles)
+        for(PhysicsObject o: objects)
         {
-            c.move(timeStep);
-        }
-
-        for(PhysicsPolygon polygon: polygons)
-        {
-            polygon.move(timeStep);
-        }
-
-        for(PhysicsBox b: boxes)
-        {
-            b.move(timeStep);
+            o.move(timeStep);
         }
     }
 
+    /**
+     * Have each object apply the forces accumulated from collision detection
+     * This transfers the force into resulting velocities
+     */
     private void applyForces()
     {
-        for(PhysicsCircle c: circles)
+        for(PhysicsObject o: objects)
         {
-            c.applyTotalForce();
-        }
-
-        for(PhysicsPolygon polygon: polygons)
-        {
-            polygon.applyTotalForce();
-        }
-
-        for(PhysicsBox b: boxes)
-        {
-            b.applyTotalForce();
+            o.applyTotalForce();
         }
     }
+    // -----------------------------------------------------------------------------------------------------------------
 
+    // SETTERS ---------------------------------------------------------------------------------------------------------
     public void setUpdatesPerFrame(int updates)
     {
         float timeStep = 1.0f / updates;

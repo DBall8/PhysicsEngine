@@ -28,6 +28,7 @@ public abstract class PhysicsObject{
     float mass;
     float invertedMass = 0.05f;
 
+    ShapeType shapeType = ShapeType.INVALID;
     WorldSettings worldSettings;
 
     protected PhysicsObject(WorldSettings worldSettings, Vec2 p, Material material, float volume)
@@ -89,18 +90,37 @@ public abstract class PhysicsObject{
         totalForce.add(force);
     }
 
+    public void checkCollision(PhysicsObject object)
+    {
+        switch (object.shapeType)
+        {
+            case POLYGON:
+                checkCollision((PhysicsPolygon)object);
+                break;
+            case CIRCLE:
+                checkCollision((PhysicsCircle) object);
+                break;
+            case BOX:
+                checkCollision((PhysicsBox) object);
+                break;
+            default:
+                System.err.println("INVALID OBJECT TYPE in check collision.");
+        }
+    }
+
     public boolean isTouching(PhysicsObject object)
     {
-        if(object instanceof PhysicsCircle) {
-            return isTouching((PhysicsCircle) object);
-        }
-        else if(object instanceof PhysicsBox)
+        switch (object.shapeType)
         {
-            return isTouching((PhysicsBox) object);
-        }
-        else
-        {
-            return isTouching((PhysicsPolygon) object);
+            case POLYGON:
+                return isTouching((PhysicsPolygon) object);
+            case CIRCLE:
+                return isTouching((PhysicsCircle) object);
+            case BOX:
+                return isTouching((PhysicsBox) object);
+            default:
+                System.err.println("INVALID OBJECT TYPE in isTouching.");
+                return false;
         }
     }
 
@@ -130,6 +150,7 @@ public abstract class PhysicsObject{
     public float getOrientation() { return orientation; }
     float getStaticFriction() { return material.getStaticFriction(); }
     float getDynamicFriction() { return material.getDynamicFriction(); }
+    private ShapeType getShapeType() { return shapeType; }
     public float getMass() { return mass; }
     public float getVelocity()
     {
@@ -144,6 +165,13 @@ public abstract class PhysicsObject{
     public abstract boolean isTouching(PhysicsCircle circle);
     public abstract boolean isTouching(PhysicsBox box);
     public abstract boolean isTouching(PhysicsPolygon polygon);
+
+    protected enum ShapeType{
+        POLYGON,
+        CIRCLE,
+        BOX,
+        INVALID
+    }
 
     // DEBUG TODO REMOVE
     // TODO DELETE THIS

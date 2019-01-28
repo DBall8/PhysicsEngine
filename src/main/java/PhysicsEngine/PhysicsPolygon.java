@@ -12,6 +12,7 @@ class PhysicsPolygon extends PhysicsObject{
     PhysicsPolygon(WorldSettings worldSettings, Vec2 p, Polygon polygon)
     {
         super(worldSettings, p, Material.Wood, polygon.estimateVolume());
+        shapeType = ShapeType.POLYGON;
         this.polygon = polygon;
         polygon.setTranslation(p.getX(), p.getY());
     }
@@ -19,6 +20,7 @@ class PhysicsPolygon extends PhysicsObject{
     PhysicsPolygon(WorldSettings worldSettings, Vec2 p, Polygon polygon, Material material)
     {
         super(worldSettings, p, material, polygon.estimateVolume());
+        shapeType = ShapeType.POLYGON;
         this.polygon = polygon;
         polygon.setTranslation(p.getX(), p.getY());
     }
