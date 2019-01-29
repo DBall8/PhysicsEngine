@@ -7,6 +7,7 @@ import PhysicsEngine.math.Point;
 import entities.*;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class GameManager extends Pane {
 
         addObject(p);
         p1 = p;
+        p1.getCollisionBox().setDebug();
 
         Body p2 = new Body(100, 50, 40, 40, Material.Metal);
         addObject(p2);
@@ -185,9 +187,17 @@ public class GameManager extends Pane {
             addObject(newBody);
         }
 
-        if(Settings.getGravity() > 0 && input.isUp() && p1.getCollisionBox().isTouching(ground.getCollisionBox()))
+        if(p1.getCollisionBox().isGrounded())
         {
-            p1.getCollisionBox().applyForce(0, -20);
+            ((Body)p1).setColor(Color.AQUA);
+            if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)
+            {
+                p1.getCollisionBox().applyForce(0, -20);
+
+            }
+        }
+        else{
+            ((Body)p1).setColor(Color.GREEN);
         }
 
 //        testPoly.setColor(Color.ORANGE);
