@@ -30,11 +30,13 @@ class Collision {
 
     /**
      * Calculates the impulse generated from the collision and applies it to both objects involved
+     * @return the impulse vector, which should be applied inverted to object 1 and normally to object 2
      */
-    void applyImpulse()
+    Vec2 getImpulse()
     {
+        Vec2 impulseVector = new Vec2(0,0);
         // If both objects have infinite mass, neither will be affected since they are immovable
-        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return; // Two infinite mass objects cannot move
+        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return impulseVector; // Two infinite mass objects cannot move
 
         // Move the objects apart if overlapping
         correctPosition();
@@ -47,10 +49,10 @@ class Collision {
         float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 
         // If the relative velocity along the normal is positive, the objects are already moving apart, do nothing
-        if(normalVelocity >= 0) return;
+        if(normalVelocity >= 0) return impulseVector;
 
-        // Use the smaller restitution
-        float e = Math.min(o2.getRestitution(), o1.getRestitution());
+        // Use the average restitution
+        float e = o2.getRestitution() + o1.getRestitution() / 2.0f;
 
         // Get the impulse scalar from the normal velocity, the restitution, and the inverted masses
         // j times normal is normal force
@@ -62,23 +64,27 @@ class Collision {
         resolutionVec.mult(j);
 
         // Apply the force to each object, in opposite directions
-        o1.applyForce(-resolutionVec.x, -resolutionVec.y);
-        o2.applyForce(resolutionVec.x, resolutionVec.y);
+        impulseVector.add(resolutionVec);
+//        o1.applyForce(-resolutionVec.x, -resolutionVec.y);
+//        o2.applyForce(resolutionVec.x, resolutionVec.y);
 //        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
 //        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
 //        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
 //        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
 
         // Apply friction generated from the collision
-        applyFriction(relativeVelocity, j);
+        impulseVector.add(getFriction(relativeVelocity, j));
+
+        return impulseVector;
     }
 
     /**
-     * Apply friction from a collision
+     * Find the friction from a collision
      * @param relativeVelocity the relative velocity of the two colliding objects
      * @param j the collision strength factor found from calculating the impulse
+     * @return The friction vector
      */
-    private void applyFriction(Vec2 relativeVelocity, float j)
+    private Vec2 getFriction(Vec2 relativeVelocity, float j)
     {
 //        float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 //        j = -1.0f * normalVelocity;
@@ -109,9 +115,11 @@ class Collision {
             frictionVec = tangent.mult(-1.0f * j * mu);
         }
 
+        return frictionVec;
+
         // Apply the friction forces in opposite forces
-        o1.applyForce(-frictionVec.x, -frictionVec.y);
-        o2.applyForce(frictionVec.x, frictionVec.y);
+//        o1.applyForce(-frictionVec.x, -frictionVec.y);
+//        o2.applyForce(frictionVec.x, frictionVec.y);
 //        o1.xvelocity -= o1.getInvertedMass() * frictionVec.x;
 //        o1.yvelocity -= o1.getInvertedMass() * frictionVec.y;
 //        o2.xvelocity += o2.getInvertedMass() * frictionVec.x;

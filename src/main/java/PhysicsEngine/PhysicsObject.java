@@ -17,6 +17,10 @@ public abstract class PhysicsObject{
     Vec2 position; // Position of the object
     Vec2 totalForce; // Sum of all forces currently acting on the object
 
+    Vec2 totalImpulse; // Stores the total impulse during one collision calculation. Used with numImpulse to distrbute
+                       // multiple impulses evenly
+    int numImpulse;    // Number of impulses on this object in a collision calculation
+
     float orientation; // current angle (in radians)
     float angularVelocity;
     float torque;
@@ -47,6 +51,8 @@ public abstract class PhysicsObject{
         this.material = material;
         this.volume = volume;
         this.totalForce = new Vec2(0, 0);
+        this.totalImpulse = new Vec2(0,0);
+        this.numImpulse = 0;
         this.mass = material.getDensity() * volume;
         if(material.getDensity() == 0)
         {
@@ -90,6 +96,33 @@ public abstract class PhysicsObject{
 
         // Zero out total force vector since they have been applied
         totalForce.zero();
+    }
+
+    /**
+     * Stores an impulse to be added to total forces at the end of a collision calculation loop
+     * @param impulse the impulse vector to accumulate
+     */
+    void applyImpulse(Vec2 impulse)
+    {
+        // Only add non-zero impulses
+        if(impulse.x !=0 || impulse.y != 0) {
+            this.totalImpulse.add(impulse);
+            this.numImpulse++;
+        }
+    }
+
+    /**
+     * Turns a collection of impulses into a resulting force
+     */
+    void applyTotalImpulse()
+    {
+        if(numImpulse <= 0 ) return; // if not impulses felt, do nothing
+        // Apply the impulse divided by the number of impulses felt
+        applyForce(totalImpulse.x / (float)numImpulse, totalImpulse.y / (float)numImpulse);
+
+        // Zero out the total impulse and impulse count
+        totalImpulse.zero();
+        numImpulse = 0;
     }
 
     /**
