@@ -215,7 +215,10 @@ public class PhysicsWorld {
         {
             BroadPair potentialCollision = broadPhase.get(i);
             c = potentialCollision.object1.checkCollision(potentialCollision.object2, 0);
-            if(c != null) c.applyImpulse();
+            if(c != null)
+            {
+                c.applyImpulse();
+            }
         }
 
         return time;
@@ -287,9 +290,59 @@ public class PhysicsWorld {
         }
     }
 
-    public float getGroundedPercent(PhysicsObject object)
+    /**
+     * Checks if the object is resting on any objects (due to gravity) and returns information about the normal
+     * forces being applied. Can be used to create an angled jump or check if there is enough support for a jump.
+     * @param object the object to check for normal forces (opposing a gravity)
+     * @return A vector where the y component represents the portion of normal forces opposing gravity, and the x
+     *          component a scaled portion of the force perpendicular to gravity
+     */
+    public Vec2 getGroundedVector(PhysicsObject object)
     {
-//        Vec2 bestNormal = new Vec2(0,0);
+        LinkedList<PhysicsObject> broad = new LinkedList<>();
+        for(PhysicsObject o: objects)
+        {
+            if(o.equals(object)) continue;
+            if(broadCheck(object, o))
+            {
+                broad.add(o);
+            }
+        }
+
+        Vec2 totalAntiGravityForce = new Vec2(0,0);
+        for(PhysicsObject o: broad)
+        {
+            Collision c = object.checkCollision(o, PhysicsObject.TOUCHING_AMOUNT);
+            if(c == null) continue;
+
+            // Get the magnitude of the normal force in the direction of gravity
+            float gravityPortion = -1.0f * Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal);
+            // Get the magnitude of the normal force perpendicular to gravity
+            float perpendicularPortion = Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal.tangent());
+            // Create a vector where we use "y" as the portion of the force against gravity, and "x" as the portion
+            // perpendicular to gravity. Only add to the perpendicular force relative to how much is being added to
+            // the parallel force, (So straight perpendicular forces add nothing while straight parallel ones add much)
+            Vec2 gravityContributionVector = new Vec2(perpendicularPortion * gravityPortion,
+                                    gravityPortion);
+            // Collect a sum of all normal force's contributions
+            totalAntiGravityForce.add(gravityContributionVector);
+        }
+
+        // Normalize the force to see how much of it is against gravity and how much is perpendicular to it
+        totalAntiGravityForce.normalize();
+        // Use the "y" component to find the angle, and divide by 2Pi to get the percent (0 to 1)
+        return totalAntiGravityForce;
+        //return (float)(2.0f * Math.asin(totalAntiGravityForce.y) / Math.PI);
+    }
+
+    /**
+     * Finds the direction of all normal forces applied to the object that is closest to straight against gravity.
+     * @param object the object to check for normal forces (opposing a gravity)
+     * @return The normal vector closest to that of gravity
+     */
+    public Vec2 getBestGroundedVector(PhysicsObject object)
+    {
+        Vec2 bestNormal = new Vec2(0,0);
         float bestMatch = 0;
         LinkedList<PhysicsObject> broad = new LinkedList<>();
         for(PhysicsObject o: objects)
@@ -312,11 +365,11 @@ public class PhysicsWorld {
             if(percentMatch > bestMatch)
             {
                 bestMatch = percentMatch;
-//                bestNormal = normal;
+                bestNormal = normal;
             }
         }
 
-        return (float)(2.0f * Math.asin(bestMatch) / Math.PI);
+        return bestNormal.mult(-1.0f);
     }
     // -----------------------------------------------------------------------------------------------------------------
 

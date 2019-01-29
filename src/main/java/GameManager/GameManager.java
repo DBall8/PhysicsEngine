@@ -4,6 +4,7 @@ import Global.Settings;
 import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsWorld;
 import PhysicsEngine.math.Point;
+import PhysicsEngine.math.Vec2;
 import entities.*;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -62,8 +63,8 @@ public class GameManager extends Pane {
         Body p2 = new Body(100, 50, 40, 40, Material.Metal);
         addObject(p2);
 
-        Body p3 = new Body(400, 50, 20, Material.Rock);
-        addObject(p3);
+//        Body p3 = new Body(400, 50, 20, Material.Rock);
+//        addObject(p3);
 
         Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
         addObject(wall1);
@@ -115,6 +116,14 @@ public class GameManager extends Pane {
         });
         addObject(testPoly);
         testPoly.setInput(input);
+
+        PolygonBody testPoly2 = new PolygonBody(800, 600, new Point[]{
+                new Point(0, 0),
+                new Point(0, 100),
+                new Point(100, 100),
+
+        });
+        addObject(testPoly2);
 
         PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
                 new Point(0, 0),
@@ -187,29 +196,15 @@ public class GameManager extends Pane {
             addObject(newBody);
         }
 
-
-        float groundedPercent = world.getGroundedPercent(p1.getCollisionBox());
-        //System.out.println(groundedPercent);
-        if(groundedPercent > 0.74f)
+        if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)
         {
-            ((Body)p1).setColor(Color.AQUA);
-            if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)
-            {
-                p1.getCollisionBox().applyForce(0, -20);
-
+//                p1.getCollisionBox().applyForce(0, Body.JUMP_STRENGTH);
+            Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
+            if(bestGroundedVector.getY() < 0) {
+                p1.getCollisionBox().applyForce(Body.JUMP_STRENGTH*bestGroundedVector.x, Body.JUMP_STRENGTH*bestGroundedVector.y);
             }
-        }
-        else{
-            ((Body)p1).setColor(Color.GREEN);
-        }
 
-//        testPoly.setColor(Color.ORANGE);
-//        for(Entity e: objects) {
-//            if(e.equals(testPoly)) continue;
-//            if (testPoly.getCollisionBox().isTouching(e.getCollisionBox())) {
-//                testPoly.setColor(Color.CYAN);
-//            }
-//        }
+        }
     }
 
     private void addObject(Entity o)

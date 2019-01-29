@@ -59,6 +59,8 @@ public class Vec2 {
         return this;
     }
 
+    public Vec2 tangent(){ return new Vec2(-y, x); }
+
     public Vec2 copy()
     {
         return new Vec2(x, y);

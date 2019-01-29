@@ -14,6 +14,7 @@ public class Body extends Entity{
     private final static int RADIUS = 20;
     private final static int MAX_AXIS_VELOCITY = 20;
     private final static float ACCELERATION = 1.0f * (60.0f / Settings.getFramerate());
+    public final static float JUMP_STRENGTH = 20;
 
     protected final static float ORIENT_SIZE = 2;
 
