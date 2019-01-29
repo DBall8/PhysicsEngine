@@ -1,11 +1,9 @@
 package PhysicsEngine;
 
-import PhysicsEngine.math.MalformedPolygonException;
-import PhysicsEngine.math.Point;
-import PhysicsEngine.math.Polygon;
-import PhysicsEngine.math.Vec2;
+import PhysicsEngine.math.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -210,14 +208,14 @@ public class PhysicsWorld {
 //        }
 //        return firstCollisionTime;
 
-
-
         // Check each object against all other objects further down the list
         // This prevents checking A vs B and then B vs A again later
+        Collision c;
         for(int i=0; i<broadPhase.size(); i++)
         {
             BroadPair potentialCollision = broadPhase.get(i);
-            potentialCollision.object1.checkCollision(potentialCollision.object2);
+            c = potentialCollision.object1.checkCollision(potentialCollision.object2, 0);
+            if(c != null) c.applyImpulse();
         }
 
         return time;
@@ -287,6 +285,38 @@ public class PhysicsWorld {
         {
             o.applyTotalForce();
         }
+    }
+
+    public float getGroundedPercent(PhysicsObject object)
+    {
+//        Vec2 bestNormal = new Vec2(0,0);
+        float bestMatch = 0;
+        LinkedList<PhysicsObject> broad = new LinkedList<>();
+        for(PhysicsObject o: objects)
+        {
+            if(o.equals(object)) continue;
+            if(broadCheck(object, o))
+            {
+                broad.add(o);
+            }
+        }
+
+        for(PhysicsObject o: broad)
+        {
+            Collision c = object.checkCollision(o, PhysicsObject.TOUCHING_AMOUNT);
+            if(c == null) continue;
+
+            Vec2 normal = c.normal;
+
+            float percentMatch = Formulas.dotProduct(worldSettings.getGravityDirection(), normal);
+            if(percentMatch > bestMatch)
+            {
+                bestMatch = percentMatch;
+//                bestNormal = normal;
+            }
+        }
+
+        return (float)(2.0f * Math.asin(bestMatch) / Math.PI);
     }
     // -----------------------------------------------------------------------------------------------------------------
 

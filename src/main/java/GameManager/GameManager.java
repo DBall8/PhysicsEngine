@@ -187,7 +187,10 @@ public class GameManager extends Pane {
             addObject(newBody);
         }
 
-        if(p1.getCollisionBox().isGrounded())
+
+        float groundedPercent = world.getGroundedPercent(p1.getCollisionBox());
+        //System.out.println(groundedPercent);
+        if(groundedPercent > 0.74f)
         {
             ((Body)p1).setColor(Color.AQUA);
             if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)

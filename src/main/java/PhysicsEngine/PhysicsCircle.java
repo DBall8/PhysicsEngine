@@ -36,10 +36,10 @@ class PhysicsCircle extends PhysicsObject {
      * @param polygon
      */
     @Override
-    void checkCollision(PhysicsPolygon polygon)
+    Collision checkCollision(PhysicsPolygon polygon, float margin)
     {
         // Pass to the polygon's circle collision function
-        polygon.checkCollision(this);
+        return polygon.checkCollision(this, margin);
     }
 
     /**
@@ -47,7 +47,7 @@ class PhysicsCircle extends PhysicsObject {
      * @param circle
      */
     @Override
-    void checkCollision(PhysicsCircle circle)
+    Collision checkCollision(PhysicsCircle circle, float margin)
     {
         float radiusSum = broadPhaseRadius + circle.broadPhaseRadius; // distance between the two circles when touching
         float dx = position.x - circle.position.x; // x distance
@@ -58,7 +58,7 @@ class PhysicsCircle extends PhysicsObject {
         boolean collided =  (radiusSum * radiusSum) > distanceSquared;
 
         // If no collision happened, do nothing
-        if(!collided) return;
+        if(!collided) return null;
 
         Collision collision;
         // If the distance is tiny, they are essentially in the same location, so just move the objects apart in any
@@ -77,8 +77,7 @@ class PhysicsCircle extends PhysicsObject {
 
             collision = new Collision(this, circle, normal, penetration);
         }
-        // Apply impulse on the two circles
-        collision.applyImpulse();
+        return collision;
     }
 
     /**

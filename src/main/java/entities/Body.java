@@ -61,7 +61,7 @@ public class Body extends Entity{
         if(input != null) {
             if (input.isDown() && !input.isUp() && yvel < MAX_AXIS_VELOCITY) {
                 yaccel = ACCELERATION;
-            } else if (!input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
+            } else if (Settings.getGravity() == 0 && !input.isDown() && input.isUp() && yvel > -MAX_AXIS_VELOCITY) {
                 yaccel = -ACCELERATION;
             }
 

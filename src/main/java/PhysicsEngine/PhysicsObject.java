@@ -96,19 +96,18 @@ public abstract class PhysicsObject{
      * Checks for a collision between two objects and applies an impulse if one has occurred
      * @param object The other object to check a collision against
      */
-    void checkCollision(PhysicsObject object)
+    Collision checkCollision(PhysicsObject object, float margin)
     {
         // Pass to the sub-class's collision check
         switch (object.shapeType)
         {
             case POLYGON:
-                checkCollision((PhysicsPolygon)object);
-                break;
+                return checkCollision((PhysicsPolygon)object, margin);
             case CIRCLE:
-                checkCollision((PhysicsCircle) object);
-                break;
+                return checkCollision((PhysicsCircle) object, margin);
             default:
                 System.err.println("INVALID OBJECT TYPE in check collision.");
+                return null;
         }
     }
 
@@ -159,15 +158,6 @@ public abstract class PhysicsObject{
         }
     }
 
-    /**
-     * TODO Checks if the object is resting on the "Ground"
-     * @return Returns true if the object is resting on a surface that counteracts gravity
-     */
-    public boolean isGrounded()
-    {
-        return false;
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
 
     // Getters and setters ---------------------------------------------------------------------------------------------
@@ -199,8 +189,8 @@ public abstract class PhysicsObject{
         return (float)Math.sqrt(x2 + y2);
     }
 
-    abstract void checkCollision(PhysicsCircle circle);
-    abstract void checkCollision(PhysicsPolygon polygon);
+    abstract Collision checkCollision(PhysicsCircle circle, float margin);
+    abstract Collision checkCollision(PhysicsPolygon polygon, float margin);
     public abstract boolean isTouching(PhysicsCircle circle);
     public abstract boolean isTouching(PhysicsPolygon polygon);
 
