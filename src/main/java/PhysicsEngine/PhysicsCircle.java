@@ -1,6 +1,5 @@
 package PhysicsEngine;
 
-import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.Vec2;
 
 /**
@@ -8,8 +7,7 @@ import PhysicsEngine.math.Vec2;
  */
 class PhysicsCircle extends PhysicsObject {
 
-    private float radius;
-
+    // CONSTRUCTORS ----------------------------------------------------------------------------------------------------
     PhysicsCircle(WorldSettings worldSettings, Vec2 p, float r)
     {
         super(worldSettings, p, Material.Wood, (float)(Math.PI * r * r));
@@ -22,22 +20,36 @@ class PhysicsCircle extends PhysicsObject {
         commonInit(r);
     }
 
+    /**
+     * Portion of the constructor common to each
+     * @param r radius of the circle
+     */
     private void commonInit(float r)
     {
         shapeType = ShapeType.CIRCLE;
-        this.radius = r;
         this.broadPhaseRadius = r;
     }
+    // -----------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Checks for a collision between a circle and a polygon
+     * @param polygon
+     */
     @Override
     void checkCollision(PhysicsPolygon polygon)
     {
+        // Pass to the polygon's circle collision function
         polygon.checkCollision(this);
     }
 
+    /**
+     * Check for a collision between this circle and another
+     * @param circle
+     */
+    @Override
     void checkCollision(PhysicsCircle circle)
     {
-        float radiusSum = radius + circle.radius; // distance between the two circles when touching
+        float radiusSum = broadPhaseRadius + circle.broadPhaseRadius; // distance between the two circles when touching
         float dx = position.x - circle.position.x; // x distance
         float dy = position.y - circle.position.y; // ydistance
 
@@ -49,11 +61,14 @@ class PhysicsCircle extends PhysicsObject {
         if(!collided) return;
 
         Collision collision;
+        // If the distance is tiny, they are essentially in the same location, so just move the objects apart in any
+        // direction
         if(distanceSquared < TINY_AMOUNT)
         {
             Vec2 normal = new Vec2(0, 1);
-            collision = new Collision(this, circle, normal, radius);
+            collision = new Collision(this, circle, normal, broadPhaseRadius);
         }
+        // Push the circles away from each other
         else {
             float penetration = (float) (radiusSum - Math.sqrt(distanceSquared));
             // Get the unit vector between the two circles
@@ -62,24 +77,40 @@ class PhysicsCircle extends PhysicsObject {
 
             collision = new Collision(this, circle, normal, penetration);
         }
+        // Apply impulse on the two circles
         collision.applyImpulse();
     }
 
+    /**
+     * Checks if the circle is touching the given polygon
+     * @param polygon
+     * @return true if they are touching
+     */
+    @Override
     public boolean isTouching(PhysicsPolygon polygon){
+        // Pass to the polygon's circle touching method
         return polygon.isTouching(this);
     }
 
+    /**
+     * Checks if the circle is touching a given circle
+     * @param circle
+     * @return true if they are touching
+     */
+    @Override
     public boolean isTouching(PhysicsCircle circle){
-        float radiusSum = radius + circle.radius; // distance between the two circles when touching
+        float radiusSum = broadPhaseRadius + circle.broadPhaseRadius; // distance between the two circles when touching
         float dx = position.x - circle.position.x; // x distance
         float dy = position.y - circle.position.y; // ydistance
 
         // Are they closer than the distance when touching?
         float distanceSquared = dx*dx + dy*dy;
-        return  (radiusSum * radiusSum) >= distanceSquared;
+        return  (radiusSum * radiusSum - TOUCHING_AMOUNT) >= distanceSquared;
     }
 
-    float findMaxRadius(){ return  radius; }
+    @Override
+    float findMaxRadius(){ return  broadPhaseRadius; }
 
-    public float getRadius(){ return radius; }
+    // Store the radius as the broad phase radius
+    public float getRadius(){ return broadPhaseRadius; }
 }

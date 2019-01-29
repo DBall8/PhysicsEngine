@@ -7,8 +7,9 @@ import PhysicsEngine.math.*;
  */
 class PhysicsPolygon extends PhysicsObject{
 
-    Polygon polygon;
+    Polygon polygon; // class containing the location of all points of the polygon
 
+    // CONSTRUCTORS ----------------------------------------------------------------------------------------------------
     PhysicsPolygon(WorldSettings worldSettings, Vec2 p, Polygon polygon)
     {
         super(worldSettings, p, Material.Wood, polygon.estimateVolume());
@@ -21,6 +22,11 @@ class PhysicsPolygon extends PhysicsObject{
         commonInit(p, polygon);
     }
 
+    /**
+     * Portion of contructors common to each
+     * @param p position vector
+     * @param polygon shape of polygon
+     */
     private void commonInit(Vec2 p, Polygon polygon)
     {
         shapeType = ShapeType.POLYGON;
@@ -28,7 +34,13 @@ class PhysicsPolygon extends PhysicsObject{
         polygon.setTranslation(p.getX(), p.getY());
         broadPhaseRadius = findMaxRadius();
     }
+    // -----------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Check and resolve a collision between this polygon and another
+     * @param polygon
+     */
+    @Override
     void checkCollision(PhysicsPolygon polygon)
     {
         // Check for collisions from each polygon's perspective
@@ -52,14 +64,19 @@ class PhysicsPolygon extends PhysicsObject{
         }
     }
 
+    /**
+     * Check for and resolve a collision between this polygon and a circle
+     * @param circle
+     */
+    @Override
     void checkCollision(PhysicsCircle circle)
     {
-        float bestDist = -Float.MAX_VALUE;
-        Vec2 bestNormal = null;
-        Vec2 bestFace = null;
-        Point bestPoint1 = null;
-        Point bestPoint2 = null;
-        Vec2 face;
+        float bestDist = -Float.MAX_VALUE; // closest distance between the circle center and a polygon face
+        Vec2 bestNormal = null; // the normal of the polygon face at the best distance
+        Vec2 bestFace = null; // the face closest to the circle's center
+        Point bestPoint1 = null; // the first of the points in the best face
+        Point bestPoint2 = null; // the second of the points in the best face
+        Vec2 face; // stores the face currently being checked
 
         // Move polygon A to be in the circle's coordinate space, rotated
         float relativeX = position.x - circle.getX();
@@ -161,19 +178,32 @@ class PhysicsPolygon extends PhysicsObject{
                 Vec2 normal = bestPoint2.getVec().normalize();
                 Collision collision = new Collision(circle, this, normal, penetration);
                 collision.applyImpulse();
-
             }
         }
     }
 
+    /**
+     * Checks if the polygon is touching another polygon
+     * @param polygon
+     * @return true if they are touching
+     */
+    @Override
     public boolean isTouching(PhysicsPolygon polygon)
     {
-        return findAxisOfLeastSeperation(polygon).penetration > 0 &&
-                polygon.findAxisOfLeastSeperation(this).penetration > 0;
+        // If an axis of seperation cannot be drawn between the two in either direction, they are touching
+        return findAxisOfLeastSeperation(polygon).penetration + TOUCHING_AMOUNT> 0 &&
+                polygon.findAxisOfLeastSeperation(this).penetration + TOUCHING_AMOUNT > 0;
     }
 
+    /**
+     * Checks if this polygon is touching the given circle
+     * @param circle
+     * @return true if they are touching
+     */
+    @Override
     public boolean isTouching(PhysicsCircle circle)
     {
+        // See checkCollision(PhysicsCircle) for details on these variables
         float bestDist = -Float.MAX_VALUE;
         Vec2 bestNormal = null;
         Vec2 bestFace = null;
@@ -244,7 +274,7 @@ class PhysicsPolygon extends PhysicsObject{
         float proj1 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint1.getVec(), -1.0f));
         float proj2 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint2.getVec(), -1.0f));
 
-        float radiusSquared = circle.getRadius() * circle.getRadius();
+        float radiusSquared = circle.getRadius() * circle.getRadius() + TOUCHING_AMOUNT;
 
         // Projection of point 1 is negative, therefore point 1 is the closest to the circle
         if(proj1 < 0)
@@ -261,7 +291,7 @@ class PhysicsPolygon extends PhysicsObject{
         {
             // Check for collision with face
             float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1.getVec());
-            if(dist < circle.getRadius())
+            if(dist < circle.getRadius() + TOUCHING_AMOUNT)
             {
                 return true;
             }
@@ -280,6 +310,11 @@ class PhysicsPolygon extends PhysicsObject{
         return false;
     }
 
+    /**
+     * Finds the axis between the two polygons
+     * @param b
+     * @return
+     */
     public Collision findAxisOfLeastSeperation(PhysicsPolygon b)
     {
         float bestDist = -Float.MAX_VALUE;
@@ -328,10 +363,10 @@ class PhysicsPolygon extends PhysicsObject{
 
             // Project each point vector along the face normal. This essentially translates to the "distance" in the
             // direction of the face normal. Therefore, if A's point has a smaller distance from B's center than B, we
-            // know that there is an overlap (quantified by the difference, positive difference is a positive overlap)
+            // know that there is an overlap (quantified by the difference, negative difference is a positive overlap)
             float sepDistance = Formulas.dotProduct(normal, new Vec2(bSupport.getX() - aSupport.getX(), bSupport.getY() - aSupport.getY()));
 
-            // Keep the best overlap and the normal along which it occurred
+            // Keep the smallest overlap and the normal along which it occurred
             if(sepDistance > bestDist)
             {
                 bestDist = sepDistance;

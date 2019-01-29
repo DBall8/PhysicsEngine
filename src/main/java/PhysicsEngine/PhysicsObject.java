@@ -12,6 +12,7 @@ public abstract class PhysicsObject{
                                                             // floating point errors
     private final static float GRAVITY_SCALAR = 0.01f; // Scale for making gravity seem normal at about 10 units
     protected final static float TINY_AMOUNT = 0.01f; // A value to consider "close enough"
+    protected final static float TOUCHING_AMOUNT = 0.1f;
 
     Vec2 position; // Position of the object
     Vec2 totalForce; // Sum of all forces currently acting on the object
