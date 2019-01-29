@@ -174,9 +174,11 @@ public class PhysicsWorld {
         {
             // Check for all collisions and update, but repeat multiple times to allow impulses to propogate through
             // (Mostly needed for large stacks of objects)
+
+            runBroadPhase();
             for(int i=0; i < worldSettings.getCollisionPrecision(); i++)
             {
-                checkCollisions(worldSettings.getScaledTimeStep());
+                runNarrowPhase(worldSettings.getScaledTimeStep());
                 applyForces();
             }
 
@@ -196,7 +198,7 @@ public class PhysicsWorld {
      * @param time UNUSED - needed for continuous collision detection
      * @return UNUSED
      */
-    private float checkCollisions(float time){
+    private float runNarrowPhase(float time){
 //        float firstCollisionTime = timeLeft; // looks for first collision
 //        float tempTime;
 //        // reset collisions for each player
@@ -208,9 +210,23 @@ public class PhysicsWorld {
 //        }
 //        return firstCollisionTime;
 
+
+
+        // Check each object against all other objects further down the list
+        // This prevents checking A vs B and then B vs A again later
+        for(int i=0; i<broadPhase.size(); i++)
+        {
+            BroadPair potentialCollision = broadPhase.get(i);
+            potentialCollision.object1.checkCollision(potentialCollision.object2);
+        }
+
+        return time;
+    }
+
+    private void runBroadPhase()
+    {
         // Empty broadPhase list
         broadPhase.clear();
-
         // Check each collision pair using a circle around the entire shape. If the circles collide, save it as a
         // potential collision to check
         for(int i=0; i<objects.size(); i++)
@@ -225,16 +241,6 @@ public class PhysicsWorld {
                 }
             }
         }
-
-        // Check each object against all other objects further down the list
-        // This prevents checking A vs B and then B vs A again later
-        for(int i=0; i<broadPhase.size(); i++)
-        {
-            BroadPair potentialCollision = broadPhase.get(i);
-            potentialCollision.object1.checkCollision(potentialCollision.object2);
-        }
-
-        return time;
     }
 
     boolean broadCheck(PhysicsObject o1, PhysicsObject o2)
