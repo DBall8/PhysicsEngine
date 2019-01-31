@@ -32,11 +32,11 @@ class Collision {
      * Calculates the impulse generated from the collision and applies it to both objects involved
      * @return the impulse vector, which should be applied inverted to object 1 and normally to object 2
      */
-    Vec2 getImpulse()
+    void applyImpulse()
     {
         Vec2 impulseVector = new Vec2(0,0);
         // If both objects have infinite mass, neither will be affected since they are immovable
-        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return impulseVector; // Two infinite mass objects cannot move
+        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return; // Two infinite mass objects cannot move
 
         // Move the objects apart if overlapping
         correctPosition();
@@ -49,7 +49,7 @@ class Collision {
         float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 
         // If the relative velocity along the normal is positive, the objects are already moving apart, do nothing
-        if(normalVelocity >= 0) return impulseVector;
+        if(normalVelocity >= 0) return;
 
         // Use the average restitution
         float e = o2.getRestitution() + o1.getRestitution() / 2.0f;
@@ -65,17 +65,16 @@ class Collision {
 
         // Apply the force to each object, in opposite directions
         impulseVector.add(resolutionVec);
-//        o1.applyForce(-resolutionVec.x, -resolutionVec.y);
-//        o2.applyForce(resolutionVec.x, resolutionVec.y);
+        // Apply friction generated from the collision
+        impulseVector.add(getFriction(relativeVelocity, j));
+
+        o2.applyImpulse(impulseVector);
+        o1.applyImpulse(impulseVector.mult(-1.0f));
+
 //        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
 //        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
 //        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
 //        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
-
-        // Apply friction generated from the collision
-        impulseVector.add(getFriction(relativeVelocity, j));
-
-        return impulseVector;
     }
 
     /**

@@ -218,9 +218,7 @@ public class PhysicsWorld {
             if(c != null)
             {
                 // Find the impulse of the collision and apply it to both objects
-                Vec2 impulse = c.getImpulse();
-                c.o1.applyImpulse(Formulas.vecMult(impulse, -1.0f));
-                c.o2.applyImpulse(impulse);
+                c.applyImpulse();
             }
         }
 
