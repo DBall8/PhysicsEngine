@@ -132,7 +132,9 @@ class PhysicsPolygon extends PhysicsObject{
         // If the center of the circle has crossed through the face, we know collision has occurred against the face
         if(bestDist < 0)
         {
-            return new Collision(this, circle, bestNormal, -bestDist);
+            Collision c = new Collision(this, circle, bestNormal, -bestDist);
+            c.contactPoint = new Point(-bestNormal.x * circle.getRadius() + circle.position.x, -bestNormal.y * circle.getRadius() + circle.position.y);
+            return c;
         }
 
         // Project the circle's center and each of the two points along the direction of the face. Then subtract each
@@ -152,7 +154,9 @@ class PhysicsPolygon extends PhysicsObject{
                 // COLLISION
                 float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
                 Vec2 normal = bestPoint1.getVec().normalize();
-                return new Collision(circle, this, normal, penetration);
+                Collision c = new Collision(circle, this, normal, penetration);
+                c.contactPoint = new Point(bestPoint1.getX() + circle.position.x, bestPoint1.getY() + circle.position.y);
+                return c;
             }
         }
         // Projection of point 1 is positive but point 2 is negative, circle is between both points and is closest to the face
@@ -162,7 +166,9 @@ class PhysicsPolygon extends PhysicsObject{
             float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1.getVec());
             if(dist < circle.getRadius() + margin)
             {
-                return new Collision(circle, this, bestNormal, circle.getRadius() - dist);
+                Collision c = new Collision(circle, this, bestNormal, circle.getRadius() - dist);
+                c.contactPoint = new Point(bestNormal.x * circle.getRadius() + circle.position.x, bestNormal.y * circle.getRadius() + circle.position.y);
+                return c;
             }
         }
         else if(proj2 > 0)
@@ -173,7 +179,9 @@ class PhysicsPolygon extends PhysicsObject{
                 // COLLISION
                 float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
                 Vec2 normal = bestPoint2.getVec().normalize();
-                return new Collision(circle, this, normal, penetration);
+                Collision c = new Collision(circle, this, normal, penetration);
+                c.contactPoint = new Point(bestPoint2.getX() + circle.position.x, bestPoint2.getY() + circle.position.y);
+                return c;
             }
         }
         return null;

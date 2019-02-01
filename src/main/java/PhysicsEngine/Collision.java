@@ -1,7 +1,11 @@
 package PhysicsEngine;
 
+import Global.DebugGlobal;
 import PhysicsEngine.math.Formulas;
+import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Vec2;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 /**
  * Class for resolving the impulse between two physics objects
@@ -19,6 +23,7 @@ class Collision {
     Vec2 normal;
     // The amount of overlap between the two objects
     float penetration;
+    Point contactPoint = null;
 
     Collision(PhysicsObject o1, PhysicsObject o2, Vec2 normal, float penetration)
     {
@@ -74,6 +79,13 @@ class Collision {
 
         // Apply friction generated from the collision
         impulseVector.add(getFriction(relativeVelocity, j));
+
+        if(DebugGlobal.IsDebug() && contactPoint != null)
+        {
+            Circle contact = new Circle(contactPoint.getX(), contactPoint.getY(), 4);
+            contact.setFill(Color.RED);
+            DebugGlobal.getDebugView().getChildren().add(contact);
+        }
 
         return impulseVector;
     }

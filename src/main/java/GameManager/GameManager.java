@@ -1,5 +1,6 @@
 package GameManager;
 
+import Global.DebugGlobal;
 import Global.Settings;
 import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsWorld;
@@ -63,8 +64,8 @@ public class GameManager extends Pane {
         Body p2 = new Body(100, 50, 40, 40, Material.Metal);
         addObject(p2);
 
-//        Body p3 = new Body(400, 50, 20, Material.Rock);
-//        addObject(p3);
+        Body p3 = new Body(400, 50, 20, Material.Rock);
+        addObject(p3);
 
         Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
         addObject(wall1);
@@ -154,6 +155,11 @@ public class GameManager extends Pane {
 //
 //        addObject(polyBodyC);
 
+        if(DebugGlobal.IsDebug())
+        {
+            this.getChildren().add(DebugGlobal.getDebugView());
+        }
+
         time.play();
     }
 
@@ -202,10 +208,10 @@ public class GameManager extends Pane {
         {
 //                p1.getCollisionBox().applyForce(0, Body.JUMP_STRENGTH);
             Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
-            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
-            System.out.println(percent);
-            if(percent < -0.5) {
-                p1.getCollisionBox().applyForce(Body.JUMP_STRENGTH*bestGroundedVector.x, Body.JUMP_STRENGTH*bestGroundedVector.y);
+//            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
+//            System.out.println(percent);
+            if(bestGroundedVector.y < -0.5) {
+                p1.getCollisionBox().applyForce(0/*Body.JUMP_STRENGTH*bestGroundedVector.x*/, Body.JUMP_STRENGTH*bestGroundedVector.y);
             }
 
         }

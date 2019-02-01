@@ -1,5 +1,6 @@
 package PhysicsEngine;
 
+import Global.DebugGlobal;
 import PhysicsEngine.math.*;
 
 import java.util.ArrayList;
@@ -162,6 +163,11 @@ public class PhysicsWorld {
         if(accumulator > 0.5f)
         {
             accumulator = 0.5f;
+        }
+
+        if(DebugGlobal.IsDebug())
+        {
+            DebugGlobal.clearDebugView();
         }
 
         // First apply the force of gravity on every object

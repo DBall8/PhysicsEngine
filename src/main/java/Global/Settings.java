@@ -1,5 +1,7 @@
 package Global;
 
+import java.util.Set;
+
 public class Settings {
 
     private static final int FRAMERATE = 120;
@@ -24,4 +26,6 @@ public class Settings {
     public static int getWindowHeight(){ return getInstance().HEIGHT; }
     public static float getGravity(){ return getInstance().GRAVITY; }
     public static boolean isShip(){ return getInstance().IS_SHIP;}
+
+    private Settings(){}
 }

@@ -1,5 +1,6 @@
 package PhysicsEngine;
 
+import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Vec2;
 
 /**
@@ -67,6 +68,7 @@ class PhysicsCircle extends PhysicsObject {
         {
             Vec2 normal = new Vec2(0, 1);
             collision = new Collision(this, circle, normal, broadPhaseRadius);
+            collision.contactPoint = new Point(normal.x * getRadius() + position.x, normal.y *getRadius() +position.y);
         }
         // Push the circles away from each other
         else {
@@ -76,6 +78,7 @@ class PhysicsCircle extends PhysicsObject {
             normal.normalize();
 
             collision = new Collision(this, circle, normal, penetration);
+            collision.contactPoint = new Point(normal.x * getRadius() + position.x, normal.y *getRadius() + position.y);
         }
         return collision;
     }
