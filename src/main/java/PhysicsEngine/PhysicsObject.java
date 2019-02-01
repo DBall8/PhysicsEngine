@@ -131,6 +131,9 @@ public abstract class PhysicsObject{
      */
     Collision checkCollision(PhysicsObject object, float margin)
     {
+        // Dont calculate collision between two immovable objects
+        if(invertedMass == 0 && object.invertedMass == 0) return null;
+
         // Pass to the sub-class's collision check
         switch (object.shapeType)
         {

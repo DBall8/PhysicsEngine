@@ -74,4 +74,13 @@ public class Formulas {
     {
         return rads * RAD_TO_DEGREE_FACTOR;
     }
+    public static float toRadians(float degrees)
+    {
+        return degrees / RAD_TO_DEGREE_FACTOR;
+    }
+
+    public static boolean BiasedGreaterThan(float a, float b, float bias)
+    {
+        return a > (b * (1 - bias)) + (a * bias);
+    }
 }

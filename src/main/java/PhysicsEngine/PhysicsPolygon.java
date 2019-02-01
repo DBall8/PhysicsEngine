@@ -1,6 +1,9 @@
 package PhysicsEngine;
 
+import Global.DebugGlobal;
 import PhysicsEngine.math.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 
 /**
  * Class for calculating collisions for a polygon (Must be completely convex to function properly)
@@ -43,25 +46,75 @@ class PhysicsPolygon extends PhysicsObject{
     @Override
     Collision checkCollision(PhysicsPolygon polygon, float margin)
     {
+        final boolean CLIP_DEBUG = false;
         // Check for collisions from each polygon's perspective
-        Collision c1 = findAxisOfLeastSeperation(polygon);
-        // Collision occurred if both cannot find an axis of seperation
-        Collision c2 = polygon.findAxisOfLeastSeperation(this);
-        if(c1.penetration + margin >= 0 && c2.penetration + margin >= 0)
-        {
-            // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
-            Collision collision;
-            if(c1.penetration < c2.penetration)
-            {
-                return c1;
-            }
-            else
-            {
-                return new Collision(this, polygon, c2.normal.mult(-1.0f), c2.penetration);
-            }
-        }
+        Face face1 = new Face();
+        Collision c1 = findAxisOfLeastSeperation(polygon, face1);
+        if(c1.penetration + margin < 0) return null; // Seperating axis found, no collision
 
-        return null;
+        Face face2 = new Face();
+        Collision c2 = polygon.findAxisOfLeastSeperation(this, face2);
+        if(c2.penetration + margin < 0) return null; // Seperating axis found, no collision
+
+        // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
+        if(Formulas.BiasedGreaterThan(c1.penetration, c2.penetration, 0.05f))
+        {
+            // Face 1 = reference face
+            // Face 2 = incident face
+            if(CLIP_DEBUG)
+            {
+                Line line1 = new Line(face1.getP1().getX(), face1.getP1().getY(), face1.getP2().getX(), face1.getP2().getY());
+                line1.setStroke(Color.AQUA);
+                line1.setStrokeWidth(5);
+
+                Line line2 = new Line(face2.getP1().getX(), face2.getP1().getY(), face2.getP2().getX(), face2.getP2().getY());
+                line2.setStroke(Color.PURPLE);
+                line2.setStrokeWidth(5);
+
+                //line.setStroke(10);
+                DebugGlobal.getDebugView().getChildren().addAll(line1, line2);
+            }
+
+            face1.translate(-position.x, -position.y);
+            face2.translate(-position.x, -position.y);
+
+            Vec2 incidentFaceVec = face1.getVec();
+            if(incidentFaceVec.getY() != 0) {
+                float faceAngle = (float) Math.acos(-c2.normal.getY());
+                if(c2.normal.getX() < 0) faceAngle += Math.PI;
+
+                face1.rotateTo(faceAngle, true);
+
+                if(face1.getP1().getY() == face1.getP2().getY())
+                {
+                    System.out.println("GOOD");
+                }
+                else
+                {
+                    System.out.println("BAD");
+                    System.out.printf("Y1: %f, Y2: %f\n", face1.getP1().getY(), face1.getP2().getY());
+                }
+                // Use face normal
+            }
+//
+            return c2;
+            //return new Collision(this, polygon, c2.normal.mult(-1.0f), c2.penetration);
+        }
+        else
+        {
+            // Face 2 = reference face
+            // Face 1 = incident face
+            if(CLIP_DEBUG) {
+                Line line1 = new Line(face2.getP1().getX(), face2.getP1().getY(), face2.getP2().getX(), face2.getP2().getY());
+                line1.setStroke(Color.AQUA);
+                line1.setStrokeWidth(5);
+
+                Line line2 = new Line(face1.getP1().getX(), face1.getP1().getY(), face1.getP2().getX(), face1.getP2().getY());
+                line2.setStroke(Color.PURPLE);
+                line2.setStrokeWidth(5);
+            }
+            return c1;
+        }
     }
 
     /**
@@ -73,10 +126,10 @@ class PhysicsPolygon extends PhysicsObject{
     {
         float bestDist = -Float.MAX_VALUE; // closest distance between the circle center and a polygon face
         Vec2 bestNormal = null; // the normal of the polygon face at the best distance
-        Vec2 bestFace = null; // the face closest to the circle's center
-        Point bestPoint1 = null; // the first of the points in the best face
-        Point bestPoint2 = null; // the second of the points in the best face
-        Vec2 face; // stores the face currently being checked
+        Face bestFace = null; // the face closest to the circle's center
+        Vec2 bestFaceVec = null;
+        Face face;
+        Vec2 faceVec; // stores the face currently being checked
 
         // Move polygon A to be in the circle's coordinate space, rotated
         float relativeX = position.x - circle.getX();
@@ -92,13 +145,12 @@ class PhysicsPolygon extends PhysicsObject{
             // Create a face from the current point and next (and loop back around for last point)
             Point point1 = polyPoints[i];
             Point point2 = (i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1]);
+            face = new Face(point1, point2);
 
-            face = new Vec2(point2.getX() - point1.getX(),
-                    point2.getY() - point1.getY());
-            face.normalize();
+            faceVec = face.getVec().normalize();
 
             // Get the normal vector of the face
-            Vec2 normal = new Vec2(face.getY(), -face.getX());
+            Vec2 normal = faceVec.tangent();
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
             Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
@@ -109,7 +161,7 @@ class PhysicsPolygon extends PhysicsObject{
 
             // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
             // (just use a point from the current face)
-            Point aSupport = polyPoints[i];
+            Point aSupport = face.getP1();
 
             // These two points are in B's coordinate space, so each point is also the vector from B's center
 
@@ -124,8 +176,7 @@ class PhysicsPolygon extends PhysicsObject{
                 bestDist = sepDistance;
                 bestNormal = normal;
                 bestFace = face;
-                bestPoint1 = point1.copy();
-                bestPoint2 = point2.copy();
+                bestFaceVec = faceVec;
             }
         }
 
@@ -140,8 +191,8 @@ class PhysicsPolygon extends PhysicsObject{
         // Project the circle's center and each of the two points along the direction of the face. Then subtract each
         // point's projection from the circle's to see if the circle is before or past each point in the face's direction
         // Project(circlePos - pointPos) is the same as Project(-pointPos) because the circle is the origin
-        float proj1 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint1.getVec(), -1.0f));
-        float proj2 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint2.getVec(), -1.0f));
+        float proj1 = Formulas.dotProduct(bestFaceVec, Formulas.vecMult(bestFace.getP1().getVec(), -1.0f));
+        float proj2 = Formulas.dotProduct(bestFaceVec, Formulas.vecMult(bestFace.getP2().getVec(), -1.0f));
 
         float radiusSquared = circle.getRadius() * circle.getRadius() + margin;
 
@@ -149,13 +200,13 @@ class PhysicsPolygon extends PhysicsObject{
         if(proj1 < 0)
         {
             // Check for collision with point 1
-            float distSquared = (bestPoint1.getX() * bestPoint1.getX()) + (bestPoint1.getY() * bestPoint1.getY());
+            float distSquared = (bestFace.getP1().getX() * bestFace.getP1().getX()) + (bestFace.getP1().getY() * bestFace.getP1().getY());
             if(distSquared < radiusSquared){
                 // COLLISION
                 float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
-                Vec2 normal = bestPoint1.getVec().normalize();
+                Vec2 normal = bestFace.getP1().getVec().normalize();
                 Collision c = new Collision(circle, this, normal, penetration);
-                c.contactPoint = new Point(bestPoint1.getX() + circle.position.x, bestPoint1.getY() + circle.position.y);
+                c.contactPoint = new Point(bestFace.getP1().getX() + circle.position.x, bestFace.getP1().getY() + circle.position.y);
                 return c;
             }
         }
@@ -163,7 +214,7 @@ class PhysicsPolygon extends PhysicsObject{
         else if(proj1 > 0 && proj2 < 0)
         {
             // Check for collision with face
-            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1.getVec());
+            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestFace.getP1().getVec());
             if(dist < circle.getRadius() + margin)
             {
                 Collision c = new Collision(circle, this, bestNormal, circle.getRadius() - dist);
@@ -174,13 +225,13 @@ class PhysicsPolygon extends PhysicsObject{
         else if(proj2 > 0)
         {
             // Check for collision with point 2
-            float distSquared = (bestPoint2.getX() * bestPoint2.getX()) + (bestPoint2.getY() * bestPoint2.getY());
+            float distSquared = (bestFace.getP2().getX() * bestFace.getP2().getX()) + (bestFace.getP2().getY() * bestFace.getP2().getY());
             if(distSquared < radiusSquared){
                 // COLLISION
                 float penetration = (float)(circle.getRadius() - Math.sqrt(distSquared));
-                Vec2 normal = bestPoint2.getVec().normalize();
+                Vec2 normal = bestFace.getP2().getVec().normalize();
                 Collision c = new Collision(circle, this, normal, penetration);
-                c.contactPoint = new Point(bestPoint2.getX() + circle.position.x, bestPoint2.getY() + circle.position.y);
+                c.contactPoint = new Point(bestFace.getP2().getX() + circle.position.x, bestFace.getP2().getY() + circle.position.y);
                 return c;
             }
         }
@@ -196,7 +247,7 @@ class PhysicsPolygon extends PhysicsObject{
     public boolean isTouching(PhysicsPolygon polygon)
     {
         // If an axis of seperation cannot be drawn between the two in either direction, they are touching
-        return findAxisOfLeastSeperation(polygon).penetration + TOUCHING_AMOUNT> 0 &&
+        return findAxisOfLeastSeperation(polygon).penetration + TOUCHING_AMOUNT > 0 &&
                 polygon.findAxisOfLeastSeperation(this).penetration + TOUCHING_AMOUNT > 0;
     }
 
@@ -211,10 +262,10 @@ class PhysicsPolygon extends PhysicsObject{
         // See checkCollision(PhysicsCircle) for details on these variables
         float bestDist = -Float.MAX_VALUE;
         Vec2 bestNormal = null;
-        Vec2 bestFace = null;
-        Point bestPoint1 = null;
-        Point bestPoint2 = null;
-        Vec2 face;
+        Face bestFace = null;
+        Vec2 bestFaceVec = null;
+        Face face;
+        Vec2 faceVec;
 
         // Move polygon A to be in the circle's coordinate space, rotated
         float relativeX = position.x - circle.getX();
@@ -230,13 +281,12 @@ class PhysicsPolygon extends PhysicsObject{
             // Create a face from the current point and next (and loop back around for last point)
             Point point1 = polyPoints[i];
             Point point2 = (i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1]);
+            face = new Face(point1, point2);
 
-            face = new Vec2(point2.getX() - point1.getX(),
-                    point2.getY() - point1.getY());
-            face.normalize();
+            faceVec = face.getVec().normalize();
 
             // Get the normal vector of the face
-            Vec2 normal = new Vec2(face.getY(), -face.getX());
+            Vec2 normal = faceVec.tangent();
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
             Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
@@ -247,7 +297,7 @@ class PhysicsPolygon extends PhysicsObject{
 
             // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
             // (just use a point from the current face)
-            Point aSupport = polyPoints[i];
+            Point aSupport = face.getP1();
 
             // These two points are in B's coordinate space, so each point is also the vector from B's center
 
@@ -262,8 +312,7 @@ class PhysicsPolygon extends PhysicsObject{
                 bestDist = sepDistance;
                 bestNormal = normal;
                 bestFace = face;
-                bestPoint1 = point1.copy();
-                bestPoint2 = point2.copy();
+                bestFaceVec = faceVec;
             }
         }
 
@@ -276,8 +325,8 @@ class PhysicsPolygon extends PhysicsObject{
         // Project the circle's center and each of the two points along the direction of the face. Then subtract each
         // point's projection from the circle's to see if the circle is before or past each point in the face's direction
         // Project(circlePos - pointPos) is the same as Project(-pointPos) because the circle is the origin
-        float proj1 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint1.getVec(), -1.0f));
-        float proj2 = Formulas.dotProduct(bestFace, Formulas.vecMult(bestPoint2.getVec(), -1.0f));
+        float proj1 = Formulas.dotProduct(bestFaceVec, Formulas.vecMult(bestFace.getP1().getVec(), -1.0f));
+        float proj2 = Formulas.dotProduct(bestFaceVec, Formulas.vecMult(bestFace.getP2().getVec(), -1.0f));
 
         float radiusSquared = circle.getRadius() * circle.getRadius() + TOUCHING_AMOUNT;
 
@@ -285,7 +334,7 @@ class PhysicsPolygon extends PhysicsObject{
         if(proj1 < 0)
         {
             // Check for collision with point 1
-            float distSquared = (bestPoint1.getX() * bestPoint1.getX()) + (bestPoint1.getY() * bestPoint1.getY());
+            float distSquared = (bestFace.getP1().getX() * bestFace.getP1().getX()) + (bestFace.getP1().getY() * bestFace.getP1().getY());
             if(distSquared < radiusSquared){
                 // COLLISION
                 return true;
@@ -295,7 +344,7 @@ class PhysicsPolygon extends PhysicsObject{
         else if(proj1 > 0 && proj2 < 0)
         {
             // Check for collision with face
-            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestPoint1.getVec());
+            float dist = Formulas.dotProduct(bestNormal.mult(-1.0f), bestFace.getP1().getVec());
             if(dist < circle.getRadius() + TOUCHING_AMOUNT)
             {
                 return true;
@@ -304,7 +353,7 @@ class PhysicsPolygon extends PhysicsObject{
         else if(proj2 > 0)
         {
             // Check for collision with point 2
-            float distSquared = (bestPoint2.getX() * bestPoint2.getX()) + (bestPoint2.getY() * bestPoint2.getY());
+            float distSquared = (bestFace.getP2().getX() * bestFace.getP2().getX()) + (bestFace.getP2().getY() * bestFace.getP2().getY());
             if(distSquared < radiusSquared){
                 // COLLISION
                 return true;
@@ -322,9 +371,22 @@ class PhysicsPolygon extends PhysicsObject{
      */
     public Collision findAxisOfLeastSeperation(PhysicsPolygon b)
     {
+        return findAxisOfLeastSeperation(b, null);
+    }
+
+    /**
+     * Finds the axis between the two polygons
+     * @param b
+     * @param referenceFace Face class in which to store the reference face of least penetration, world coordinates
+     * @return
+     */
+    public Collision findAxisOfLeastSeperation(PhysicsPolygon b, Face referenceFace)
+    {
         float bestDist = -Float.MAX_VALUE;
         Vec2 bestNormal = null;
-        Vec2 face;
+        Face bestFace = null;
+        Face face;
+        Vec2 faceVec;
 
         // Move polygon B to origin = its center, and rotate it to its current rotation
         b.polygon.translateAndRotate(0, 0, b.orientation, true);
@@ -342,13 +404,12 @@ class PhysicsPolygon extends PhysicsObject{
             // Create a face from the current point and next (and loop back around for last point)
             Point point1 = polyPoints[i];
             Point point2 = i == polyPoints.length-1? polyPoints[0]: polyPoints[i+1];
+            face = new Face(point1, point2);
 
-            face = new Vec2(point2.getX() - point1.getX(),
-                    point2.getY() - point1.getY());
-            face.normalize();
+            faceVec = face.getVec().normalize();
 
             // Get the normal vector of the face
-            Vec2 normal = new Vec2(face.getY(), -face.getX());
+            Vec2 normal = faceVec.tangent();
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
             Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
@@ -362,7 +423,7 @@ class PhysicsPolygon extends PhysicsObject{
             Point bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
             // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
             // (just use a point from the current face)
-            Point aSupport = polyPoints[i];
+            Point aSupport = face.getP1();
 
             // These two points are in B's coordinate space, so each point is also the vector from B's center
 
@@ -376,7 +437,16 @@ class PhysicsPolygon extends PhysicsObject{
             {
                 bestDist = sepDistance;
                 bestNormal = normal;
+                bestFace = face;
             }
+        }
+
+        // If a face object was passed in, store the best face points in it
+        if(referenceFace != null && bestFace != null)
+        {
+            Point p1 = new Point(bestFace.getP1().getX() + b.getX(), bestFace.getP1().getY() + b.getY());
+            Point p2 = new Point(bestFace.getP2().getX() + b.getX(), bestFace.getP2().getY() + b.getY());
+            referenceFace.set(p1, p2);
         }
 //        System.out.println(bestDist);
         // For now, store this in a collision object
