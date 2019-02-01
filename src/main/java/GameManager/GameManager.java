@@ -185,10 +185,12 @@ public class GameManager extends Pane {
             //Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, 40, Material.Rock);
             //addObject(newBody);
 
+            float size = (float)Math.random()*75 + 25;
+
             PolygonBody newBody = new PolygonBody(input.getMouseX(), input.getMouseY(), new Point[]{
                     new Point(0, 0),
-                    new Point(50, 50),
-                    new Point(50, 0),
+                    new Point(size, size),
+                    new Point(size, 0),
             });
             newBody.setMaterial(Material.Rock);
             float randAngle = (float)(Math.random()*2.0f*Math.PI);
@@ -200,7 +202,9 @@ public class GameManager extends Pane {
         {
 //                p1.getCollisionBox().applyForce(0, Body.JUMP_STRENGTH);
             Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
-            if(bestGroundedVector.getY() < 0) {
+            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
+            System.out.println(percent);
+            if(percent < -0.5) {
                 p1.getCollisionBox().applyForce(Body.JUMP_STRENGTH*bestGroundedVector.x, Body.JUMP_STRENGTH*bestGroundedVector.y);
             }
 
