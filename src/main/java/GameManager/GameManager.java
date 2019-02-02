@@ -202,10 +202,10 @@ public class GameManager extends Pane {
         {
 //                p1.getCollisionBox().applyForce(0, Body.JUMP_STRENGTH);
             Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
-            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
-            System.out.println(percent);
-            if(percent < -0.5) {
-                p1.getCollisionBox().applyForce(Body.JUMP_STRENGTH*bestGroundedVector.x, Body.JUMP_STRENGTH*bestGroundedVector.y);
+//            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
+//            System.out.println(percent);
+            if(bestGroundedVector.y < -0.7) {
+                p1.getCollisionBox().applyForce(/*Body.JUMP_STRENGTH*bestGroundedVector.x*/0, Body.JUMP_STRENGTH*bestGroundedVector.y);
             }
 
         }
