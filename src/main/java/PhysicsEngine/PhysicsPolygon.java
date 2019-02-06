@@ -464,68 +464,144 @@ class PhysicsPolygon extends PhysicsObject{
 
     private void findContactPoints(Collision collision, Face referenceFace, Face incidentFace)
     {
-        final boolean CLIP_DEBUG = true;
-        if(CLIP_DEBUG && worldSettings.canDebug()) {
+        final boolean SHOW_FACES = true;
+        final boolean SHOW_LINES = false;
+        final boolean SHOW_CONTACT_POINTS = true;
+        final boolean SHOW_INTERSECTION_POINTS = false;
+        if(SHOW_FACES && worldSettings.canDebug()) {
             worldSettings.getDebugger().drawFace(referenceFace, Color.PURPLE);
             worldSettings.getDebugger().drawFace(incidentFace, Color.AQUA);
             worldSettings.getDebugger().drawNormal(referenceFace, collision.normal, Color.GREEN);
         }
 
-        Vec2 faceVec = referenceFace.getVec();
-
-        float transX = collision.o2.getX();
-        float transY = collision.o2.getY();
-        referenceFace.translate(-transX, -transY);
-        incidentFace.translate(-transX, -transY);
-
-        // If the incident's face is not parallel to the x axis with an upward normal, rotate both faces around the
-        // origin until the incidicent face is
-        float faceAngle = 0;
-        if(collision.normal.getY() != -1) {
-            faceAngle = (float) Math.acos(-collision.normal.getY());
-            if(collision.normal.getX() > 0) faceAngle *= -1.0f;
-            referenceFace.rotateAboutOrigin(faceAngle, true);
-            incidentFace.rotateAboutOrigin(faceAngle, true);
-        }
-
-        float minx, maxx;
-        if(referenceFace.getP1().getX() < referenceFace.getP2().getX())
+        // Form two lines that are perpendicular to the reference face and cross each of the face's edges, to create
+        // 2 clipping lines
+        Line clippingLine1;
+        Line clippingLine2;
+        if(collision.normal.x == 0)
         {
-            minx = referenceFace.getP1().getX();
-            maxx = referenceFace.getP2().getX();
+            clippingLine1 = new Line(incidentFace.getP1().getX());
+            clippingLine2 = new Line(incidentFace.getP2().getX());
         }
-        else
+        else {
+            float slope = collision.normal.y / collision.normal.x;
+            clippingLine1 = new Line(slope, referenceFace.getP1().getY() - (slope * referenceFace.getP1().getX()));
+            clippingLine2 = new Line(slope, referenceFace.getP2().getY() - (slope * referenceFace.getP2().getX()));
+        }
+
+        // Find the two points where the incident line crosses each clipping line
+        Line incidentLine = incidentFace.getLine();
+        Point intersection1 = clippingLine1.findIntersection(incidentLine);
+        Point intersection2 = clippingLine2.findIntersection(incidentLine);
+        if(worldSettings.canDebug() && SHOW_LINES)
         {
-            minx = referenceFace.getP2().getX();
-            maxx = referenceFace.getP1().getX();
+            worldSettings.getDebugger().drawLine(clippingLine1, Color.GREEN);
+            worldSettings.getDebugger().drawLine(clippingLine2, Color.GREEN);
+            worldSettings.getDebugger().drawLine(incidentLine, Color.LIGHTGREEN);
         }
 
-        float contactPoint1X = Formulas.clamp(minx, maxx, incidentFace.getP1().getX());
-        Point contactPoint1 = new Point(contactPoint1X, incidentFace.getYAt(contactPoint1X));
+        // TODO clamp using y when incident face is vertical
 
-        float contactPoint2X = Formulas.clamp(minx, maxx, incidentFace.getP2().getX());
-        Point contactPoint2 = new Point(contactPoint2X, incidentFace.getYAt(contactPoint2X));
+        Point contactPoint1;
+        Point contactPoint2;
+        if(intersection1 == null || intersection2 == null)
+        {
+            // Incident face is perpendicular to reference face
+            contactPoint1 = incidentFace.getP1();
+            contactPoint2 = incidentFace.getP2();
+        }
+        else {
+            if(worldSettings.canDebug() && SHOW_INTERSECTION_POINTS)
+            {
+                worldSettings.getDebugger().drawPoint(intersection1, Color.PINK);
+                worldSettings.getDebugger().drawPoint(intersection2, Color.PINK);
+            }
+            if(incidentLine.isVertical())
+            {
+                // TODO double check that intersection 1 x is always less than intersection 2 x
+                if(intersection1.getY() > intersection2.getY())
+                {
+                    Point temp = intersection1;
+                    intersection1 = intersection2;
+                    intersection2 = temp;
+                }
 
-        // TODO Fix bug where rotating the contact points does not seem to work properly
-        // Rotate the points back to how they were
-        contactPoint1 = contactPoint1.getRotatedPoint(-faceAngle);
-        contactPoint2 = contactPoint2.getRotatedPoint(-faceAngle);
+                contactPoint1 = incidentFace.getP1().clampPointY(intersection1, intersection2);
 
-        // Translate the points back to how they were
-        Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
-        Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
+                contactPoint2 = incidentFace.getP2().clampPointY(intersection1, intersection2);
+            }
+            else
+            {
+                // TODO double check that intersection 1 x is always less than intersection 2 x
+                if(intersection1.getX() > intersection2.getX())
+                {
+                    Point temp = intersection1;
+                    intersection1 = intersection2;
+                    intersection2 = temp;
+                }
 
-        if(worldSettings.canDebug()) {
-            float faceProj = Formulas.dotProduct(collision.normal, faceVec);
+                contactPoint1 = incidentFace.getP1().clampPointX(intersection1, intersection2);
+
+                contactPoint2 = incidentFace.getP2().clampPointX(intersection1, intersection2);
+            }
+
+        }
+
+//        Vec2 faceVec = referenceFace.getVec();
+//
+//        float transX = collision.o1.getX();
+//        float transY = collision.o1.getY();
+//        referenceFace.translate(-transX, -transY);
+//        incidentFace.translate(-transX, -transY);
+//
+//        // If the incident's face is not parallel to the x axis with an upward normal, rotate both faces around the
+//        // origin until the incidicent face is
+//        float faceAngle = 0;
+//        if(collision.normal.getY() != -1) {
+//            faceAngle = (float) Math.acos(-collision.normal.getY());
+//            if(collision.normal.getX() > 0) faceAngle *= -1.0f;
+//            referenceFace.rotateAboutOrigin(faceAngle, true);
+//            incidentFace.rotateAboutOrigin(faceAngle, true);
+//        }
+//
+//        float minx, maxx;
+//        if(referenceFace.getP1().getX() < referenceFace.getP2().getX())
+//        {
+//            minx = referenceFace.getP1().getX();
+//            maxx = referenceFace.getP2().getX();
+//        }
+//        else
+//        {
+//            minx = referenceFace.getP2().getX();
+//            maxx = referenceFace.getP1().getX();
+//        }
+//
+//        float contactPoint1X = Formulas.clamp(minx, maxx, incidentFace.getP1().getX());
+//        Point contactPoint1 = new Point(contactPoint1X, incidentFace.getYAt(contactPoint1X));
+//
+//        float contactPoint2X = Formulas.clamp(minx, maxx, incidentFace.getP2().getX());
+//        Point contactPoint2 = new Point(contactPoint2X, incidentFace.getYAt(contactPoint2X));
+//
+//        // TODO Fix bug where rotating the contact points does not seem to work properly
+//        // Rotate the points back to how they were
+//        contactPoint1 = contactPoint1.getRotatedPoint(-faceAngle);
+//        contactPoint2 = contactPoint2.getRotatedPoint(-faceAngle);
+//
+//        // Translate the points back to how they were
+//        Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
+//        Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
+
+        if(worldSettings.canDebug() && SHOW_CONTACT_POINTS) {
+            //float faceProj = Formulas.dotProduct(collision.normal, faceVec);
 
             // TODO use vector from reference shape's center, not from origin, do it before returning rotated points
             //if(Formulas.dotProduct(collision.normal, contactVec1) - faceProj >= 0)
             {
-                worldSettings.getDebugger().drawPoint(contactVec1, Color.RED);
+                worldSettings.getDebugger().drawPoint(contactPoint1, Color.RED);
             }
             //if(Formulas.dotProduct(collision.normal, contactVec2) - faceProj >= 0)
             {
-                worldSettings.getDebugger().drawPoint(contactVec2, Color.RED);
+                worldSettings.getDebugger().drawPoint(contactPoint2, Color.RED);
             }
         }
     }

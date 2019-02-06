@@ -12,6 +12,7 @@ public class Debugger {
 
     private static final int POINT_RADIUS = 4;
     private static final int LINE_THICKNESS = 5;
+    private static final int LINE_LENGTH = 800;
     private static final float NORMAL_LENGTH = 10.0f;
 
     private Group view;
@@ -52,6 +53,23 @@ public class Debugger {
                 midy + (normal.getY() * NORMAL_LENGTH));
         line.setStroke(c);
         line.setStrokeWidth(LINE_THICKNESS);
+        view.getChildren().add(line);
+    }
+
+    public void drawLine(PhysicsEngine.math.Line l, Color c)
+    {
+        Line line;
+        if(l.isVertical())
+        {
+            line = new Line(l.getYIntercept(), l.getYAt(0), l.getYIntercept(), LINE_LENGTH);
+        }
+        else
+            {
+            line = new Line(0, l.getYAt(0), LINE_LENGTH, l.getYAt(LINE_LENGTH));
+        }
+
+        line.setStroke(c);
+        line.setStrokeWidth(LINE_THICKNESS / 2.0f);
         view.getChildren().add(line);
     }
 

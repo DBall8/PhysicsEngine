@@ -50,6 +50,28 @@ public class Point {
         return y;
     }
 
+    public Point clampPointX(Point min, Point max)
+    {
+        if (x < min.x) {
+            return min;
+        } else if (x < max.x) {
+            return this;
+        } else {
+            return max;
+        }
+    }
+
+    public Point clampPointY(Point min, Point max)
+    {
+        if (y < min.y) {
+            return min;
+        } else if (y < max.y) {
+            return this;
+        } else {
+            return max;
+        }
+    }
+
     public Point getRotatedPoint(float angleRads)
     {
         float oldAngle = (float)Math.atan(x / -y);
