@@ -1,10 +1,7 @@
 package PhysicsEngine;
 
-import Global.DebugGlobal;
 import PhysicsEngine.math.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 /**
  * Class for calculating collisions for a polygon (Must be completely convex to function properly)
@@ -48,20 +45,31 @@ class PhysicsPolygon extends PhysicsObject{
     Collision checkCollision(PhysicsPolygon polygon, float margin)
     {
         // Check for collisions from each polygon's perspective
-        Face face1 = new Face();
-        Collision c1 = findAxisOfLeastSeperation(polygon, face1);
+        SeperatingAxisResult result1 = new SeperatingAxisResult();
+        Collision c1 = findAxisOfLeastSeperation(polygon, result1);
         if(c1.penetration + margin < 0) return null; // Seperating axis found, no collision
 
-        Face face2 = new Face();
-        Collision c2 = polygon.findAxisOfLeastSeperation(this, face2);
+        SeperatingAxisResult result2 = new SeperatingAxisResult();
+        Collision c2 = polygon.findAxisOfLeastSeperation(this, result2);
         if(c2.penetration + margin < 0) return null; // Seperating axis found, no collision
+
+//        if(worldSettings.canDebug()) {
+//            worldSettings.getDebugger().drawFace(result1.referenceFace, Color.PURPLE);
+//            worldSettings.getDebugger().drawNormal(result1.referenceFace, c1.normal, Color.LIGHTPINK);
+//            worldSettings.getDebugger().drawFace(result2.referenceFace, Color.BLUE);
+//            worldSettings.getDebugger().drawNormal(result2.referenceFace, c2.normal, Color.LIGHTBLUE);
+//        }
+
+        // TODO need to find incident face from the the reference face, not simply from the other collision
+        // IDEA: pass an object that stores the index of the point that crossed the reference face
 
         // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
         if(Formulas.BiasedGreaterThan(c1.penetration, c2.penetration, 0.05f))
         {
             // Face 1 = reference face??
             // Face 2 = incident face??
-            findContactPoints(c2, face2, face1);
+            Face incidentFace = findIncidentFace(this, result2);
+            findContactPoints(c2, result2.referenceFace, incidentFace);
 
             // Use face normal
 //
@@ -72,76 +80,9 @@ class PhysicsPolygon extends PhysicsObject{
         {
             // Face 2 = reference face??
             // Face 1 = incident face??
-            findContactPoints(c1, face1, face2);
+            Face incidentFace = findIncidentFace(polygon, result1);
+            findContactPoints(c1, result1.referenceFace, incidentFace);
             return c1;
-        }
-    }
-
-    private void findContactPoints(Collision collision, Face referenceFace, Face incidentFace)
-    {
-        final boolean CLIP_DEBUG = true;
-        if(CLIP_DEBUG && worldSettings.canDebug()) {
-            worldSettings.getDebugger().drawFace(referenceFace, Color.PURPLE);
-            worldSettings.getDebugger().drawFace(incidentFace, Color.AQUA);
-            worldSettings.getDebugger().drawNormal(referenceFace, collision.normal, Color.GREEN);
-        }
-
-        Vec2 faceVec = referenceFace.getVec();
-
-        float transX = collision.o2.getX();
-        float transY = collision.o2.getY();
-        referenceFace.translate(-transX, -transY);
-        incidentFace.translate(-transX, -transY);
-
-        // If the incident's face is not parallel to the x axis with an upward normal, rotate both faces around the
-        // origin until the incidicent face is
-        float faceAngle = 0;
-        if(collision.normal.getY() != -1) {
-            faceAngle = (float) Math.acos(-collision.normal.getY());
-            if(collision.normal.getX() > 0) faceAngle *= -1.0f;
-            referenceFace.rotateAboutOrigin(faceAngle, true);
-            incidentFace.rotateAboutOrigin(faceAngle, true);
-        }
-
-        float minx, maxx;
-        if(referenceFace.getP1().getX() < referenceFace.getP2().getX())
-        {
-            minx = referenceFace.getP1().getX();
-            maxx = referenceFace.getP2().getX();
-        }
-        else
-        {
-            minx = referenceFace.getP2().getX();
-            maxx = referenceFace.getP1().getX();
-        }
-
-        float contactPoint1X = Formulas.clamp(minx, maxx, incidentFace.getP1().getX());
-        Point contactPoint1 = new Point(contactPoint1X, incidentFace.getYAt(contactPoint1X));
-
-        float contactPoint2X = Formulas.clamp(minx, maxx, incidentFace.getP2().getX());
-        Point contactPoint2 = new Point(contactPoint2X, incidentFace.getYAt(contactPoint2X));
-
-        // TODO Fix bug with contact faces and points not always right
-        // Rotate the points back to how they were
-        contactPoint1 = contactPoint1.getRotatedPoint(-faceAngle);
-        contactPoint2 = contactPoint2.getRotatedPoint(-faceAngle);
-
-        // Translate the points back to how they were
-        Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
-        Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
-
-        if(worldSettings.canDebug()) {
-            float faceProj = Formulas.dotProduct(collision.normal, faceVec);
-
-            // TODO use vector from reference shape's center, not from origin, do it before returning rotated points
-            //if(Formulas.dotProduct(collision.normal, contactVec1) - faceProj >= 0)
-            {
-                worldSettings.getDebugger().drawPoint(contactVec1, Color.RED);
-            }
-            //if(Formulas.dotProduct(collision.normal, contactVec2) - faceProj >= 0)
-            {
-                worldSettings.getDebugger().drawPoint(contactVec2, Color.RED);
-            }
         }
     }
 
@@ -405,14 +346,15 @@ class PhysicsPolygon extends PhysicsObject{
     /**
      * Finds the axis between the two polygons
      * @param b
-     * @param referenceFace Face class in which to store the reference face of least penetration, world coordinates
+     * @param result class which stores information about the seperating axis
      * @return
      */
-    public Collision findAxisOfLeastSeperation(PhysicsPolygon b, Face referenceFace)
+    public Collision findAxisOfLeastSeperation(PhysicsPolygon b, SeperatingAxisResult result)
     {
         float bestDist = -Float.MAX_VALUE;
         Vec2 bestNormal = null;
         Face bestFace = null;
+        int incidentPointIndex = -1;
         Face face;
         Vec2 faceVec;
 
@@ -425,6 +367,7 @@ class PhysicsPolygon extends PhysicsObject{
 
         // Now we will use the points from polygon A in polygon B's coordinate space
         Point[] polyPoints = polygon.getCalculatedPoints();
+        Point[] bPoints = b.getPolygon().getCalculatedPoints();
 
         // Loop through each face and try to see if a seperating line can be drawn
         for(int i=0; i<polyPoints.length; i++)
@@ -441,16 +384,17 @@ class PhysicsPolygon extends PhysicsObject{
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
             Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
-            boolean flip = false;
             if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
             {
-                flip = true;
                 normal.mult(-1.0f);
             }
 
             // Get the point from polygon B that is closest to polygon A along the direction of the face's normal
             // (Get the support point in the opposite direction of the face normal)
-            Point bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
+            int bSupportIndex = b.getPolygon().getSupportPointIndex(Formulas.vecMult(normal, -1.0f));
+            Point bSupport = bPoints[bSupportIndex];
+            //Point bSupport = b.getPolygon().getSupportPoint(Formulas.vecMult(normal, -1.0f));
+
             // Get the point from polygon A that is closest to polygon B along the direction of the face's normal
             // (just use a point from the current face)
             Point aSupport = face.getP1();
@@ -462,41 +406,128 @@ class PhysicsPolygon extends PhysicsObject{
             // know that there is an overlap (quantified by the difference, negative difference is a positive overlap)
             float sepDistance = Formulas.dotProduct(normal, new Vec2(bSupport.getX() - aSupport.getX(), bSupport.getY() - aSupport.getY()));
 
-            // Keep the smallest overlap and the normal along which it occurred
-            // An overlap is a positive sepDistance
-            if(bestDist > 0)
+            // sepDistance will likely be negative for all but one side. This positive value for one side indicates that
+            // a separating axis can be drawn for this one side. Therefore, if no positive value is found for any side,
+            // no separating axis can be drawn and the objects have collided. We then want the greatest sepDistance,
+            // which is the negative of the penetration.
+            if(sepDistance > bestDist)
             {
-                if(sepDistance < bestDist && sepDistance > 0)
-                {
-                    bestDist = sepDistance;
-                    bestNormal = normal;
-                    bestFace = face;
-                }
-            }
-            else{
-                if(sepDistance > bestDist)
-                {
-                    bestDist = sepDistance;
-                    bestNormal = normal;
-                    bestFace = face;
-                }
+                bestDist = sepDistance;
+                bestNormal = normal;
+                bestFace = face;
+                incidentPointIndex = bSupportIndex;
             }
 
 //            System.out.println(bestDist);
         }
 
         // If a face object was passed in, store the best face points in it
-        if(referenceFace != null && bestFace != null)
+        if(result != null && bestFace != null)
         {
             Point p1 = new Point(bestFace.getP1().getX() + b.getX(), bestFace.getP1().getY() + b.getY());
             Point p2 = new Point(bestFace.getP2().getX() + b.getX(), bestFace.getP2().getY() + b.getY());
-            referenceFace.set(p1, p2);
+            Face referenceFace = new Face(p1, p2);
+
+            result.referenceFace = referenceFace;
+            result.normal = bestNormal;
+            result.incidentPointIndex = incidentPointIndex;
         }
 //        System.out.println(bestDist);
         // For now, store this in a collision object
         Collision collision = new Collision(this, b, bestNormal, -bestDist);
 
         return collision;
+    }
+
+    private Face findIncidentFace(PhysicsPolygon b, SeperatingAxisResult axisResult)
+    {
+        b.getPolygon().setTranslation(b.getX(), b.getY());
+        Point[] bPoints = b.getPolygon().getCalculatedPoints();
+        Point incidentPoint = bPoints[axisResult.incidentPointIndex];
+        int beforeIndex = axisResult.incidentPointIndex == 0? bPoints.length-1 : axisResult.incidentPointIndex-1;
+        int afterIndex = axisResult.incidentPointIndex == bPoints.length-1? 0 : axisResult.incidentPointIndex+1;
+        Face face1 = new Face(bPoints[beforeIndex], incidentPoint);
+        Face face2 = new Face(incidentPoint, bPoints[afterIndex]);
+
+        float test1 = Math.abs(Formulas.dotProduct(axisResult.normal, face1.getVec()));
+        float test2 = Math.abs(Formulas.dotProduct(axisResult.normal, face2.getVec()));
+
+        if(test1 > test2)
+        {
+            return face2;
+        }
+        else
+        {
+            return face1;
+        }
+    }
+
+    private void findContactPoints(Collision collision, Face referenceFace, Face incidentFace)
+    {
+        final boolean CLIP_DEBUG = true;
+        if(CLIP_DEBUG && worldSettings.canDebug()) {
+            worldSettings.getDebugger().drawFace(referenceFace, Color.PURPLE);
+            worldSettings.getDebugger().drawFace(incidentFace, Color.AQUA);
+            worldSettings.getDebugger().drawNormal(referenceFace, collision.normal, Color.GREEN);
+        }
+
+        Vec2 faceVec = referenceFace.getVec();
+
+        float transX = collision.o2.getX();
+        float transY = collision.o2.getY();
+        referenceFace.translate(-transX, -transY);
+        incidentFace.translate(-transX, -transY);
+
+        // If the incident's face is not parallel to the x axis with an upward normal, rotate both faces around the
+        // origin until the incidicent face is
+        float faceAngle = 0;
+        if(collision.normal.getY() != -1) {
+            faceAngle = (float) Math.acos(-collision.normal.getY());
+            if(collision.normal.getX() > 0) faceAngle *= -1.0f;
+            referenceFace.rotateAboutOrigin(faceAngle, true);
+            incidentFace.rotateAboutOrigin(faceAngle, true);
+        }
+
+        float minx, maxx;
+        if(referenceFace.getP1().getX() < referenceFace.getP2().getX())
+        {
+            minx = referenceFace.getP1().getX();
+            maxx = referenceFace.getP2().getX();
+        }
+        else
+        {
+            minx = referenceFace.getP2().getX();
+            maxx = referenceFace.getP1().getX();
+        }
+
+        float contactPoint1X = Formulas.clamp(minx, maxx, incidentFace.getP1().getX());
+        Point contactPoint1 = new Point(contactPoint1X, incidentFace.getYAt(contactPoint1X));
+
+        float contactPoint2X = Formulas.clamp(minx, maxx, incidentFace.getP2().getX());
+        Point contactPoint2 = new Point(contactPoint2X, incidentFace.getYAt(contactPoint2X));
+
+        // TODO Fix bug where rotating the contact points does not seem to work properly
+        // Rotate the points back to how they were
+        contactPoint1 = contactPoint1.getRotatedPoint(-faceAngle);
+        contactPoint2 = contactPoint2.getRotatedPoint(-faceAngle);
+
+        // Translate the points back to how they were
+        Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
+        Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
+
+        if(worldSettings.canDebug()) {
+            float faceProj = Formulas.dotProduct(collision.normal, faceVec);
+
+            // TODO use vector from reference shape's center, not from origin, do it before returning rotated points
+            //if(Formulas.dotProduct(collision.normal, contactVec1) - faceProj >= 0)
+            {
+                worldSettings.getDebugger().drawPoint(contactVec1, Color.RED);
+            }
+            //if(Formulas.dotProduct(collision.normal, contactVec2) - faceProj >= 0)
+            {
+                worldSettings.getDebugger().drawPoint(contactVec2, Color.RED);
+            }
+        }
     }
 
     /**
@@ -521,5 +552,13 @@ class PhysicsPolygon extends PhysicsObject{
     public Polygon getPolygon()
     {
         return polygon;
+    }
+
+    private class SeperatingAxisResult{
+        Face referenceFace;
+        Vec2 normal;
+        int incidentPointIndex;
+
+        public SeperatingAxisResult(){}
     }
 }

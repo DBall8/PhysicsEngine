@@ -256,6 +256,36 @@ public class Polygon {
     }
 
     /**
+     * Returns the index of point that is furthest in a given direction on the polygon
+     * @param direction Vector representing the direction to use
+     * @return the index of point with the greatest projecting in the given direction
+     */
+    public int getSupportPointIndex(Vec2 direction) {
+
+        if(points.length <= 0) System.err.println("POLYGON POINTS NOT CALCULATED");
+
+        // Start with "empty" values and store the best
+        float bestProjection = -Float.MAX_VALUE;
+        int supportIndex = -1;
+
+        // Loop through each point and save the one with best projection
+        for(int i=0; i<points.length; i++)
+        {
+            Point point = points[i];
+            float projection = Formulas.dotProduct(point.getVec(), direction);
+            if(projection > bestProjection)
+            {
+                supportIndex = i;
+                bestProjection = projection;
+            }
+        }
+
+        if(supportIndex < 0)
+            System.err.println("[[[SUPPORT POINT NOT FOUND]]]");
+        return supportIndex;
+    }
+
+    /**
      * Creates a copy of the polygon
      * @return
      */

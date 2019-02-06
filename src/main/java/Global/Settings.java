@@ -6,7 +6,7 @@ public class Settings {
     private static final int FRAMERATE = 120;
     private static int WIDTH = 1200;
     private static int HEIGHT = 900;
-    private static final float GRAVITY = 0; // default 10
+    private static final float GRAVITY = 10; // default 10
 
     private static final boolean IS_SHIP = false;
 
