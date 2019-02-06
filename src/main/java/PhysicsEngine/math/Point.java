@@ -49,4 +49,23 @@ public class Point {
     {
         return y;
     }
+
+    public Point getRotatedPoint(float angleRads)
+    {
+        float oldAngle = (float)Math.atan(x / -y);
+        // Add Pi for the half the rotation to adjust for the range of inverse tan
+        if(y > 0) oldAngle += Math.PI;
+
+        // get the distance from the center and the new angle of the point
+        float mag = getVec().magnitude();
+        float newAngle = oldAngle + angleRads;
+
+        // Calculate the points new x and y coordinates
+        float newx = (float) (mag * Math.sin(newAngle));
+        float newy = (float) (-mag * Math.cos(newAngle));
+        //if(newAngle >= Math.PI/4 && newAngle < 3.0f*Math.PI/4) pointAngles[i] += Math.PI;
+//          System.out.format("Old x: %f, new X: %f\n", originPoints[i].x, newx);
+//          System.out.format("Old y: %f, new Y: %f\n\n", originPoints[i].y, newy);
+        return new Point(newx, newy);
+    }
 }

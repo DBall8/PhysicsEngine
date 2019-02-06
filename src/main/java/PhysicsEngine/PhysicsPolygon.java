@@ -3,6 +3,7 @@ package PhysicsEngine;
 import Global.DebugGlobal;
 import PhysicsEngine.math.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 /**
@@ -46,7 +47,6 @@ class PhysicsPolygon extends PhysicsObject{
     @Override
     Collision checkCollision(PhysicsPolygon polygon, float margin)
     {
-        final boolean CLIP_DEBUG = false;
         // Check for collisions from each polygon's perspective
         Face face1 = new Face();
         Collision c1 = findAxisOfLeastSeperation(polygon, face1);
@@ -56,46 +56,15 @@ class PhysicsPolygon extends PhysicsObject{
         Collision c2 = polygon.findAxisOfLeastSeperation(this, face2);
         if(c2.penetration + margin < 0) return null; // Seperating axis found, no collision
 
+        System.out.println("COLLIDE");
         // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
         if(Formulas.BiasedGreaterThan(c1.penetration, c2.penetration, 0.05f))
         {
             // Face 1 = reference face
             // Face 2 = incident face
-            if(CLIP_DEBUG)
-            {
-                Line line1 = new Line(face1.getP1().getX(), face1.getP1().getY(), face1.getP2().getX(), face1.getP2().getY());
-                line1.setStroke(Color.AQUA);
-                line1.setStrokeWidth(5);
+            findContactPoints(c2, face1, face2);
 
-                Line line2 = new Line(face2.getP1().getX(), face2.getP1().getY(), face2.getP2().getX(), face2.getP2().getY());
-                line2.setStroke(Color.PURPLE);
-                line2.setStrokeWidth(5);
-
-                //line.setStroke(10);
-                DebugGlobal.getDebugView().getChildren().addAll(line1, line2);
-            }
-
-            face1.translate(-position.x, -position.y);
-            face2.translate(-position.x, -position.y);
-
-            Vec2 incidentFaceVec = face1.getVec();
-            if(incidentFaceVec.getY() != 0) {
-                float faceAngle = (float) Math.acos(-c2.normal.getY());
-                if(c2.normal.getX() < 0) faceAngle += Math.PI;
-
-                face1.rotateTo(faceAngle, true);
-
-                if(face1.getP1().getY() == face1.getP2().getY())
-                {
-                    System.out.println("GOOD");
-                }
-                else
-                {
-                    System.out.println("BAD");
-                    System.out.printf("Y1: %f, Y2: %f\n", face1.getP1().getY(), face1.getP2().getY());
-                }
-                // Use face normal
-            }
+            // Use face normal
 //
             return c2;
             //return new Collision(this, polygon, c2.normal.mult(-1.0f), c2.penetration);
@@ -104,16 +73,85 @@ class PhysicsPolygon extends PhysicsObject{
         {
             // Face 2 = reference face
             // Face 1 = incident face
-            if(CLIP_DEBUG) {
-                Line line1 = new Line(face2.getP1().getX(), face2.getP1().getY(), face2.getP2().getX(), face2.getP2().getY());
-                line1.setStroke(Color.AQUA);
-                line1.setStrokeWidth(5);
-
-                Line line2 = new Line(face1.getP1().getX(), face1.getP1().getY(), face1.getP2().getX(), face1.getP2().getY());
-                line2.setStroke(Color.PURPLE);
-                line2.setStrokeWidth(5);
-            }
+            findContactPoints(c1, face2, face1);
             return c1;
+        }
+    }
+
+    private void findContactPoints(Collision collision, Face referenceFace, Face incidentFace)
+    {
+        final boolean CLIP_DEBUG = true;
+        if(CLIP_DEBUG) {
+            Line line1 = new Line(referenceFace.getP1().getX(), referenceFace.getP1().getY(), referenceFace.getP2().getX(), referenceFace.getP2().getY());
+            line1.setStroke(Color.PURPLE);
+            line1.setStrokeWidth(5);
+
+            Line line2 = new Line(incidentFace.getP1().getX(), incidentFace.getP1().getY(), incidentFace.getP2().getX(), incidentFace.getP2().getY());
+            line2.setStroke(Color.AQUA);
+            line2.setStrokeWidth(5);
+            DebugGlobal.getDebugView().getChildren().addAll(line1, line2);
+        }
+
+        Vec2 faceVec = referenceFace.getVec();
+
+        float transX = collision.o2.getX();
+        float transY = collision.o2.getY();
+        referenceFace.translate(-transX, -transY);
+        incidentFace.translate(-transX, -transY);
+
+        // If the incident's face is not parallel to the x axis with an upward normal, rotate both faces around the
+        // origin until the incidicent face is
+        float faceAngle = 0;
+        if(collision.normal.getY() != -1) {
+            faceAngle = (float) Math.acos(-collision.normal.getY());
+            if(collision.normal.getX() > 0) faceAngle *= -1.0f;
+            referenceFace.rotateAboutOrigin(faceAngle, true);
+            incidentFace.rotateAboutOrigin(faceAngle, true);
+        }
+
+        float minx, maxx;
+        if(referenceFace.getP1().getX() < referenceFace.getP2().getX())
+        {
+            minx = referenceFace.getP1().getX();
+            maxx = referenceFace.getP2().getX();
+        }
+        else
+        {
+            minx = referenceFace.getP2().getX();
+            maxx = referenceFace.getP1().getX();
+        }
+
+        float contactPoint1X = Formulas.clamp(minx, maxx, incidentFace.getP1().getX());
+        Point contactPoint1 = new Point(contactPoint1X, incidentFace.getYAt(contactPoint1X));
+
+        float contactPoint2X = Formulas.clamp(minx, maxx, incidentFace.getP2().getX());
+        Point contactPoint2 = new Point(contactPoint2X, incidentFace.getYAt(contactPoint2X));
+
+        // TODO Fix bug with contact faces and points not always right
+        // Rotate the points back to how they were
+        contactPoint1 = contactPoint1.getRotatedPoint(-faceAngle);
+        contactPoint2 = contactPoint2.getRotatedPoint(-faceAngle);
+
+        // Translate the points back to how they were
+        Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
+        Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
+
+        if(DebugGlobal.IsDebug()) {
+            float faceProj = Formulas.dotProduct(collision.normal, faceVec);
+
+            // TODO use vector from reference shape's center, not from origin, do it before returning rotated points
+            //if(Formulas.dotProduct(collision.normal, contactVec1) - faceProj >= 0)
+            {
+                Circle contact1 = new Circle(contactVec1.getX(), contactVec1.getY(), 4);
+                contact1.setFill(Color.RED);
+                DebugGlobal.getDebugView().getChildren().add(contact1);
+            }
+            //if(Formulas.dotProduct(collision.normal, contactVec2) - faceProj >= 0)
+            {
+                Circle contact2 = new Circle(contactVec2.getX(), contactVec2.getY(), 4);
+                contact2.setFill(Color.RED);
+                DebugGlobal.getDebugView().getChildren().add(contact2);
+            }
         }
     }
 
@@ -413,8 +451,10 @@ class PhysicsPolygon extends PhysicsObject{
 
             // Check that the normal faces away from the center of the polygon, if not, flip the normal
             Vec2 pointVecFromCenter = new Vec2(polyPoints[i].getX() - relativeX, polyPoints[i].getY() - relativeY);
+            boolean flip = false;
             if(Formulas.dotProduct(normal, pointVecFromCenter) < 0)
             {
+                flip = true;
                 normal.mult(-1.0f);
             }
 
@@ -433,12 +473,26 @@ class PhysicsPolygon extends PhysicsObject{
             float sepDistance = Formulas.dotProduct(normal, new Vec2(bSupport.getX() - aSupport.getX(), bSupport.getY() - aSupport.getY()));
 
             // Keep the smallest overlap and the normal along which it occurred
-            if(sepDistance > bestDist)
+            // An overlap is a positive sepDistance
+            if(bestDist > 0)
             {
-                bestDist = sepDistance;
-                bestNormal = normal;
-                bestFace = face;
+                if(sepDistance < bestDist && sepDistance > 0)
+                {
+                    bestDist = sepDistance;
+                    bestNormal = normal;
+                    bestFace = face;
+                }
             }
+            else{
+                if(sepDistance > bestDist)
+                {
+                    bestDist = sepDistance;
+                    bestNormal = normal;
+                    bestFace = face;
+                }
+            }
+
+//            System.out.println(bestDist);
         }
 
         // If a face object was passed in, store the best face points in it

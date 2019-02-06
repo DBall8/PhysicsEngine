@@ -11,16 +11,21 @@ public class FaceRotation {
     @Test
     public void testFaces(){
         Face face1 = new Face(new Point(0, -10), new Point(10, 0));
-        System.out.println("1");
         test(face1);
         face1 = new Face(new Point(10, 0), new Point(0, 10));
-        System.out.println("2");
         test(face1);
         face1 = new Face(new Point(0, 10), new Point(-10, 0));
-        System.out.println("3");
         test(face1);
         face1 = new Face(new Point(-10, 0), new Point(0, -10));
-        System.out.println("4");
+        test(face1);
+
+        face1 = new Face(new Point(-3, 53), new Point(345, -5));
+        test(face1);
+
+        face1 = new Face(new Point(60, -90), new Point(12, -10));
+        test(face1);
+
+        face1 = new Face(new Point(1, 1), new Point(130, 1));
         test(face1);
     }
 
@@ -36,10 +41,10 @@ public class FaceRotation {
 
         Vec2 faceVec = face.getVec();
         if(faceVec.getY() != 0) {
-            float faceAngle = (float) Math.acos(normal.getY());
-            if(normal.getX() > 0) faceAngle += Math.PI;
-            System.out.println(Formulas.toDegrees(faceAngle));
-            face.rotateTo(faceAngle, true);
+            float faceAngle = (float) Math.acos(-normal.getY());
+            if(normal.getX() > 0) faceAngle *= -1.0f;
+//            System.out.println(Formulas.toDegrees(faceAngle));
+            face.rotateAboutOrigin(faceAngle, true);
         }
 
         if(Float.isNaN(face.getP1().getY())) assertEquals(true, false);
