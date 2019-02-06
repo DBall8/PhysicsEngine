@@ -56,13 +56,12 @@ class PhysicsPolygon extends PhysicsObject{
         Collision c2 = polygon.findAxisOfLeastSeperation(this, face2);
         if(c2.penetration + margin < 0) return null; // Seperating axis found, no collision
 
-        System.out.println("COLLIDE");
         // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
         if(Formulas.BiasedGreaterThan(c1.penetration, c2.penetration, 0.05f))
         {
-            // Face 1 = reference face
-            // Face 2 = incident face
-            findContactPoints(c2, face1, face2);
+            // Face 1 = reference face??
+            // Face 2 = incident face??
+            findContactPoints(c2, face2, face1);
 
             // Use face normal
 //
@@ -71,9 +70,9 @@ class PhysicsPolygon extends PhysicsObject{
         }
         else
         {
-            // Face 2 = reference face
-            // Face 1 = incident face
-            findContactPoints(c1, face2, face1);
+            // Face 2 = reference face??
+            // Face 1 = incident face??
+            findContactPoints(c1, face1, face2);
             return c1;
         }
     }
@@ -81,15 +80,10 @@ class PhysicsPolygon extends PhysicsObject{
     private void findContactPoints(Collision collision, Face referenceFace, Face incidentFace)
     {
         final boolean CLIP_DEBUG = true;
-        if(CLIP_DEBUG) {
-            Line line1 = new Line(referenceFace.getP1().getX(), referenceFace.getP1().getY(), referenceFace.getP2().getX(), referenceFace.getP2().getY());
-            line1.setStroke(Color.PURPLE);
-            line1.setStrokeWidth(5);
-
-            Line line2 = new Line(incidentFace.getP1().getX(), incidentFace.getP1().getY(), incidentFace.getP2().getX(), incidentFace.getP2().getY());
-            line2.setStroke(Color.AQUA);
-            line2.setStrokeWidth(5);
-            DebugGlobal.getDebugView().getChildren().addAll(line1, line2);
+        if(CLIP_DEBUG && worldSettings.canDebug()) {
+            worldSettings.getDebugger().drawFace(referenceFace, Color.PURPLE);
+            worldSettings.getDebugger().drawFace(incidentFace, Color.AQUA);
+            worldSettings.getDebugger().drawNormal(referenceFace, collision.normal, Color.GREEN);
         }
 
         Vec2 faceVec = referenceFace.getVec();
@@ -136,21 +130,17 @@ class PhysicsPolygon extends PhysicsObject{
         Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
         Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
 
-        if(DebugGlobal.IsDebug()) {
+        if(worldSettings.canDebug()) {
             float faceProj = Formulas.dotProduct(collision.normal, faceVec);
 
             // TODO use vector from reference shape's center, not from origin, do it before returning rotated points
             //if(Formulas.dotProduct(collision.normal, contactVec1) - faceProj >= 0)
             {
-                Circle contact1 = new Circle(contactVec1.getX(), contactVec1.getY(), 4);
-                contact1.setFill(Color.RED);
-                DebugGlobal.getDebugView().getChildren().add(contact1);
+                worldSettings.getDebugger().drawPoint(contactVec1, Color.RED);
             }
             //if(Formulas.dotProduct(collision.normal, contactVec2) - faceProj >= 0)
             {
-                Circle contact2 = new Circle(contactVec2.getX(), contactVec2.getY(), 4);
-                contact2.setFill(Color.RED);
-                DebugGlobal.getDebugView().getChildren().add(contact2);
+                worldSettings.getDebugger().drawPoint(contactVec2, Color.RED);
             }
         }
     }

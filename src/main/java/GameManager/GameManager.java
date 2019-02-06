@@ -35,6 +35,10 @@ public class GameManager extends Pane {
         this.height = Settings.getWindowHeight();
 
 //        world.setGravityDirection(1, 0);
+        if(DebugGlobal.IsDebug())
+        {
+            world.addDebugView(DebugGlobal.getDebugView());
+        }
 
         time = new GameTime(this);
     }

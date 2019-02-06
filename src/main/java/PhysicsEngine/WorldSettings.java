@@ -1,6 +1,8 @@
 package PhysicsEngine;
 
+import PhysicsEngine.debug.Debugger;
 import PhysicsEngine.math.Vec2;
+import javafx.scene.Group;
 
 public class WorldSettings {
 
@@ -11,6 +13,8 @@ public class WorldSettings {
     private boolean friction = true; // true if there is friction between objects
     private float gravity = 10; // the amount of gravity (10 is normal)
     private Vec2 gravityDirection = new Vec2(0, 1);
+
+    private Debugger debugger = null;
 
     WorldSettings(){}
 
@@ -35,6 +39,12 @@ public class WorldSettings {
     }
 
     public Vec2 getGravityDirection() { return gravityDirection; }
+
+    public boolean canDebug(){ return debugger != null; }
+
+    public Debugger getDebugger(){ return debugger; }
+
+    public void addDebugView(Group group){ this.debugger = new Debugger(group); }
 
     // ------------------------------------------------------------------------------
 

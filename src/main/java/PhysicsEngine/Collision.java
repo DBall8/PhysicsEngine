@@ -80,11 +80,9 @@ class Collision {
         // Apply friction generated from the collision
         impulseVector.add(getFriction(relativeVelocity, j));
 
-        if(DebugGlobal.IsDebug() && contactPoint != null)
+        if(o1.worldSettings.canDebug() && contactPoint != null)
         {
-            Circle contact = new Circle(contactPoint.getX(), contactPoint.getY(), 4);
-            contact.setFill(Color.RED);
-            DebugGlobal.getDebugView().getChildren().add(contact);
+            o1.worldSettings.getDebugger().drawPoint(contactPoint, Color.RED);
         }
 
         return impulseVector;

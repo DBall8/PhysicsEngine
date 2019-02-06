@@ -2,6 +2,7 @@ package PhysicsEngine;
 
 import Global.DebugGlobal;
 import PhysicsEngine.math.*;
+import javafx.scene.Group;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -165,9 +166,9 @@ public class PhysicsWorld {
             accumulator = 0.5f;
         }
 
-        if(DebugGlobal.IsDebug())
+        if(worldSettings.canDebug())
         {
-            DebugGlobal.clearDebugView();
+            worldSettings.getDebugger().clear();
         }
 
         // First apply the force of gravity on every object
@@ -421,4 +422,6 @@ public class PhysicsWorld {
             this.object2 = object2;
         }
     }
+
+    public void addDebugView(Group group){ worldSettings.addDebugView(group); }
 }
