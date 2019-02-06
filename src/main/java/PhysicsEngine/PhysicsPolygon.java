@@ -478,19 +478,23 @@ class PhysicsPolygon extends PhysicsObject{
         // 2 clipping lines
         Line clippingLine1;
         Line clippingLine2;
+
+        // If the normal of the face is vertical, create two veritcal lines at each face point
         if(collision.normal.x == 0)
         {
             clippingLine1 = new Line(incidentFace.getP1().getX());
             clippingLine2 = new Line(incidentFace.getP2().getX());
         }
         else {
+            // The slope is obtained from the normal, and then the lines from plugging in the face points into
+            // y = mx + b
             float slope = collision.normal.y / collision.normal.x;
             clippingLine1 = new Line(slope, referenceFace.getP1().getY() - (slope * referenceFace.getP1().getX()));
             clippingLine2 = new Line(slope, referenceFace.getP2().getY() - (slope * referenceFace.getP2().getX()));
         }
 
         // Find the two points where the incident line crosses each clipping line
-        Line incidentLine = incidentFace.getLine();
+        Line incidentLine = incidentFace.getLine(); // line generated from the incident face
         Point intersection1 = clippingLine1.findIntersection(incidentLine);
         Point intersection2 = clippingLine2.findIntersection(incidentLine);
         if(worldSettings.canDebug() && SHOW_LINES)
@@ -500,10 +504,13 @@ class PhysicsPolygon extends PhysicsObject{
             worldSettings.getDebugger().drawLine(incidentLine, Color.LIGHTGREEN);
         }
 
-        // TODO clamp using y when incident face is vertical
-
+        // Maximum of two contact points. The are the points on the face that are in between the two clipping lines, or
+        // if a face point is outside the the two clipping lines replace it with the intersection with the closest clipping
+        // line
         Point contactPoint1;
         Point contactPoint2;
+
+        // If if the face crossed neither clipping line, both points are inside and are therefore contact points
         if(intersection1 == null || intersection2 == null)
         {
             // Incident face is perpendicular to reference face
@@ -516,80 +523,42 @@ class PhysicsPolygon extends PhysicsObject{
                 worldSettings.getDebugger().drawPoint(intersection1, Color.PINK);
                 worldSettings.getDebugger().drawPoint(intersection2, Color.PINK);
             }
+
+            // If the incident line is vertical, use the y axis to determine whether the face points are between the
+            // clipping lines
             if(incidentLine.isVertical())
             {
-                // TODO double check that intersection 1 x is always less than intersection 2 x
-                if(intersection1.getY() > intersection2.getY())
+                // Use whichever intersection has the smaller y as the MIN and the other as the MAX
+                if(intersection1.getY() < intersection2.getY())
                 {
-                    Point temp = intersection1;
-                    intersection1 = intersection2;
-                    intersection2 = temp;
+                    contactPoint1 = incidentFace.getP1().clampPointY(intersection1, intersection2);
+                    contactPoint2 = incidentFace.getP2().clampPointY(intersection1, intersection2);
+                }
+                else
+                {
+                    contactPoint1 = incidentFace.getP1().clampPointY(intersection2, intersection1);
+                    contactPoint2 = incidentFace.getP2().clampPointY(intersection2, intersection1);
                 }
 
-                contactPoint1 = incidentFace.getP1().clampPointY(intersection1, intersection2);
-
-                contactPoint2 = incidentFace.getP2().clampPointY(intersection1, intersection2);
             }
             else
             {
-                // TODO double check that intersection 1 x is always less than intersection 2 x
-                if(intersection1.getX() > intersection2.getX())
+                // Use whichever intersection has the smaller x as the MIN and the other as the MAX
+                if(intersection1.getX() < intersection2.getX())
                 {
-                    Point temp = intersection1;
-                    intersection1 = intersection2;
-                    intersection2 = temp;
+                    contactPoint1 = incidentFace.getP1().clampPointX(intersection1, intersection2);
+                    contactPoint2 = incidentFace.getP2().clampPointX(intersection1, intersection2);
                 }
-
-                contactPoint1 = incidentFace.getP1().clampPointX(intersection1, intersection2);
-
-                contactPoint2 = incidentFace.getP2().clampPointX(intersection1, intersection2);
+                else
+                {
+                    contactPoint1 = incidentFace.getP1().clampPointX(intersection2, intersection1);
+                    contactPoint2 = incidentFace.getP2().clampPointX(intersection2, intersection1);
+                }
             }
 
         }
 
-//        Vec2 faceVec = referenceFace.getVec();
-//
-//        float transX = collision.o1.getX();
-//        float transY = collision.o1.getY();
-//        referenceFace.translate(-transX, -transY);
-//        incidentFace.translate(-transX, -transY);
-//
-//        // If the incident's face is not parallel to the x axis with an upward normal, rotate both faces around the
-//        // origin until the incidicent face is
-//        float faceAngle = 0;
-//        if(collision.normal.getY() != -1) {
-//            faceAngle = (float) Math.acos(-collision.normal.getY());
-//            if(collision.normal.getX() > 0) faceAngle *= -1.0f;
-//            referenceFace.rotateAboutOrigin(faceAngle, true);
-//            incidentFace.rotateAboutOrigin(faceAngle, true);
-//        }
-//
-//        float minx, maxx;
-//        if(referenceFace.getP1().getX() < referenceFace.getP2().getX())
-//        {
-//            minx = referenceFace.getP1().getX();
-//            maxx = referenceFace.getP2().getX();
-//        }
-//        else
-//        {
-//            minx = referenceFace.getP2().getX();
-//            maxx = referenceFace.getP1().getX();
-//        }
-//
-//        float contactPoint1X = Formulas.clamp(minx, maxx, incidentFace.getP1().getX());
-//        Point contactPoint1 = new Point(contactPoint1X, incidentFace.getYAt(contactPoint1X));
-//
-//        float contactPoint2X = Formulas.clamp(minx, maxx, incidentFace.getP2().getX());
-//        Point contactPoint2 = new Point(contactPoint2X, incidentFace.getYAt(contactPoint2X));
-//
-//        // TODO Fix bug where rotating the contact points does not seem to work properly
-//        // Rotate the points back to how they were
-//        contactPoint1 = contactPoint1.getRotatedPoint(-faceAngle);
-//        contactPoint2 = contactPoint2.getRotatedPoint(-faceAngle);
-//
-//        // Translate the points back to how they were
-//        Vec2 contactVec1 = contactPoint1.getVec().add(transX, transY);
-//        Vec2 contactVec2 = contactPoint2.getVec().add(transX, transY);
+        // TODO use projection to rule out contact points on the wrong side of the reference face
 
         if(worldSettings.canDebug() && SHOW_CONTACT_POINTS) {
             //float faceProj = Formulas.dotProduct(collision.normal, faceVec);
