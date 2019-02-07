@@ -56,7 +56,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(20, 20, 40, 40, Material.Wood);
+            Body b = new Body(40, 40, 40, 40, Material.Wood);
             b.setInput(input);
             p = b;
         }
@@ -122,32 +122,32 @@ public class GameManager extends Pane {
         addObject(testPoly);
         testPoly.setInput(input);
 
-//        PolygonBody testPoly2 = new PolygonBody(800, 600, new Point[]{
-//                new Point(0, 0),
-//                new Point(0, 100),
-//                new Point(100, 100),
-//
-//        });
-//        addObject(testPoly2);
-//
-//        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
-//                new Point(0, 0),
-//                new Point(25, 15),
-//                new Point(40, 40),
-//                new Point(25, 55),
-//                new Point(0, 60),
-//                new Point(-25, 55),
-//                new Point(-40, 40),
-//                new Point(-25, 15),
-//        });
-//        addObject(poly1);
-//
-//        PolygonBody poly2 = new PolygonBody(300, 200, new Point[]{
-//                new Point(0, 0),
-//                new Point(100, 100),
-//                new Point(0, 100),
-//        });
-//        addObject(poly2);
+        PolygonBody testPoly2 = new PolygonBody(800, 600, new Point[]{
+                new Point(0, 0),
+                new Point(0, 100),
+                new Point(100, 100),
+
+        });
+        addObject(testPoly2);
+
+        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
+                new Point(0, 0),
+                new Point(25, 15),
+                new Point(40, 40),
+                new Point(25, 55),
+                new Point(0, 60),
+                new Point(-25, 55),
+                new Point(-40, 40),
+                new Point(-25, 15),
+        });
+        addObject(poly1);
+
+        PolygonBody poly2 = new PolygonBody(300, 200, new Point[]{
+                new Point(0, 0),
+                new Point(100, 100),
+                new Point(0, 100),
+        });
+        addObject(poly2);
 
 //        PolygonBody polyBodyC = new PolygonBody(420, 420, new Point[]{
 //                new Point(40, 0),

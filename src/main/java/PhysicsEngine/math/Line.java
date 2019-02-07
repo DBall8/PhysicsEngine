@@ -22,7 +22,7 @@ public class Line {
     {
 
         if((infiniteSlope && line.infiniteSlope) ||
-            (slope == line.slope))
+            (slope == line.slope && !infiniteSlope && !line.infiniteSlope))
         {
             // both lines have the same slope and will not intersect
             return null;

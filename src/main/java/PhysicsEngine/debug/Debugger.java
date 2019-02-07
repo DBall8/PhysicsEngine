@@ -29,6 +29,13 @@ public class Debugger {
         view.getChildren().add(circle);
     }
 
+    public void drawPoint(Point p, Color c, int size)
+    {
+        Circle circle = new Circle(p.getX(), p.getY(), size);
+        circle.setFill(c);
+        view.getChildren().add(circle);
+    }
+
     public void drawPoint(Vec2 p, Color c)
     {
         Circle circle = new Circle(p.getX(), p.getY(), POINT_RADIUS);

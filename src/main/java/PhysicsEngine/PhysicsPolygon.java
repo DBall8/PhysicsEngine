@@ -9,9 +9,8 @@ import javafx.scene.paint.Color;
 class PhysicsPolygon extends PhysicsObject{
 
     // FOR DEBUG
-    private static final boolean SHOW_FACES = true;
+    private static final boolean SHOW_FACES = false;
     private static final boolean SHOW_LINES = false;
-    private static final boolean SHOW_CONTACT_POINTS = true;
     private static final boolean SHOW_INTERSECTION_POINTS = false;
 
     Polygon polygon; // class containing the location of all points of the polygon
@@ -30,7 +29,7 @@ class PhysicsPolygon extends PhysicsObject{
     }
 
     /**
-     * Portion of contructors common to each
+     * Portion of constructors common to each
      * @param p position vector
      * @param polygon shape of polygon
      */
@@ -497,8 +496,8 @@ class PhysicsPolygon extends PhysicsObject{
         // If the normal of the face is vertical, create two veritcal lines at each face point
         if(collision.normal.x == 0)
         {
-            clippingLine1 = new Line(incidentFace.getP1().getX());
-            clippingLine2 = new Line(incidentFace.getP2().getX());
+            clippingLine1 = new Line(referenceFace.getP1().getX());
+            clippingLine2 = new Line(referenceFace.getP2().getX());
         }
         else {
             // The slope is obtained from the normal, and then the lines from plugging in the face points into
@@ -537,8 +536,8 @@ class PhysicsPolygon extends PhysicsObject{
         else {
             if(worldSettings.canDebug() && SHOW_INTERSECTION_POINTS)
             {
-                worldSettings.getDebugger().drawPoint(intersection1, Color.PINK);
-                worldSettings.getDebugger().drawPoint(intersection2, Color.PINK);
+                worldSettings.getDebugger().drawPoint(intersection1, Color.PINK, 8);
+                worldSettings.getDebugger().drawPoint(intersection2, Color.PINK, 8);
             }
 
             // If the incident line is vertical, use the y axis to determine whether the face points are between the
