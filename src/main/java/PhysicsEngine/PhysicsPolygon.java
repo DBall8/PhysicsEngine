@@ -518,8 +518,6 @@ class PhysicsPolygon extends PhysicsObject{
             worldSettings.getDebugger().drawLine(incidentLine, Color.LIGHTGREEN);
         }
 
-        // TODO clipping is failing
-
         // Maximum of two contact points. The are the points on the face that are in between the two clipping lines, or
         // if a face point is outside the the two clipping lines replace it with the intersection with the closest clipping
         // line

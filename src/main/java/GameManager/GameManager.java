@@ -35,10 +35,6 @@ public class GameManager extends Pane {
         this.height = Settings.getWindowHeight();
 
 //        world.setGravityDirection(1, 0);
-        if(DebugGlobal.IsDebug())
-        {
-            world.addDebugView(DebugGlobal.getDebugView());
-        }
 
         time = new GameTime(this);
     }
@@ -56,7 +52,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(40, 40, 40, 40, Material.Wood);
+            Body b = new Body(40, 40, 20/*, 40*/, Material.Wood);
             b.setInput(input);
             p = b;
         }
@@ -65,11 +61,11 @@ public class GameManager extends Pane {
         p1 = p;
         p1.getCollisionBox().setDebug();
 
-//        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
-//        addObject(p2);
-//
-//        Body p3 = new Body(400, 50, 20, Material.Rock);
-//        addObject(p3);
+        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
+        addObject(p2);
+
+        Body p3 = new Body(400, 50, 20, Material.Rock);
+        addObject(p3);
 
         Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
         addObject(wall1);
@@ -121,7 +117,7 @@ public class GameManager extends Pane {
         });
         addObject(testPoly);
         testPoly.setInput(input);
-
+//
         PolygonBody testPoly2 = new PolygonBody(800, 600, new Point[]{
                 new Point(0, 0),
                 new Point(0, 100),
@@ -129,7 +125,7 @@ public class GameManager extends Pane {
 
         });
         addObject(testPoly2);
-
+//
         PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
                 new Point(0, 0),
                 new Point(25, 15),
@@ -141,7 +137,7 @@ public class GameManager extends Pane {
                 new Point(-25, 15),
         });
         addObject(poly1);
-
+//
         PolygonBody poly2 = new PolygonBody(300, 200, new Point[]{
                 new Point(0, 0),
                 new Point(100, 100),
@@ -161,6 +157,11 @@ public class GameManager extends Pane {
         if(DebugGlobal.IsDebug())
         {
             this.getChildren().add(DebugGlobal.getDebugView());
+        }
+
+        if(DebugGlobal.IsDebug())
+        {
+            world.addDebugView(DebugGlobal.getDebugView());
         }
 
         time.play();

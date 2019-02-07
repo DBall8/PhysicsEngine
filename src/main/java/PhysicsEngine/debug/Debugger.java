@@ -14,6 +14,7 @@ public class Debugger {
     private static final int LINE_THICKNESS = 3;
     private static final int LINE_LENGTH = 800;
     private static final float NORMAL_LENGTH = 10.0f;
+    private static final float VEC_LENGTH = 50;
 
     private Group view;
 
@@ -77,6 +78,15 @@ public class Debugger {
 
         line.setStroke(c);
         line.setStrokeWidth(LINE_THICKNESS / 2.0f);
+        view.getChildren().add(line);
+    }
+
+    public void drawVec(Point pos, Vec2 vec, Color c)
+    {
+        Line line = new Line(pos.getX(), pos.getY(),
+                        pos.getX() + (vec.getX() * VEC_LENGTH), pos.getY() + (vec.getY() * VEC_LENGTH));
+        line.setStroke(c);
+        line.setStrokeWidth(LINE_THICKNESS);
         view.getChildren().add(line);
     }
 

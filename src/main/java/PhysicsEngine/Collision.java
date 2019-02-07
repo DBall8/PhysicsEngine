@@ -1,11 +1,10 @@
 package PhysicsEngine;
 
-import Global.DebugGlobal;
+import PhysicsEngine.math.Face;
 import PhysicsEngine.math.Formulas;
 import PhysicsEngine.math.Point;
 import PhysicsEngine.math.Vec2;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 
 /**
  * Class for resolving the impulse between two physics objects
@@ -16,6 +15,9 @@ class Collision {
                                                                    // of overlapped objects
     private final static float MIN_POSITION_CORRECTION = 0.05f; // Minimum position correction to use
     private final static short MAX_CONTACT_POINTS = 2;
+
+    private final static boolean ENABLE_ROTATION = true;
+    private final static boolean ENABLE_FRICTION = true;
 
     // Objects involved in collision
     PhysicsObject o1;
@@ -57,50 +59,112 @@ class Collision {
      * Calculates the impulse generated from the collision and applies it to both objects involved
      * @return the impulse vector, which should be applied inverted to object 1 and normally to object 2
      */
-    Vec2 getImpulse()
+    void applyImpulse()
     {
-        Vec2 impulseVector = new Vec2(0,0);
         // If both objects have infinite mass, neither will be affected since they are immovable
-        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return impulseVector; // Two infinite mass objects cannot move
+        if(o1.getInvertedMass() + o2.getInvertedMass() == 0) return; // Two infinite mass objects cannot move
+
+        if(numContactPoints == 0)
+        {
+            // TODO fix this ever hitting
+            return;
+        }
 
         // Move the objects apart if overlapping
         correctPosition();
 
-        // Get the vector formed by the two circles' velocities
-        Vec2 relativeVelocity = new Vec2(o2.getXvelocity() - o1.getXvelocity(),
-                                         o2.getYvelocity() - o1.getYvelocity());
-
-        // Get the relative velocity along the normal vector
-        float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
-
-        // If the relative velocity along the normal is positive, the objects are already moving apart, do nothing
-        if(normalVelocity >= 0) return impulseVector;
-
         // Use the average restitution
         float e = o2.getRestitution() + o1.getRestitution() / 2.0f;
+        // get the coefficient of friction to use for this collision
+        float muStatic =  (o1.getStaticFriction() + o2.getStaticFriction()) / 2.0f;
+        float muDynamic = (o1.getDynamicFriction() + o2.getDynamicFriction()) / 2.0f;
 
-        // Get the impulse scalar from the normal velocity, the restitution, and the inverted masses
-        // j times normal is normal force
-        float j = -(1.0f + e) * normalVelocity;
-        j /= o1.getInvertedMass() + o2.getInvertedMass();
+        float crossA;
+        float crossB;
+        Vec2 contactA;
+        Vec2 contactB;
+        for(int i=0; i<numContactPoints; i++) {
 
-        // Distribute the impulse across the normal of the collision
-        Vec2 resolutionVec = normal.copy();
-        resolutionVec.mult(j);
+            contactA = new Vec2(contactPoints[i].getX() - o1.getX(), contactPoints[i].getY() - o1.getY());
+            contactB = new Vec2(contactPoints[i].getX() - o2.getX(), contactPoints[i].getY() - o2.getY());
 
-        // Apply the force to each object, in opposite directions
-        impulseVector.add(resolutionVec);
-//        o1.applyForce(-resolutionVec.x, -resolutionVec.y);
-//        o2.applyForce(resolutionVec.x, resolutionVec.y);
-//        o1.xvelocity -= o1.getInvertedMass() * resolutionVec.x;
-//        o1.yvelocity -= o1.getInvertedMass() * resolutionVec.y;
-//        o2.xvelocity += o2.getInvertedMass() * resolutionVec.x;
-//        o2.yvelocity += o2.getInvertedMass() * resolutionVec.y;
+            // Get the vector formed by the two circles' velocities
+            Vec2 pointAAngularVelocity = Formulas.cross(o1.getAngularVelocity(), contactA);
+            Vec2 pointBAngularVelocity = Formulas.cross(o2.getAngularVelocity(), contactB);
+            Vec2 relativeVelocity = new Vec2(o2.getXvelocity() + pointBAngularVelocity.x - o1.getXvelocity() - pointAAngularVelocity.x,
+                    o2.getYvelocity() + pointBAngularVelocity.y - o1.getYvelocity() - pointAAngularVelocity.y);
+            // Get the relative velocity along the normal vector
+            float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 
-        // Apply friction generated from the collision
-        impulseVector.add(getFriction(relativeVelocity, j));
+            // If the relative velocity along the normal is positive, the objects are already moving apart, do nothing
+            if(normalVelocity >= 0) return;
 
-        return impulseVector;
+            crossA = Formulas.cross(contactA, normal);
+            crossB = Formulas.cross(contactB, normal);
+
+            crossA *= crossA;
+            crossB *= crossB;
+
+            // Get the impulse scalar from the normal velocity, the restitution, and the inverted masses
+            // j times normal is normal force
+            float j = -(1.0f + e) * normalVelocity;
+            float inverseMassSum = o1.getInvertedMass() + o2.getInvertedMass();
+            if(ENABLE_ROTATION)
+            {
+                inverseMassSum += (crossA * o1.getInvertedInertia()) + (crossB * o2.getInvertedInertia());
+            }
+            j /= inverseMassSum;
+            j /= numContactPoints;
+
+            // Distribute the impulse across the normal of the collision
+            Vec2 resolutionVec = Formulas.vecMult(normal, j);
+
+            Vec2 oppositeImpulse = resolutionVec.copy().mult(-1.0f);
+            if(ENABLE_ROTATION) {
+                o1.applyImpulse(oppositeImpulse, contactA);
+                o2.applyImpulse(resolutionVec, contactB);
+            }
+            else
+            {
+                o1.applyImpulse(oppositeImpulse, new Vec2(0,0));
+                o2.applyImpulse(resolutionVec, new Vec2(0,0));
+            }
+
+            if(!ENABLE_FRICTION) return;
+
+            Vec2 tangent = Formulas.vecMult(normal, -1.0f * Formulas.dotProduct(relativeVelocity, normal));
+            tangent = Formulas.vecAdd(relativeVelocity, tangent);
+            tangent.normalize();
+
+            // Recalculate j but using the tangent of the collision normal
+            float jF = -1.0f * Formulas.dotProduct(relativeVelocity, tangent);
+            jF /= inverseMassSum;
+            jF /= numContactPoints;
+
+            // If the the absolute value of jF is less than the static coefficient times j
+            Vec2 frictionVec;
+            if(Math.abs(jF) < muStatic * j)
+            {
+                frictionVec = tangent.mult(jF);
+            }
+            // Otherwise use j and dynamic friction
+            else
+            {
+                frictionVec = tangent.mult(-1.0f * j * muDynamic);
+            }
+
+            if(ENABLE_ROTATION) {
+                o1.applyImpulse(Formulas.vecMult(frictionVec, -1.0f), contactA);
+                o2.applyImpulse(frictionVec, contactB);
+            }
+            else
+            {
+                o1.applyImpulse(Formulas.vecMult(frictionVec, -1.0f), new Vec2(0,0));
+                o2.applyImpulse(frictionVec, new Vec2(0,0));
+            }
+
+        }
+
     }
 
     /**
@@ -109,7 +173,7 @@ class Collision {
      * @param j the collision strength factor found from calculating the impulse
      * @return The friction vector
      */
-    private Vec2 getFriction(Vec2 relativeVelocity, float j)
+    private Vec2 getFriction(Vec2 relativeVelocity, float j, float denom)
     {
 //        float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 //        j = -1.0f * normalVelocity;
@@ -122,7 +186,7 @@ class Collision {
 
         // Recalculate j but using the tangent of the collision normal
         float jF = -1.0f * Formulas.dotProduct(relativeVelocity, tangent);
-        jF /= (o1.getInvertedMass() + o2.getInvertedMass());
+        jF /= denom;
 
         // get the coefficient of friction to use for this collision
         float mu =  (o1.getStaticFriction() + o2.getStaticFriction()) / 2.0f;

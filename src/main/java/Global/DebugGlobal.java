@@ -3,7 +3,7 @@ package Global;
 import javafx.scene.Group;
 
 public class DebugGlobal {
-    private final static boolean DEBUG = true;
+    private final static boolean DEBUG = false;
 
     private Group debugView = new Group();
 

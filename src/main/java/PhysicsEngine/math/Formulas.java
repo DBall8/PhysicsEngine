@@ -53,6 +53,10 @@ public class Formulas {
     {
         return (v1.getX() * v2.getY()) - (v2.getX() * v1.getY());
     }
+    public static Vec2 cross(float scalar, Vec2 v2)
+    {
+        return new Vec2(-scalar * v2.getY(), scalar * v2.getX());
+    }
 
     public static float normalizeAngle(float angleInRads)
     {

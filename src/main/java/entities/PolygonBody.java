@@ -68,7 +68,7 @@ public class PolygonBody extends Ship {
     @Override
     public void update() {
         super.update();
-        collisionBox.setOrientation(angle);
+        //collisionBox.setOrientation(angle);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class PolygonBody extends Ship {
 //        shape.setFill(color);
 //        visuals.getChildren().set(0, shape);
 
-        rotate.setAngle(Formulas.toDegrees(angle));
+        rotate.setAngle(Formulas.toDegrees(collisionBox.getOrientation()));
         visuals.setTranslateX(collisionBox.getX());
         visuals.setTranslateY(collisionBox.getY());
     }
