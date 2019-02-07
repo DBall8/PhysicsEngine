@@ -13,6 +13,8 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameManager extends Pane {
 
@@ -194,17 +196,27 @@ public class GameManager extends Pane {
             //Body newBody = new Body(input.getMouseX(), input.getMouseY(), 40, 40, Material.Rock);
             //addObject(newBody);
 
-            float size = (float)Math.random()*75 + 25;
+//            float size = (float)Math.random()*75 + 25;
+//
+//            PolygonBody newBody = new PolygonBody(input.getMouseX(), input.getMouseY(), new Point[]{
+//                    new Point(0, 0),
+//                    new Point(size, size),
+//                    new Point(size, 0),
+//            });
+//            newBody.setMaterial(Material.Rock);
+//            float randAngle = (float)(Math.random()*2.0f*Math.PI);
+//            newBody.setRotation(randAngle);
+//            addObject(newBody);
 
-            PolygonBody newBody = new PolygonBody(input.getMouseX(), input.getMouseY(), new Point[]{
-                    new Point(0, 0),
-                    new Point(size, size),
-                    new Point(size, 0),
-            });
-            newBody.setMaterial(Material.Rock);
-            float randAngle = (float)(Math.random()*2.0f*Math.PI);
-            newBody.setRotation(randAngle);
-            addObject(newBody);
+            Bullet b = new Bullet(p1.getCollisionBox().getX(), p1.getCollisionBox().getY() - 40, p1.getCollisionBox().getOrientation());
+            addObject(b);
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    removeObject(b);
+                }
+            }, (int)(3 * 1000));
         }
 
         if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)
@@ -224,6 +236,12 @@ public class GameManager extends Pane {
     {
         objects.add(o);
         this.getChildren().add(o.getVisuals());
+    }
+
+    private void removeObject(Entity o)
+    {
+        objects.remove(o);
+        this.getChildren().remove(o.getVisuals());
     }
 
 }
