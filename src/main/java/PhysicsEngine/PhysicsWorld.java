@@ -3,6 +3,7 @@ package PhysicsEngine;
 import Global.DebugGlobal;
 import PhysicsEngine.math.*;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -332,7 +333,7 @@ public class PhysicsWorld {
             // Get the magnitude of the normal force in the direction of gravity
             float gravityPortion = -1.0f * Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal);
             // Get the magnitude of the normal force perpendicular to gravity
-            float perpendicularPortion = Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal.tangent());
+            float perpendicularPortion = Math.abs(Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal.tangent()));
             // Create a vector where we use "y" as the portion of the force against gravity, and "x" as the portion
             // perpendicular to gravity. Only add to the perpendicular force relative to how much is being added to
             // the parallel force, (So straight perpendicular forces add nothing while straight parallel ones add much)

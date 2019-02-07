@@ -58,8 +58,6 @@ class PhysicsPolygon extends PhysicsObject{
         Collision c2 = polygon.findAxisOfLeastSeperation(this, result2);
         if(c2.penetration + margin < 0) return null; // Seperating axis found, no collision
 
-        // TODO need to find incident face from the the reference face, not simply from the other collision
-        // IDEA: pass an object that stores the index of the point that crossed the reference face
 
         // Take the collision with the least penetration, if it was from the box's perspective, flip perspective
         if(Formulas.BiasedGreaterThan(c1.penetration, c2.penetration, 0.05f))
@@ -70,7 +68,7 @@ class PhysicsPolygon extends PhysicsObject{
             findContactPoints(c2, result2.referenceFace, incidentFace);
 
             // Use face normal
-//
+            c2.flipPerspective();
             return c2;
             //return new Collision(this, polygon, c2.normal.mult(-1.0f), c2.penetration);
         }

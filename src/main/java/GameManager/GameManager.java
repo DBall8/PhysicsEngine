@@ -27,6 +27,9 @@ public class GameManager extends Pane {
 
     UserInputListener input;
 
+    Ability jumpAbility = new Ability(0.5f);
+    Vec2 gravityDirection = new Vec2(0, 1).normalize();
+
     public static PhysicsWorld world = new PhysicsWorld(Settings.getGravity(), false);
 
     public GameManager(){
@@ -34,7 +37,7 @@ public class GameManager extends Pane {
         this.width = Settings.getWindowWidth();
         this.height = Settings.getWindowHeight();
 
-//        world.setGravityDirection(1, 0);
+        world.setGravityDirection(gravityDirection.x, gravityDirection.y);
 
         time = new GameTime(this);
     }
@@ -52,7 +55,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(40, 40, 20/*, 40*/, Material.Wood);
+            Body b = new Body(40, 40, 40, 40, Material.Wood);
             b.setInput(input);
             p = b;
         }
@@ -208,16 +211,30 @@ public class GameManager extends Pane {
             addObject(newBody);
         }
 
-        if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)
+
+        if(Settings.getGravity() > 0 && input.isUp() && jumpAbility.isReady())
         {
+            jumpAbility.use();
 //                p1.getCollisionBox().applyForce(0, Body.JUMP_STRENGTH);
-            Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
+
 //            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
 //            System.out.println(percent);
+            Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
             if(bestGroundedVector.y < -0.5) {
-                p1.getCollisionBox().applyForce(0/*Body.JUMP_STRENGTH*bestGroundedVector.x*/, Body.JUMP_STRENGTH*bestGroundedVector.y);
+                float jumpForce = Body.JUMP_STRENGTH*bestGroundedVector.y;
+                p1.getCollisionBox().applyForce(jumpForce * gravityDirection.x,
+                                                jumpForce * gravityDirection.y);
             }
 
+        }
+
+        if(jumpAbility.isReady())
+        {
+            ((Body)p1).setColor(Color.BLUE);
+        }
+        else
+        {
+            ((Body)p1).setColor(Color.RED);
         }
     }
 
