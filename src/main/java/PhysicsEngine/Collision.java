@@ -15,6 +15,7 @@ class Collision {
     private final static float POSITION_CORRECTION_PERCENT = 0.2f; // the percent to use when correcting the position
                                                                    // of overlapped objects
     private final static float MIN_POSITION_CORRECTION = 0.05f; // Minimum position correction to use
+    private final static short MAX_CONTACT_POINTS = 2;
 
     // Objects involved in collision
     PhysicsObject o1;
@@ -23,7 +24,8 @@ class Collision {
     Vec2 normal;
     // The amount of overlap between the two objects
     float penetration;
-    Point contactPoint = null;
+    Point[] contactPoints;
+    short numContactPoints;
 
     Collision(PhysicsObject o1, PhysicsObject o2, Vec2 normal, float penetration)
     {
@@ -31,6 +33,24 @@ class Collision {
         this.o2 = o2;
         this.normal = normal;
         this.penetration = penetration;
+        this.contactPoints = new Point[2];
+        this.numContactPoints = 0;
+    }
+
+    void addContactPoint(Point p)
+    {
+        if(numContactPoints > MAX_CONTACT_POINTS)
+        {
+            System.err.println("TOO MANY CONTACT POINTS.");
+            return;
+        }
+        contactPoints[numContactPoints] = p;
+        numContactPoints++;
+
+        if(o1.worldSettings.canDebug())
+        {
+            o1.worldSettings.getDebugger().drawPoint(p, Color.RED);
+        }
     }
 
     /**
@@ -79,11 +99,6 @@ class Collision {
 
         // Apply friction generated from the collision
         impulseVector.add(getFriction(relativeVelocity, j));
-
-        if(o1.worldSettings.canDebug() && contactPoint != null)
-        {
-            o1.worldSettings.getDebugger().drawPoint(contactPoint, Color.RED);
-        }
 
         return impulseVector;
     }

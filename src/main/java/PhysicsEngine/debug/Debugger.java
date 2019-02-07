@@ -10,8 +10,8 @@ import javafx.scene.shape.Line;
 
 public class Debugger {
 
-    private static final int POINT_RADIUS = 4;
-    private static final int LINE_THICKNESS = 5;
+    private static final int POINT_RADIUS = 6;
+    private static final int LINE_THICKNESS = 3;
     private static final int LINE_LENGTH = 800;
     private static final float NORMAL_LENGTH = 10.0f;
 
