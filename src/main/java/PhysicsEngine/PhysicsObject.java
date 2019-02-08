@@ -55,17 +55,9 @@ public abstract class PhysicsObject{
         this.totalForce = new Vec2(0, 0);
         this.totalImpulse = new Vec2(0,0);
         this.numImpulse = 0;
-        this.mass = material.getDensity() * volume;
-        this.inertia = mass * volume;
-        if(material.getDensity() == 0)
-        {
-            invertedMass = 0;
-            invertedIntertia = 0;
-        }
-        else {
-            invertedMass = MASS_SCALING_FACTOR / mass;
-            invertedIntertia = MASS_SCALING_FACTOR / inertia;
-        }
+
+        setMass(volume * material.getDensity());
+        setInertia(mass * volume);
     }
 
     /**
@@ -241,6 +233,30 @@ public abstract class PhysicsObject{
         float x2 = xvelocity*xvelocity;
         float y2 = yvelocity*yvelocity;
         return (float)Math.sqrt(x2 + y2);
+    }
+
+    protected void setMass(float mass)
+    {
+        this.mass = mass;
+        if(material.getDensity() == 0)
+        {
+            invertedMass = 0;
+        }
+        else {
+            invertedMass = MASS_SCALING_FACTOR / mass;
+        }
+    }
+
+    protected void setInertia(float inertia)
+    {
+        this.inertia = inertia;
+        if(material.getDensity() == 0)
+        {
+            invertedIntertia = 0;
+        }
+        else {
+            invertedIntertia = MASS_SCALING_FACTOR / inertia;
+        }
     }
 
     abstract Collision checkCollision(PhysicsCircle circle, float margin);

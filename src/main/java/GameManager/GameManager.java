@@ -55,7 +55,7 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(40, 40, 40, 40, Material.Wood);
+            Body b = new Body(40, 40, 20, /*40,*/ Material.Wood);
             b.setInput(input);
             p = b;
         }
@@ -129,15 +129,27 @@ public class GameManager extends Pane {
         });
         addObject(testPoly2);
 //
-        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
-                new Point(0, 0),
-                new Point(25, 15),
-                new Point(40, 40),
-                new Point(25, 55),
-                new Point(0, 60),
-                new Point(-25, 55),
-                new Point(-40, 40),
-                new Point(-25, 15),
+//        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
+//                new Point(0, 0),
+//                new Point(25, 15),
+//                new Point(40, 40),
+//                new Point(25, 55),
+//                new Point(0, 60),
+//                new Point(-25, 55),
+//                new Point(-40, 40),
+//                new Point(-25, 15),
+//        });
+//        addObject(poly1);
+
+        PolygonBody poly1 = new PolygonBody(100, 600, new float[]{
+                0, 0,
+                25, 15,
+                40, 40,
+                25, 55,
+                0, 60,
+                -25, 55,
+                -40, 40,
+                -25, 15,
         });
         addObject(poly1);
 //

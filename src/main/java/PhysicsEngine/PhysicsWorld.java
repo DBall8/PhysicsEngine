@@ -134,6 +134,36 @@ public class PhysicsWorld {
         }
     }
 
+    public PhysicsObject addPolygon(float centerx, float centery, float[] points)
+    {
+        try
+        {
+            PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points));
+            objects.add(p);
+            return p;
+        }
+        catch (MalformedPolygonException e)
+        {
+            System.err.println("ERROR: Points do not form a valid polygon.");
+            return null;
+        }
+    }
+
+    public PhysicsObject addPolygon(float centerx, float centery, float[] points, Material material)
+    {
+        try
+        {
+            PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points), material);
+            objects.add(p);
+            return p;
+        }
+        catch (MalformedPolygonException e)
+        {
+            System.err.println("ERROR: Points do not form a valid polygon.");
+            return null;
+        }
+    }
+
     public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);

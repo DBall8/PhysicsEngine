@@ -17,6 +17,20 @@ public class Polygon {
     float rotation = 0; // Current rotation in radians
     Point[] points; // The points of the polygon at the current translation and rotation
 
+    public Polygon(float[] points) throws MalformedPolygonException
+    {
+        if(points.length % 2 != 0)
+        {
+            throw new MalformedPolygonException("Odd number of coordinates given, cannot form points.");
+        }
+
+        this.originPoints = new Point[points.length/2];
+        for(int i=0; i<points.length; i+=2)
+        {
+            this.originPoints[i/2] = new Point(points[i], points[i+1]);
+        }
+        commonInit();
+    }
 
     /**
      * Constructor
@@ -26,7 +40,11 @@ public class Polygon {
     public Polygon(Point[] points) throws MalformedPolygonException{
         if(points.length <= 0) throw(new MalformedPolygonException("Points do not form a valid polygon."));
         this.originPoints = points;
+        commonInit();
+    }
 
+    public void commonInit()
+    {
         // Take the given polygon and center it at the origin.
         centerAtOrigin();
         // Find the relative angles of each point
@@ -85,38 +103,6 @@ public class Polygon {
             if(dy <= 0) pointAngles[i] += Math.PI;
 //            System.out.println(pointAngles[i] * (180.0 / Math.PI));
         }
-    }
-
-    /**
-     * Estimate the volume of the polygon
-     * @return the estimated volume
-     */
-    public float estimateVolume()
-    {
-        // Assume the polygon is regular, with apothem as the average of its points distances from the center
-        // But is a percentage of the apothem relative to n, since the fewer n the smaller the apothem becomes
-        // A = n * apothem^2 * tan(180/n)
-
-        // get the average distance from the center of the points, use this as the apothem
-        float apothem = 0;
-        for(Point point: originPoints)
-        {
-            apothem += Math.sqrt((point.getX() * point.getX()) + (point.getY() * point.getY()));
-        }
-
-        apothem /= originPoints.length;
-        apothem *= (originPoints.length * VOLUME_ESTIMATE_FACTOR / 100.0f);
-
-        float estimatedVolume = (float)(apothem * apothem * Math.tan(Math.PI / originPoints.length) * originPoints.length);
-
-//        // When taking the average, divide by 1 more than the number of points to decrease the result more when there
-//        // are fewer points. This is because less points indicates a further overestimate,(think of a triangle vs an
-//        // even octagon)
-//        pointDistSum /= originPoints.length;
-//        float estimatedVolume = (float)(Math.PI * pointDistSum);
-//        estimatedVolume = estimatedVolume * (originPoints.length * VOLUME_ESTIMATE_FACTOR / 100.0f);
-        //System.out.println(estimatedVolume);
-        return estimatedVolume;
     }
 
     /**
@@ -361,5 +347,30 @@ public class Polygon {
 
             points[i] = new Point(px, py);
         }
+    }
+
+    /**
+     * Estimate the volume of the polygon
+     * @return the estimated volume
+     */
+    public float estimateVolume()
+    {
+        float areaSum = 0;
+
+        for(int i=0; i<originPoints.length; i++)
+        {
+            Point p1 = originPoints[i];
+            Point p2 = i < originPoints.length -1 ? originPoints[i+1] : originPoints[0];
+
+            float midx = (p1.getX() + p2.getX()) / 2.0f;
+            float midy = (p1.getY() + p2.getY()) / 2.0f;
+            Vec2 midPoint = new Vec2(midx, midy);
+            Vec2 baseDir = midPoint.tangent().normalize();
+            float height = midPoint.magnitude();
+            float base = 2 * Math.abs(Formulas.dotProduct(baseDir, p2.getVec()));
+            areaSum += 0.5f * base * height;
+        }
+
+        return areaSum;
     }
 }
