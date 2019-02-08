@@ -16,6 +16,8 @@ import java.util.List;
 
 public class GameManager extends Pane {
 
+    private final static boolean PLAYER_IS_CIRCLE = false;
+
     private Scene scene;
     private List<Entity> objects = new ArrayList<>();
     private int width, height;
@@ -55,7 +57,14 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(40, 40, 20, /*40,*/ Material.Wood);
+            Body b;
+            if(PLAYER_IS_CIRCLE) {
+                b = new Body(40, 40, 20, Material.Wood);
+            }
+            else
+            {
+                b = new Body(40, 40, 40, 40, Material.Wood);
+            }
             b.setInput(input);
             p = b;
         }
@@ -64,8 +73,8 @@ public class GameManager extends Pane {
         p1 = p;
         p1.getCollisionBox().setDebug();
 
-        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
-        addObject(p2);
+//        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
+//        addObject(p2);
 
         Body p3 = new Body(400, 50, 20, Material.Rock);
         addObject(p3);

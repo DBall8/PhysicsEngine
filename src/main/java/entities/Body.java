@@ -11,10 +11,13 @@ import javafx.scene.shape.Shape;
 
 public class Body extends Entity{
 
+    private final static boolean CONTROL_VIA_SPIN = false;
+
     private final static int RADIUS = 20;
     private final static int MAX_AXIS_VELOCITY = 20;
     private final static float ACCELERATION = 1.0f * (60.0f / Settings.getFramerate());
-    public final static float JUMP_STRENGTH = 20;
+    public final static float JUMP_STRENGTH = 40;
+    private final static float SPIN_ACCEL = 10.0f * (60.0f / Settings.getFramerate());
 
     protected final static float ORIENT_SIZE = 2;
 
@@ -67,9 +70,9 @@ public class Body extends Entity{
             }
 
             if (input.isRight() && !input.isLeft() && xvel < MAX_AXIS_VELOCITY) {
-                xaccel = ACCELERATION;
+                xaccel = CONTROL_VIA_SPIN? SPIN_ACCEL : ACCELERATION;
             } else if (!input.isRight() && input.isLeft() && xvel > -MAX_AXIS_VELOCITY) {
-                xaccel = -ACCELERATION;
+                xaccel = CONTROL_VIA_SPIN? -SPIN_ACCEL : -ACCELERATION;
             }
 
             if(input.isBoost())
@@ -78,7 +81,13 @@ public class Body extends Entity{
             }
         }
 
-        collisionBox.applyForce(xaccel, yaccel);
+        if(CONTROL_VIA_SPIN) {
+            collisionBox.applyForce(0, yaccel);
+            collisionBox.applyTorque(xaccel);
+        }
+        else{
+            collisionBox.applyForce(xaccel, yaccel);
+        }
     }
 
     public void setColor(Color color)

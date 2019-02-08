@@ -91,11 +91,11 @@ public abstract class PhysicsObject{
         // Update velocities
         xvelocity += invertedMass * totalForce.x;
         yvelocity += invertedMass * totalForce.y;
-        //angularVelocity += invertedIntertia * torque;
+        angularVelocity += invertedIntertia * torque;
 
         // Zero out total force vector since they have been applied
         totalForce.zero();
-        //torque = 0;
+        torque = 0;
     }
 
     /**
@@ -104,19 +104,12 @@ public abstract class PhysicsObject{
      */
     void applyImpulse(Vec2 impulse, Vec2 contactVec)
     {
-        this.totalImpulse.add(impulse);
-        this.numImpulse = 1;
-        applyTorque(impulse, contactVec);
+        applyForce(impulse.x, impulse.y);
+        applyTorque(Formulas.cross(contactVec, impulse));
         // Only add non-zero impulses
 //        if(impulse.x !=0 || impulse.y != 0) {
 //            this.totalImpulse.add(impulse);
 //            this.numImpulse = ++;
-    }
-
-    void applyTorque(Vec2 impulse, Vec2 contactVector)
-    {
-        angularVelocity += invertedIntertia * Formulas.cross(contactVector, impulse);
-        //torque += Formulas.cross(contactVector, impulse);
     }
 
     /**
@@ -167,6 +160,15 @@ public abstract class PhysicsObject{
         Vec2 force = new Vec2(xcomponent, ycomponent);
         force.mult(worldSettings.getForceScaleFactor()); // scale by force scale factor
         totalForce.add(force);
+    }
+
+    /**
+     * Applies a torque to the object. Positive torque increases clockwise spin
+     * @param torque
+     */
+    public void applyTorque(float torque)
+    {
+        this.torque += torque;
     }
 
     /**
