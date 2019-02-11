@@ -1,9 +1,7 @@
-package PhysicsEngine;
+package physicsEngine;
 
-import Global.DebugGlobal;
-import PhysicsEngine.math.*;
+import physicsEngine.math.*;
 import javafx.scene.Group;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

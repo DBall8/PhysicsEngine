@@ -1,4 +1,4 @@
-package PhysicsEngine;
+package physicsEngine;
 
 /**
  * Class for storing material specific information

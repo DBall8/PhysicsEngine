@@ -1,6 +1,6 @@
-package PhysicsEngine;
+package physicsEngine;
 
-import PhysicsEngine.math.*;
+import physicsEngine.math.*;
 import javafx.scene.paint.Color;
 
 /**

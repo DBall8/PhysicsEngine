@@ -1,7 +1,7 @@
-package PhysicsEngine;
+package physicsEngine;
 
-import PhysicsEngine.math.Point;
-import PhysicsEngine.math.Vec2;
+import physicsEngine.math.Point;
+import physicsEngine.math.Vec2;
 
 /**
  * Class for calculating collisions for a circle

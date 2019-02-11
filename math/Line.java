@@ -1,4 +1,4 @@
-package PhysicsEngine.math;
+package physicsEngine.math;
 
 public class Line {
     private float slope;

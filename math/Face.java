@@ -1,4 +1,4 @@
-package PhysicsEngine.math;
+package physicsEngine.math;
 
 public class Face {
     private Point p1;

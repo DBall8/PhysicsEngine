@@ -1,9 +1,8 @@
-package PhysicsEngine;
+package physicsEngine;
 
-import PhysicsEngine.math.Face;
-import PhysicsEngine.math.Formulas;
-import PhysicsEngine.math.Point;
-import PhysicsEngine.math.Vec2;
+import physicsEngine.math.Formulas;
+import physicsEngine.math.Point;
+import physicsEngine.math.Vec2;
 import javafx.scene.paint.Color;
 
 /**

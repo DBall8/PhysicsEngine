@@ -1,7 +1,7 @@
-package PhysicsEngine;
+package physicsEngine;
 
-import PhysicsEngine.debug.Debugger;
-import PhysicsEngine.math.Vec2;
+import physicsEngine.debug.Debugger;
+import physicsEngine.math.Vec2;
 import javafx.scene.Group;
 
 public class WorldSettings {

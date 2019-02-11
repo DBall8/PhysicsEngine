@@ -1,7 +1,7 @@
-package PhysicsEngine;
+package physicsEngine;
 
-import PhysicsEngine.math.Formulas;
-import PhysicsEngine.math.Vec2;
+import physicsEngine.math.Formulas;
+import physicsEngine.math.Vec2;
 
 /**
  * Class for calculation collisions between objects

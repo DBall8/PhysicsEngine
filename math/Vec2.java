@@ -1,4 +1,4 @@
-package PhysicsEngine.math;
+package physicsEngine.math;
 
 /**
  * Class used for tracking a vector. Can be modified.

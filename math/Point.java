@@ -1,4 +1,4 @@
-package PhysicsEngine.math;
+package physicsEngine.math;
 
 /**
  * Class used for storing points. Cannot be modified once created

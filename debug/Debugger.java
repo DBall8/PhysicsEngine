@@ -1,8 +1,8 @@
-package PhysicsEngine.debug;
+package physicsEngine.debug;
 
-import PhysicsEngine.math.Face;
-import PhysicsEngine.math.Point;
-import PhysicsEngine.math.Vec2;
+import physicsEngine.math.Face;
+import physicsEngine.math.Point;
+import physicsEngine.math.Vec2;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -64,7 +64,7 @@ public class Debugger {
         view.getChildren().add(line);
     }
 
-    public void drawLine(PhysicsEngine.math.Line l, Color c)
+    public void drawLine(physicsEngine.math.Line l, Color c)
     {
         Line line;
         if(l.isVertical())

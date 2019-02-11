@@ -1,4 +1,4 @@
-package PhysicsEngine.math;
+package physicsEngine.math;
 
 /**
  * Class for formulas for global use
