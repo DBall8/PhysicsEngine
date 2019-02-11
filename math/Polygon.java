@@ -272,6 +272,31 @@ public class Polygon {
     }
 
     /**
+     * Estimate the volume of the polygon
+     * @return the estimated volume
+     */
+    public float estimateVolume()
+    {
+        float areaSum = 0;
+
+        for(int i=0; i<originPoints.length; i++)
+        {
+            Point p1 = originPoints[i];
+            Point p2 = i < originPoints.length -1 ? originPoints[i+1] : originPoints[0];
+
+            float midx = (p1.getX() + p2.getX()) / 2.0f;
+            float midy = (p1.getY() + p2.getY()) / 2.0f;
+            Vec2 midPoint = new Vec2(midx, midy);
+            Vec2 baseDir = midPoint.tangent().normalize();
+            float height = midPoint.magnitude();
+            float base = 2 * Math.abs(Formulas.dotProduct(baseDir, p2.getVec()));
+            areaSum += 0.5f * base * height;
+        }
+
+        return areaSum;
+    }
+
+    /**
      * Creates a copy of the polygon
      * @return
      */
@@ -347,30 +372,5 @@ public class Polygon {
 
             points[i] = new Point(px, py);
         }
-    }
-
-    /**
-     * Estimate the volume of the polygon
-     * @return the estimated volume
-     */
-    public float estimateVolume()
-    {
-        float areaSum = 0;
-
-        for(int i=0; i<originPoints.length; i++)
-        {
-            Point p1 = originPoints[i];
-            Point p2 = i < originPoints.length -1 ? originPoints[i+1] : originPoints[0];
-
-            float midx = (p1.getX() + p2.getX()) / 2.0f;
-            float midy = (p1.getY() + p2.getY()) / 2.0f;
-            Vec2 midPoint = new Vec2(midx, midy);
-            Vec2 baseDir = midPoint.tangent().normalize();
-            float height = midPoint.magnitude();
-            float base = 2 * Math.abs(Formulas.dotProduct(baseDir, p2.getVec()));
-            areaSum += 0.5f * base * height;
-        }
-
-        return areaSum;
     }
 }
