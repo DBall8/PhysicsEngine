@@ -221,8 +221,8 @@ public abstract class PhysicsObject{
     float getInvertedInertia(){ return  invertedIntertia; }
     public float getX(){ return position.getX(); }
     public float getY(){ return position.getY(); }
-    public float getXvelocity() { return xvelocity; }
-    public float getYvelocity() { return yvelocity; }
+    public float getXVelocity() { return xvelocity; }
+    public float getYVelocity() { return yvelocity; }
     public float getAngularVelocity() { return angularVelocity; }
     public float getOrientation() { return orientation; }
     float getStaticFriction() { return material.getStaticFriction(); }

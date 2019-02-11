@@ -88,8 +88,8 @@ class Collision {
             // Get the vector formed by the two circles' velocities
             Vec2 pointAAngularVelocity = Formulas.cross(o1.getAngularVelocity(), contactA);
             Vec2 pointBAngularVelocity = Formulas.cross(o2.getAngularVelocity(), contactB);
-            Vec2 relativeVelocity = new Vec2(o2.getXvelocity() + pointBAngularVelocity.x - o1.getXvelocity() - pointAAngularVelocity.x,
-                    o2.getYvelocity() + pointBAngularVelocity.y - o1.getYvelocity() - pointAAngularVelocity.y);
+            Vec2 relativeVelocity = new Vec2(o2.getXVelocity() + pointBAngularVelocity.x - o1.getXVelocity() - pointAAngularVelocity.x,
+                    o2.getYVelocity() + pointBAngularVelocity.y - o1.getYVelocity() - pointAAngularVelocity.y);
             // Get the relative velocity along the normal vector
             float normalVelocity = Formulas.dotProduct(normal, relativeVelocity);
 
