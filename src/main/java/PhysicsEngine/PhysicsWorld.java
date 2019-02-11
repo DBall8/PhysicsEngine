@@ -1,6 +1,9 @@
 package PhysicsEngine;
 
+import Global.DebugGlobal;
 import PhysicsEngine.math.*;
+import javafx.scene.Group;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -131,6 +134,36 @@ public class PhysicsWorld {
         }
     }
 
+    public PhysicsObject addPolygon(float centerx, float centery, float[] points)
+    {
+        try
+        {
+            PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points));
+            objects.add(p);
+            return p;
+        }
+        catch (MalformedPolygonException e)
+        {
+            System.err.println("ERROR: Points do not form a valid polygon.");
+            return null;
+        }
+    }
+
+    public PhysicsObject addPolygon(float centerx, float centery, float[] points, Material material)
+    {
+        try
+        {
+            PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points), material);
+            objects.add(p);
+            return p;
+        }
+        catch (MalformedPolygonException e)
+        {
+            System.err.println("ERROR: Points do not form a valid polygon.");
+            return null;
+        }
+    }
+
     public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
@@ -162,6 +195,11 @@ public class PhysicsWorld {
         if(accumulator > 0.5f)
         {
             accumulator = 0.5f;
+        }
+
+        if(worldSettings.canDebug())
+        {
+            worldSettings.getDebugger().clear();
         }
 
         // First apply the force of gravity on every object
@@ -325,7 +363,7 @@ public class PhysicsWorld {
             // Get the magnitude of the normal force in the direction of gravity
             float gravityPortion = -1.0f * Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal);
             // Get the magnitude of the normal force perpendicular to gravity
-            float perpendicularPortion = Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal.tangent());
+            float perpendicularPortion = Math.abs(Formulas.dotProduct(worldSettings.getGravityDirection(), c.normal.tangent()));
             // Create a vector where we use "y" as the portion of the force against gravity, and "x" as the portion
             // perpendicular to gravity. Only add to the perpendicular force relative to how much is being added to
             // the parallel force, (So straight perpendicular forces add nothing while straight parallel ones add much)
@@ -413,4 +451,6 @@ public class PhysicsWorld {
             this.object2 = object2;
         }
     }
+
+    public void addDebugView(Group group){ worldSettings.addDebugView(group); }
 }

@@ -53,6 +53,10 @@ public class Formulas {
     {
         return (v1.getX() * v2.getY()) - (v2.getX() * v1.getY());
     }
+    public static Vec2 cross(float scalar, Vec2 v2)
+    {
+        return new Vec2(-scalar * v2.getY(), scalar * v2.getX());
+    }
 
     public static float normalizeAngle(float angleInRads)
     {
@@ -73,5 +77,14 @@ public class Formulas {
     public static float toDegrees(float rads)
     {
         return rads * RAD_TO_DEGREE_FACTOR;
+    }
+    public static float toRadians(float degrees)
+    {
+        return degrees / RAD_TO_DEGREE_FACTOR;
+    }
+
+    public static boolean BiasedGreaterThan(float a, float b, float bias)
+    {
+        return a > (b * (1 - bias)) + (a * bias);
     }
 }

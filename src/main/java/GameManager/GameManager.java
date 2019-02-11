@@ -1,5 +1,6 @@
 package GameManager;
 
+import Global.DebugGlobal;
 import Global.Settings;
 import PhysicsEngine.Material;
 import PhysicsEngine.PhysicsWorld;
@@ -15,6 +16,8 @@ import java.util.List;
 
 public class GameManager extends Pane {
 
+    private final static boolean PLAYER_IS_CIRCLE = false;
+
     private Scene scene;
     private List<Entity> objects = new ArrayList<>();
     private int width, height;
@@ -26,6 +29,9 @@ public class GameManager extends Pane {
 
     UserInputListener input;
 
+    Ability jumpAbility = new Ability(0.5f);
+    Vec2 gravityDirection = new Vec2(0, 1).normalize();
+
     public static PhysicsWorld world = new PhysicsWorld(Settings.getGravity(), false);
 
     public GameManager(){
@@ -33,7 +39,7 @@ public class GameManager extends Pane {
         this.width = Settings.getWindowWidth();
         this.height = Settings.getWindowHeight();
 
-//        world.setGravityDirection(1, 0);
+        world.setGravityDirection(gravityDirection.x, gravityDirection.y);
 
         time = new GameTime(this);
     }
@@ -51,7 +57,14 @@ public class GameManager extends Pane {
         }
         else
         {
-            Body b = new Body(20, 20, 20, /*40,*/ Material.Wood);
+            Body b;
+            if(PLAYER_IS_CIRCLE) {
+                b = new Body(40, 40, 20, Material.Wood);
+            }
+            else
+            {
+                b = new Body(40, 40, 40, 40, Material.Wood);
+            }
             b.setInput(input);
             p = b;
         }
@@ -60,11 +73,11 @@ public class GameManager extends Pane {
         p1 = p;
         p1.getCollisionBox().setDebug();
 
-        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
-        addObject(p2);
+//        Body p2 = new Body(100, 50, 40, 40, Material.Metal);
+//        addObject(p2);
 
-//        Body p3 = new Body(400, 50, 20, Material.Rock);
-//        addObject(p3);
+        Body p3 = new Body(400, 50, 20, Material.Rock);
+        addObject(p3);
 
         Wall wall1 = new Wall(-30, Settings.getWindowHeight() / 2, 80, Settings.getWindowHeight());
         addObject(wall1);
@@ -90,7 +103,7 @@ public class GameManager extends Pane {
 
 //        PhysicsPolygon pp = (PhysicsPolygon)(polyBody.getCollisionBox());
 //        Polygon poly = pp.getPolygon();
-//
+
 //        PolygonBody polyBody2 = new PolygonBody(600, 100, new Point[]{
 //                new Point(10, 0),
 //                new Point(10, 10),
@@ -98,7 +111,7 @@ public class GameManager extends Pane {
 //                new Point(0, 0),
 //        });
 //        addObject(polyBody2);
-
+//
 //        PolygonBody polyBody3 = new PolygonBody(500, 500, new Point[]{
 //                new Point(100, 0),
 //                new Point(100, 100),
@@ -116,7 +129,7 @@ public class GameManager extends Pane {
         });
         addObject(testPoly);
         testPoly.setInput(input);
-
+//
         PolygonBody testPoly2 = new PolygonBody(800, 600, new Point[]{
                 new Point(0, 0),
                 new Point(0, 100),
@@ -124,24 +137,35 @@ public class GameManager extends Pane {
 
         });
         addObject(testPoly2);
+//
+//        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
+//                new Point(0, 0),
+//                new Point(25, 15),
+//                new Point(40, 40),
+//                new Point(25, 55),
+//                new Point(0, 60),
+//                new Point(-25, 55),
+//                new Point(-40, 40),
+//                new Point(-25, 15),
+//        });
+//        addObject(poly1);
 
-        PolygonBody poly1 = new PolygonBody(100, 600, new Point[]{
-                new Point(0, 0),
-                new Point(25, 15),
-                new Point(40, 40),
-                new Point(25, 55),
-                new Point(0, 60),
-                new Point(-25, 55),
-                new Point(-40, 40),
-                new Point(-25, 15),
+        PolygonBody poly1 = new PolygonBody(100, 600, new float[]{
+                0, 0,
+                25, 15,
+                40, 40,
+                25, 55,
+                0, 60,
+                -25, 55,
+                -40, 40,
+                -25, 15,
         });
         addObject(poly1);
-
+//
         PolygonBody poly2 = new PolygonBody(300, 200, new Point[]{
                 new Point(0, 0),
-                new Point(0, 100),
                 new Point(100, 100),
-
+                new Point(0, 100),
         });
         addObject(poly2);
 
@@ -153,6 +177,16 @@ public class GameManager extends Pane {
 //        });
 //
 //        addObject(polyBodyC);
+
+        if(DebugGlobal.IsDebug())
+        {
+            this.getChildren().add(DebugGlobal.getDebugView());
+        }
+
+        if(DebugGlobal.IsDebug())
+        {
+            world.addDebugView(DebugGlobal.getDebugView());
+        }
 
         time.play();
     }
@@ -198,16 +232,30 @@ public class GameManager extends Pane {
             addObject(newBody);
         }
 
-        if(Settings.getGravity() > 0 && input.isUp() /*&& p1.getCollisionBox().isTouching(ground.getCollisionBox())*/)
+
+        if(Settings.getGravity() > 0 && input.isUp() && jumpAbility.isReady())
         {
+            jumpAbility.use();
 //                p1.getCollisionBox().applyForce(0, Body.JUMP_STRENGTH);
-            Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
+
 //            float percent = (float)(2.0*Math.asin(bestGroundedVector.getY()) / Math.PI);
 //            System.out.println(percent);
-            if(bestGroundedVector.y < -0.7) {
-                p1.getCollisionBox().applyForce(/*Body.JUMP_STRENGTH*bestGroundedVector.x*/0, Body.JUMP_STRENGTH*bestGroundedVector.y);
+            Vec2 bestGroundedVector = world.getGroundedVector(p1.getCollisionBox());
+            if(bestGroundedVector.y < -0.5) {
+                float jumpForce = Body.JUMP_STRENGTH*bestGroundedVector.y;
+                p1.getCollisionBox().applyForce(jumpForce * gravityDirection.x,
+                                                jumpForce * gravityDirection.y);
             }
 
+        }
+
+        if(jumpAbility.isReady())
+        {
+            ((Body)p1).setColor(Color.BLUE);
+        }
+        else
+        {
+            ((Body)p1).setColor(Color.RED);
         }
     }
 

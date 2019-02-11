@@ -32,6 +32,8 @@ public abstract class PhysicsObject{
     Material material;
     float mass;
     float invertedMass = 0.05f;
+    float inertia;
+    float invertedIntertia;
     float broadPhaseRadius = 0; // Radius at the furthest point from the shape's center
 
     ShapeType shapeType = ShapeType.INVALID; // Enum for tracking which collision methods to use (circle vs polygon)
@@ -53,14 +55,9 @@ public abstract class PhysicsObject{
         this.totalForce = new Vec2(0, 0);
         this.totalImpulse = new Vec2(0,0);
         this.numImpulse = 0;
-        this.mass = material.getDensity() * volume;
-        if(material.getDensity() == 0)
-        {
-            invertedMass = 0;
-        }
-        else {
-            invertedMass = MASS_SCALING_FACTOR / mass;
-        }
+
+        setMass(volume * material.getDensity());
+        setInertia(mass * volume);
     }
 
     /**
@@ -72,6 +69,7 @@ public abstract class PhysicsObject{
         // Update position
         position.x = position.x + xvelocity * timeStep;
         position.y = position.y + yvelocity * timeStep;
+        orientation = orientation + angularVelocity * timeStep;
     }
 
     /**
@@ -93,22 +91,25 @@ public abstract class PhysicsObject{
         // Update velocities
         xvelocity += invertedMass * totalForce.x;
         yvelocity += invertedMass * totalForce.y;
+        angularVelocity += invertedIntertia * torque;
 
         // Zero out total force vector since they have been applied
         totalForce.zero();
+        torque = 0;
     }
 
     /**
      * Stores an impulse to be added to total forces at the end of a collision calculation loop
      * @param impulse the impulse vector to accumulate
      */
-    void applyImpulse(Vec2 impulse)
+    void applyImpulse(Vec2 impulse, Vec2 contactVec)
     {
+        applyForce(impulse.x, impulse.y);
+        applyTorque(Formulas.cross(contactVec, impulse));
         // Only add non-zero impulses
-        if(impulse.x !=0 || impulse.y != 0) {
-            this.totalImpulse.add(impulse);
-            this.numImpulse++;
-        }
+//        if(impulse.x !=0 || impulse.y != 0) {
+//            this.totalImpulse.add(impulse);
+//            this.numImpulse = ++;
     }
 
     /**
@@ -131,6 +132,9 @@ public abstract class PhysicsObject{
      */
     Collision checkCollision(PhysicsObject object, float margin)
     {
+        // Dont calculate collision between two immovable objects
+        if(invertedMass == 0 && object.invertedMass == 0) return null;
+
         // Pass to the sub-class's collision check
         switch (object.shapeType)
         {
@@ -156,6 +160,15 @@ public abstract class PhysicsObject{
         Vec2 force = new Vec2(xcomponent, ycomponent);
         force.mult(worldSettings.getForceScaleFactor()); // scale by force scale factor
         totalForce.add(force);
+    }
+
+    /**
+     * Applies a torque to the object. Positive torque increases clockwise spin
+     * @param torque
+     */
+    public void applyTorque(float torque)
+    {
+        this.torque += torque;
     }
 
     /**
@@ -205,10 +218,12 @@ public abstract class PhysicsObject{
 
     float getRestitution(){ return material.getRestitution(); }
     float getInvertedMass(){ return invertedMass; }
+    float getInvertedInertia(){ return  invertedIntertia; }
     public float getX(){ return position.getX(); }
     public float getY(){ return position.getY(); }
     public float getXvelocity() { return xvelocity; }
     public float getYvelocity() { return yvelocity; }
+    public float getAngularVelocity() { return angularVelocity; }
     public float getOrientation() { return orientation; }
     float getStaticFriction() { return material.getStaticFriction(); }
     float getDynamicFriction() { return material.getDynamicFriction(); }
@@ -220,6 +235,30 @@ public abstract class PhysicsObject{
         float x2 = xvelocity*xvelocity;
         float y2 = yvelocity*yvelocity;
         return (float)Math.sqrt(x2 + y2);
+    }
+
+    protected void setMass(float mass)
+    {
+        this.mass = mass;
+        if(material.getDensity() == 0)
+        {
+            invertedMass = 0;
+        }
+        else {
+            invertedMass = MASS_SCALING_FACTOR / mass;
+        }
+    }
+
+    protected void setInertia(float inertia)
+    {
+        this.inertia = inertia;
+        if(material.getDensity() == 0)
+        {
+            invertedIntertia = 0;
+        }
+        else {
+            invertedIntertia = MASS_SCALING_FACTOR / inertia;
+        }
     }
 
     abstract Collision checkCollision(PhysicsCircle circle, float margin);

@@ -3,6 +3,7 @@ package entities;
 import GameManager.GameManager;
 import PhysicsEngine.Material;
 import PhysicsEngine.math.Formulas;
+import PhysicsEngine.math.MalformedPolygonException;
 import PhysicsEngine.math.Point;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -26,6 +27,7 @@ public class PolygonBody extends Ship {
             polyPoints[2*i] = (points[i].getX());
             polyPoints[2*i + 1] = (points[i].getY());
         }
+
         shape = new Polygon(polyPoints);
         shape.setFill(Color.ORANGE);
 
@@ -39,36 +41,41 @@ public class PolygonBody extends Ship {
         visuals.getTransforms().add(rotate);
     }
 
-    public PolygonBody(float x, float y, PhysicsEngine.math.Polygon polygon) {
-        //super(x, y, 20, Material.Wood);
+    public PolygonBody(float x, float y, float[] points) {
 
-        collisionBox = GameManager.world.addPolygon(x, y, polygon);
+        try {
+            PhysicsEngine.math.Polygon polygon = new PhysicsEngine.math.Polygon(points);
+            collisionBox = GameManager.world.addPolygon(x, y, polygon);
 
-        Point[] points = polygon.getPoints();
+            Point[] centeredPoints = polygon.getPoints();
+            double[] polyPoints = new double[centeredPoints.length*2];
+            for(int i=0; i<centeredPoints.length; i++)
+            {
+                polyPoints[2*i] = (centeredPoints[i].getX());
+                polyPoints[2*i + 1] = (centeredPoints[i].getY());
+            }
 
-        double[] polyPoints = new double[points.length*2];
-        for(int i=0; i<points.length; i++)
-        {
-            polyPoints[2*i] = (points[i].getX());
-            polyPoints[2*i + 1] = (points[i].getY());
+            shape = new Polygon(polyPoints);
+            shape.setFill(Color.ORANGE);
+
+            Line orient = new Line(0,0, centeredPoints[0].getX(), centeredPoints[1].getY());
+            orient.setStrokeWidth(ORIENT_SIZE);
+            orient.setFill(Color.BLACK);
+
+            visuals.getChildren().addAll(shape, orient);
+
+            rotate = new Rotate(0, 0, 0);
+            visuals.getTransforms().add(rotate);
+        } catch (MalformedPolygonException e) {
+            e.printStackTrace();
         }
-        shape = new Polygon(polyPoints);
-        shape.setFill(color);
 
-        Line orient = new Line(0,0,points[0].getX(), points[0].getY());
-        orient.setStrokeWidth(ORIENT_SIZE);
-        orient.setFill(Color.BLACK);
-
-        visuals.getChildren().addAll(shape, orient);
-
-        rotate = new Rotate(0, 0, 0);
-        visuals.getTransforms().add(rotate);
     }
 
     @Override
     public void update() {
         super.update();
-        collisionBox.setOrientation(angle);
+        //collisionBox.setOrientation(angle);
     }
 
     @Override
@@ -88,7 +95,7 @@ public class PolygonBody extends Ship {
 //        shape.setFill(color);
 //        visuals.getChildren().set(0, shape);
 
-        rotate.setAngle(Formulas.toDegrees(angle));
+        rotate.setAngle(Formulas.toDegrees(collisionBox.getOrientation()));
         visuals.setTranslateX(collisionBox.getX());
         visuals.setTranslateY(collisionBox.getY());
     }
