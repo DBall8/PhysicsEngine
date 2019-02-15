@@ -80,6 +80,7 @@ public abstract class PhysicsObject{
         position.x = position.x + xvelocity * timeStep;
         position.y = position.y + yvelocity * timeStep;
         orientation = orientation + angularVelocity * timeStep;
+        orientation = Formulas.normalizeAngle(orientation);
     }
 
     /**
