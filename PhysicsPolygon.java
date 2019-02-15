@@ -39,6 +39,7 @@ class PhysicsPolygon extends PhysicsObject{
         this.polygon = polygon;
         polygon.setTranslation(p.getX(), p.getY());
         broadPhaseRadius = findMaxRadius();
+        setInertia(0.33f * volume * volume);
     }
     // -----------------------------------------------------------------------------------------------------------------
 

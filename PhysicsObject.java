@@ -245,7 +245,6 @@ public abstract class PhysicsObject{
     float getInvertedInertia(){ return  invertedIntertia; }
     float getStaticFriction() { return material.getStaticFriction(); }
     float getDynamicFriction() { return material.getDynamicFriction(); }
-    abstract float findMaxRadius();
     private ShapeType getShapeType() { return shapeType; }
 
     protected void setMass(float mass)
@@ -276,6 +275,7 @@ public abstract class PhysicsObject{
     abstract Collision checkCollision(PhysicsPolygon polygon, float margin);
     public abstract boolean isTouching(PhysicsCircle circle);
     public abstract boolean isTouching(PhysicsPolygon polygon);
+    abstract float findMaxRadius();
 
     protected enum ShapeType{
         POLYGON,
