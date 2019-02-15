@@ -14,6 +14,10 @@ public abstract class PhysicsObject{
     protected final static float TINY_AMOUNT = 0.01f; // A value to consider "close enough"
     protected final static float TOUCHING_AMOUNT = 0.1f;
 
+    private static long idCounter = 0;
+
+    private String id;
+
     Vec2 position; // Position of the object
     Vec2 totalForce; // Sum of all forces currently acting on the object
 
@@ -43,6 +47,7 @@ public abstract class PhysicsObject{
 
     protected PhysicsObject(WorldSettings worldSettings, Vec2 p, Material material, float volume)
     {
+        this.id = generateID();
         this.worldSettings = worldSettings;
         position = p;
         this.angularVelocity = 0;
@@ -58,6 +63,11 @@ public abstract class PhysicsObject{
 
         setMass(volume * material.getDensity());
         setInertia(mass * volume);
+    }
+
+    private synchronized String generateID()
+    {
+        return "Obj-" + String.valueOf(idCounter++);
     }
 
     /**
@@ -215,20 +225,13 @@ public abstract class PhysicsObject{
         this.material = material;
         this.invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
     }
-
-    float getRestitution(){ return material.getRestitution(); }
-    float getInvertedMass(){ return invertedMass; }
-    float getInvertedInertia(){ return  invertedIntertia; }
+    public String getId(){ return id; }
     public float getX(){ return position.getX(); }
     public float getY(){ return position.getY(); }
     public float getXVelocity() { return xvelocity; }
     public float getYVelocity() { return yvelocity; }
     public float getAngularVelocity() { return angularVelocity; }
     public float getOrientation() { return orientation; }
-    float getStaticFriction() { return material.getStaticFriction(); }
-    float getDynamicFriction() { return material.getDynamicFriction(); }
-    abstract float findMaxRadius();
-    private ShapeType getShapeType() { return shapeType; }
     public float getMass() { return mass; }
     public float getVelocity()
     {
@@ -236,6 +239,14 @@ public abstract class PhysicsObject{
         float y2 = yvelocity*yvelocity;
         return (float)Math.sqrt(x2 + y2);
     }
+
+    float getRestitution(){ return material.getRestitution(); }
+    float getInvertedMass(){ return invertedMass; }
+    float getInvertedInertia(){ return  invertedIntertia; }
+    float getStaticFriction() { return material.getStaticFriction(); }
+    float getDynamicFriction() { return material.getDynamicFriction(); }
+    abstract float findMaxRadius();
+    private ShapeType getShapeType() { return shapeType; }
 
     protected void setMass(float mass)
     {

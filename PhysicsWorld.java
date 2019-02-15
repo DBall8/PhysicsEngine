@@ -175,6 +175,22 @@ public class PhysicsWorld {
         objects.add(p);
         return p;
     }
+
+    public void removeObject(PhysicsObject object)
+    {
+        objects.remove(object);
+    }
+
+    public void removeObject(String objectId)
+    {
+        for(int i=0; i<objects.size(); i++)
+        {
+            if(objects.get(i).getId().equals(objectId))
+            {
+                objects.remove(i);
+            }
+        }
+    }
     // -----------------------------------------------------------------------------------------------------------------
 
     // Physics calculation methods -------------------------------------------------------------------------------------
