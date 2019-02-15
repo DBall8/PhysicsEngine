@@ -14,9 +14,6 @@ public class PhysicsWorld {
 
     private final static int INITIAL_FRAMERATE = 120; // default frame rate
     private final static float INITIAL_COLLISION_PRECISION = 50;
-    private final static float TIME_SCALE_FACTOR = 120; // factor for making time run faster and adjusting forces (might need to seperate)
-
-    private final static float TIME_STEP = 1.0f / INITIAL_FRAMERATE; // amount of time to step forward
 
     // List of all physics objects to simulate
     private List<PhysicsObject> objects = new ArrayList<>();
@@ -36,17 +33,17 @@ public class PhysicsWorld {
         worldSettings.setGravity(gravity);
         worldSettings.setFriction(friction);
         setCollisionPrecision(INITIAL_COLLISION_PRECISION);
-        setUpdatesPerFrame(INITIAL_FRAMERATE);
+        setUpdatesPerSecond(INITIAL_FRAMERATE);
     }
     public PhysicsWorld(float gravity){
         worldSettings.setGravity(gravity);
         setCollisionPrecision(INITIAL_COLLISION_PRECISION);
-        setUpdatesPerFrame(INITIAL_FRAMERATE);
+        setUpdatesPerSecond(INITIAL_FRAMERATE);
     }
     public PhysicsWorld()
     {
         setCollisionPrecision(INITIAL_COLLISION_PRECISION);
-        setUpdatesPerFrame(INITIAL_FRAMERATE);
+        setUpdatesPerSecond(INITIAL_FRAMERATE);
     }
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -249,8 +246,10 @@ public class PhysicsWorld {
         // First apply the force of gravity on every object
         applyGravity();
 
+        float timeStep = worldSettings.getTimeStep();
+
         // As long as enough "time" is left in the accumulator "tank", consume a timestep's worth and update the world
-        while(accumulator >= TIME_STEP)
+        while(accumulator >= timeStep)
         {
             // Check for all collisions and update, but repeat multiple times to allow impulses to propogate through
             // (Mostly needed for large stacks of objects)
@@ -265,12 +264,12 @@ public class PhysicsWorld {
             // Update each object's position
             move(worldSettings.getScaledTimeStep());
             // Take the "time" from the accumulator "tank"
-            accumulator -= TIME_STEP;
+            accumulator -= timeStep;
         }
 
         // If there is still "time" left in the accumulator but not enough for a full time step, return a value to use
         // to guess each movement forward to allow for smoother animations
-        return accumulator / TIME_STEP;
+        return accumulator / timeStep;
     }
 
     /**
@@ -463,7 +462,7 @@ public class PhysicsWorld {
     // -----------------------------------------------------------------------------------------------------------------
 
     // SETTERS ---------------------------------------------------------------------------------------------------------
-    public void setUpdatesPerFrame(int updates)
+    public void setUpdatesPerSecond(int updates)
     {
         if(updates <= 0)
         {
@@ -471,8 +470,10 @@ public class PhysicsWorld {
             return;
         }
         float timeStep = 1.0f / updates;
-        worldSettings.setScaledTimeStep(timeStep * TIME_SCALE_FACTOR);
-        worldSettings.setForceScaleFactor(updates / TIME_SCALE_FACTOR);
+        worldSettings.setTimeStep(timeStep);
+        // Set the time step and force scaled factors to be scaled by the initial framerate
+        worldSettings.setScaledTimeStep(timeStep * INITIAL_FRAMERATE);
+        worldSettings.setTimeScaleFactor(updates / INITIAL_FRAMERATE);
     }
 
     public void setCollisionPrecision(float precision)

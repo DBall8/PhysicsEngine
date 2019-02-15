@@ -13,6 +13,7 @@ public abstract class PhysicsObject{
     private final static float GRAVITY_SCALAR = 0.01f; // Scale for making gravity seem normal at about 10 units
     protected final static float TINY_AMOUNT = 0.01f; // A value to consider "close enough"
     protected final static float TOUCHING_AMOUNT = 0.1f;
+    private final static float MIN_FORCE = 0.01f;
 
     private static long idCounter = 0;
 
@@ -76,7 +77,7 @@ public abstract class PhysicsObject{
      */
     void move(float timeStep)
     {
-        // Update position
+        // Update position;
         position.x = position.x + xvelocity * timeStep;
         position.y = position.y + yvelocity * timeStep;
         orientation = orientation + angularVelocity * timeStep;
@@ -99,10 +100,19 @@ public abstract class PhysicsObject{
      */
     void applyTotalForce()
     {
-        // Update velocities
-        xvelocity += invertedMass * totalForce.x;
-        yvelocity += invertedMass * totalForce.y;
-        angularVelocity += invertedIntertia * torque;
+        // Update velocities, but only apply forces big enough to matter
+        if(totalForce.x > MIN_FORCE || totalForce.x < -MIN_FORCE)
+        {
+            xvelocity += invertedMass * totalForce.x;
+        }
+
+        if(totalForce.y > MIN_FORCE || totalForce.y < -MIN_FORCE) {
+            yvelocity += invertedMass * totalForce.y;
+        }
+
+        if(torque > MIN_FORCE || torque < -MIN_FORCE) {
+            angularVelocity += invertedIntertia * torque;
+        }
 
         // Zero out total force vector since they have been applied
         totalForce.zero();
@@ -116,8 +126,8 @@ public abstract class PhysicsObject{
      */
     void applyImpulse(Vec2 impulse, Vec2 contactVec)
     {
-        totalForce.add(impulse);
-        this.torque += Formulas.cross(contactVec, impulse);
+        applyForce(impulse);
+        applyTorque(Formulas.cross(contactVec, impulse));
     }
 
     /**
@@ -166,7 +176,15 @@ public abstract class PhysicsObject{
     public void applyForce(float xcomponent, float ycomponent)
     {
         Vec2 force = new Vec2(xcomponent, ycomponent);
-        force.mult(worldSettings.getForceScaleFactor()); // scale by force scale factor
+        totalForce.add(force);
+    }
+
+    /**
+     * Applies a force on the object
+     * @param force Vector describing the force
+     */
+    public void applyForce(Vec2 force)
+    {
         totalForce.add(force);
     }
 
@@ -176,7 +194,7 @@ public abstract class PhysicsObject{
      */
     public void applyTorque(float torque)
     {
-        this.torque += torque * worldSettings.getForceScaleFactor();
+        this.torque += torque;
     }
 
     /**
@@ -188,7 +206,6 @@ public abstract class PhysicsObject{
     {
         Vec2 force = new Vec2(Formulas.getXComponent(magnitude, angleInRadians),
                 Formulas.getYComponent(magnitude, angleInRadians));
-        force.mult(worldSettings.getForceScaleFactor());
         totalForce.add(force);
     }
 

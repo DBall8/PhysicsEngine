@@ -6,9 +6,10 @@ import javafx.scene.Group;
 
 public class WorldSettings {
 
-    private float scaledTimeStep = 1.0f/120.0f; // scaled time step to speed up moving things along
+    private float timeStep = 1.0f/120.0f;
+    private float scaledTimeStep = timeStep; // scaled time step to speed up moving things along
     private float collisionPrecision = 1; // How many times it iterates through the collision, stops stacks squashing
-    private float forceScaleFactor = 1; // Scale from original update frame rate so scale forces
+    private float timeScaleFactor = 1; // Scale from original update frame rate so scale forces
 
     private boolean friction = true; // true if there is friction between objects
     private float gravity = 10; // the amount of gravity (10 is normal)
@@ -18,6 +19,10 @@ public class WorldSettings {
 
     WorldSettings(){}
 
+    public float getTimeStep() {
+        return timeStep;
+    }
+
     public float getScaledTimeStep() {
         return scaledTimeStep;
     }
@@ -26,8 +31,8 @@ public class WorldSettings {
         return collisionPrecision;
     }
 
-    public float getForceScaleFactor() {
-        return forceScaleFactor;
+    public float getTimeScaleFactor() {
+        return timeScaleFactor;
     }
 
     public boolean isFriction() {
@@ -48,6 +53,10 @@ public class WorldSettings {
 
     // ------------------------------------------------------------------------------
 
+    void setTimeStep(float timeStep) {
+        this.timeStep = timeStep;
+    }
+
     void setScaledTimeStep(float scaledTimeStep) {
         this.scaledTimeStep = scaledTimeStep;
     }
@@ -56,8 +65,8 @@ public class WorldSettings {
         this.collisionPrecision = collisionPrecision;
     }
 
-    void setForceScaleFactor(float forceScaleFactor) {
-        this.forceScaleFactor = forceScaleFactor;
+    void setTimeScaleFactor(float timeScaleFactor) {
+        this.timeScaleFactor = timeScaleFactor;
     }
 
     void setFriction(boolean friction) {
