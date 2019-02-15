@@ -12,7 +12,7 @@ class Collision {
 
     private final static float POSITION_CORRECTION_PERCENT = 0.2f; // the percent to use when correcting the position
                                                                    // of overlapped objects
-    private final static float MIN_POSITION_CORRECTION = 0.05f; // Minimum position correction to use
+    private final static float MIN_POSITION_CORRECTION = 0.1f; // Minimum position correction to use
     private final static short MAX_CONTACT_POINTS = 2;
 
     private final static boolean ENABLE_ROTATION = true;
@@ -163,7 +163,8 @@ class Collision {
     private void correctPosition()
     {
         // If the overlap is small enough, ignore it
-        if(penetration <= MIN_POSITION_CORRECTION) return;
+        float minPositionCorrection = MIN_POSITION_CORRECTION * o1.worldSettings.getTimeScaleFactor();
+        if(penetration <= minPositionCorrection) return;
 
         float correctionAmount;
         correctionAmount = (penetration / (o1.getInvertedMass() + o2.getInvertedMass())) * POSITION_CORRECTION_PERCENT;

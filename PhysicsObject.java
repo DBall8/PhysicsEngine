@@ -13,7 +13,8 @@ public abstract class PhysicsObject{
     private final static float GRAVITY_SCALAR = 0.01f; // Scale for making gravity seem normal at about 10 units
     protected final static float TINY_AMOUNT = 0.01f; // A value to consider "close enough"
     protected final static float TOUCHING_AMOUNT = 0.1f;
-    private final static float MIN_FORCE = 0.01f;
+    private final static float MIN_MOVEMENT = 0.1f;
+    private final static float MIN_ROTATION = 0.0005f;
 
     private static long idCounter = 0;
 
@@ -77,11 +78,25 @@ public abstract class PhysicsObject{
      */
     void move(float timeStep)
     {
+        float minMovement = MIN_MOVEMENT * worldSettings.getTimeScaleFactor();
+
         // Update position;
-        position.x = position.x + xvelocity * timeStep;
-        position.y = position.y + yvelocity * timeStep;
-        orientation = orientation + angularVelocity * timeStep;
-        orientation = Formulas.normalizeAngle(orientation);
+        float dx = xvelocity * timeStep;
+        if(dx > minMovement || dx < -minMovement)
+        {
+            position.x += dx;
+        }
+        float dy = yvelocity * timeStep;
+        if(dy > minMovement || dy < -minMovement)
+        {
+            position.y += dy;
+        }
+
+        float dr = angularVelocity * timeStep;
+        if(dr > MIN_ROTATION || dr < -MIN_ROTATION) {
+            orientation += dr;
+            orientation = Formulas.normalizeAngle(orientation);
+        }
     }
 
     /**
@@ -101,18 +116,9 @@ public abstract class PhysicsObject{
     void applyTotalForce()
     {
         // Update velocities, but only apply forces big enough to matter
-        if(totalForce.x > MIN_FORCE || totalForce.x < -MIN_FORCE)
-        {
-            xvelocity += invertedMass * totalForce.x;
-        }
-
-        if(totalForce.y > MIN_FORCE || totalForce.y < -MIN_FORCE) {
-            yvelocity += invertedMass * totalForce.y;
-        }
-
-        if(torque > MIN_FORCE || torque < -MIN_FORCE) {
-            angularVelocity += invertedIntertia * torque;
-        }
+        xvelocity += invertedMass * totalForce.x;
+        yvelocity += invertedMass * totalForce.y;
+        angularVelocity += invertedIntertia * torque;
 
         // Zero out total force vector since they have been applied
         totalForce.zero();

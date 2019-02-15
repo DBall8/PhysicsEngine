@@ -473,7 +473,7 @@ public class PhysicsWorld {
         worldSettings.setTimeStep(timeStep);
         // Set the time step and force scaled factors to be scaled by the initial framerate
         worldSettings.setScaledTimeStep(timeStep * INITIAL_FRAMERATE);
-        worldSettings.setTimeScaleFactor(updates / INITIAL_FRAMERATE);
+        worldSettings.setTimeScaleFactor((float)INITIAL_FRAMERATE / (float)updates);
     }
 
     public void setCollisionPrecision(float precision)
