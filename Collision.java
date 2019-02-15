@@ -110,21 +110,24 @@ class Collision {
                 inverseMassSum += (crossA * o1.getInvertedInertia()) + (crossB * o2.getInvertedInertia());
             }
             j /= inverseMassSum;
-            j /= numContactPoints;
+            //j /= numContactPoints;
 
             // Distribute the impulse across the normal of the collision
             Vec2 resolutionVec = Formulas.vecMult(normal, j);
 
             Vec2 oppositeImpulse = resolutionVec.copy().mult(-1.0f);
-            if (ENABLE_ROTATION) {
-                o1.applyImpulse(oppositeImpulse, contactA);
-                o2.applyImpulse(resolutionVec, contactB);
-            } else {
-                o1.applyImpulse(oppositeImpulse, new Vec2(0, 0));
-                o2.applyImpulse(resolutionVec, new Vec2(0, 0));
-            }
+            if(!ENABLE_FRICTION) {
+                if (ENABLE_ROTATION)
+                {
+                    o1.applyImpulse(oppositeImpulse, contactA);
+                    o2.applyImpulse(resolutionVec, contactB);
+                } else {
+                    o1.applyImpulse(oppositeImpulse, new Vec2(0, 0));
+                    o2.applyImpulse(resolutionVec, new Vec2(0, 0));
+                }
 
-            if (!ENABLE_FRICTION) return;
+                return;
+            }
 
             Vec2 tangent = Formulas.vecMult(normal, -1.0f * Formulas.dotProduct(relativeVelocity, normal));
             tangent = Formulas.vecAdd(relativeVelocity, tangent);
@@ -133,7 +136,7 @@ class Collision {
             // Recalculate j but using the tangent of the collision normal
             float jF = -1.0f * Formulas.dotProduct(relativeVelocity, tangent);
             jF /= inverseMassSum;
-            jF /= numContactPoints;
+            //jF /= numContactPoints;
 
             // If the the absolute value of jF is less than the static coefficient times j
             Vec2 frictionVec;
@@ -145,14 +148,16 @@ class Collision {
                 frictionVec = tangent.mult(-1.0f * j * muDynamic);
             }
 
-            if (ENABLE_ROTATION) {
-                o1.applyImpulse(Formulas.vecMult(frictionVec, -1.0f), contactA);
-                o2.applyImpulse(frictionVec, contactB);
-            } else {
-                o1.applyImpulse(Formulas.vecMult(frictionVec, -1.0f), new Vec2(0, 0));
-                o2.applyImpulse(frictionVec, new Vec2(0, 0));
-            }
+            oppositeImpulse.add(Formulas.vecMult(frictionVec, -1.0f));
+            resolutionVec.add(frictionVec);
 
+            if (ENABLE_ROTATION) {
+                o1.applyImpulse(oppositeImpulse, contactA);
+                o2.applyImpulse(resolutionVec, contactB);
+            } else {
+                o1.applyImpulse(oppositeImpulse, new Vec2(0, 0));
+                o2.applyImpulse(resolutionVec, new Vec2(0, 0));
+            }
         }
 
     }

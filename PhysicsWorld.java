@@ -304,10 +304,10 @@ public class PhysicsWorld {
         }
 
         // Apply all impulses
-//        for(PhysicsObject o: objects)
-//        {
-//            o.applyTotalImpulse();
-//        }
+        for(PhysicsObject o: objects)
+        {
+            o.applyTotalImpulse();
+        }
 
         return time;
     }

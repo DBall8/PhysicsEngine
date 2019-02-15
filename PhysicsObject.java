@@ -132,23 +132,26 @@ public abstract class PhysicsObject{
      */
     void applyImpulse(Vec2 impulse, Vec2 contactVec)
     {
-        applyForce(impulse);
+        if(impulse.x != 0 || impulse.y != 0) {
+            totalImpulse.add(impulse);
+            numImpulse++;
+        }
         applyTorque(Formulas.cross(contactVec, impulse));
     }
 
     /**
      * Turns a collection of impulses into a resulting force
      */
-//    void applyTotalImpulse()
-//    {
-//        if(numImpulse <= 0 ) return; // if not impulses felt, do nothing
-//        // Apply the impulse divided by the number of impulses felt
-//        applyForce(totalImpulse.x / (float)numImpulse, totalImpulse.y / (float)numImpulse);
-//
-//        // Zero out the total impulse and impulse count
-//        totalImpulse.zero();
-//        numImpulse = 0;
-//    }
+    void applyTotalImpulse()
+    {
+        if(numImpulse <= 0 ) return; // if no impulses felt, do nothing
+        // Apply the impulse divided by the number of impulses felt
+        applyForce(totalImpulse.x / (float)numImpulse, totalImpulse.y / (float)numImpulse);
+
+        // Zero out the total impulse and impulse count
+        totalImpulse.zero();
+        numImpulse = 0;
+    }
 
     /**
      * Checks for a collision between two objects and applies an impulse if one has occurred
