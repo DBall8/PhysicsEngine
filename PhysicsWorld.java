@@ -22,6 +22,9 @@ public class PhysicsWorld {
     private List<PhysicsObject> objects = new ArrayList<>();
     private List<BroadPair> broadPhase = new ArrayList<>();
 
+    private List<PhysicsObject> removalList = new LinkedList<>();
+    private List<PhysicsObject> additionList = new LinkedList<>();
+
     // Value for accumulating needed physics updates
     private float accumulator = 0;
 
@@ -51,14 +54,14 @@ public class PhysicsWorld {
     public PhysicsObject addCircle(float x, float y, float radius)
     {
         PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius);
-        objects.add(c);
+        add(c);
         return c;
     }
 
     public PhysicsObject addCircle(float x, float y, float radius, Material material )
     {
         PhysicsCircle c = new PhysicsCircle(worldSettings, new Vec2(x, y), radius, material);
-        objects.add(c);
+        add(c);
         return c;
     }
 
@@ -72,7 +75,7 @@ public class PhysicsWorld {
                     new Point(0, height),
             });
             PhysicsPolygon b = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
-            objects.add(b);
+            add(b);
             return b;
         }
         catch (MalformedPolygonException e)
@@ -92,7 +95,7 @@ public class PhysicsWorld {
                     new Point(0, height),
             });
             PhysicsPolygon b = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon, material);
-            objects.add(b);
+            add(b);
             return b;
         }
         catch (MalformedPolygonException e)
@@ -107,7 +110,7 @@ public class PhysicsWorld {
         try
         {
             PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points));
-            objects.add(p);
+            add(p);
             return p;
         }
         catch (MalformedPolygonException e)
@@ -122,7 +125,7 @@ public class PhysicsWorld {
         try
         {
             PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points), material);
-            objects.add(p);
+            add(p);
             return p;
         }
         catch (MalformedPolygonException e)
@@ -137,7 +140,7 @@ public class PhysicsWorld {
         try
         {
             PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points));
-            objects.add(p);
+            add(p);
             return p;
         }
         catch (MalformedPolygonException e)
@@ -152,7 +155,7 @@ public class PhysicsWorld {
         try
         {
             PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), new Polygon(points), material);
-            objects.add(p);
+            add(p);
             return p;
         }
         catch (MalformedPolygonException e)
@@ -165,20 +168,20 @@ public class PhysicsWorld {
     public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon);
-        objects.add(p);
+        add(p);
         return p;
     }
 
     public PhysicsObject addPolygon(float centerx, float centery, Polygon polygon, Material material)
     {
         PhysicsPolygon p = new PhysicsPolygon(worldSettings, new Vec2(centerx, centery), polygon, material);
-        objects.add(p);
+        add(p);
         return p;
     }
 
     public void removeObject(PhysicsObject object)
     {
-        objects.remove(object);
+        remove(object);
     }
 
     public void removeObject(String objectId)
@@ -187,11 +190,36 @@ public class PhysicsWorld {
         {
             if(objects.get(i).getId().equals(objectId))
             {
-                objects.remove(i);
+                remove(objects.get(i));
             }
         }
     }
     // -----------------------------------------------------------------------------------------------------------------
+
+    private synchronized void add(PhysicsObject object)
+    {
+        additionList.add(object);
+    }
+
+    private synchronized void remove(PhysicsObject object)
+    {
+        removalList.add(object);
+    }
+
+    private synchronized void updateObjectList()
+    {
+        for(PhysicsObject object: additionList)
+        {
+           objects.add(object);
+        }
+        additionList.clear();
+
+        for(PhysicsObject object: removalList)
+        {
+            objects.remove(object);
+        }
+        removalList.clear();
+    }
 
     // Physics calculation methods -------------------------------------------------------------------------------------
 
@@ -215,6 +243,8 @@ public class PhysicsWorld {
         {
             worldSettings.getDebugger().clear();
         }
+
+        updateObjectList();
 
         // First apply the force of gravity on every object
         applyGravity();
@@ -275,10 +305,10 @@ public class PhysicsWorld {
         }
 
         // Apply all impulses
-        for(PhysicsObject o: objects)
-        {
-            o.applyTotalImpulse();
-        }
+//        for(PhysicsObject o: objects)
+//        {
+//            o.applyTotalImpulse();
+//        }
 
         return time;
     }
@@ -435,6 +465,11 @@ public class PhysicsWorld {
     // SETTERS ---------------------------------------------------------------------------------------------------------
     public void setUpdatesPerFrame(int updates)
     {
+        if(updates <= 0)
+        {
+            System.err.println("Cannot set updates per frame to a value of 0 or less.");
+            return;
+        }
         float timeStep = 1.0f / updates;
         worldSettings.setScaledTimeStep(timeStep * TIME_SCALE_FACTOR);
         worldSettings.setForceScaleFactor(updates / TIME_SCALE_FACTOR);

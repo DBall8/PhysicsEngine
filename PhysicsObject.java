@@ -111,31 +111,28 @@ public abstract class PhysicsObject{
 
     /**
      * Stores an impulse to be added to total forces at the end of a collision calculation loop
+     * NOTE this method does not scale the forces by the force scale factor since they happen every frame
      * @param impulse the impulse vector to accumulate
      */
     void applyImpulse(Vec2 impulse, Vec2 contactVec)
     {
-        applyForce(impulse.x, impulse.y);
-        applyTorque(Formulas.cross(contactVec, impulse));
-        // Only add non-zero impulses
-//        if(impulse.x !=0 || impulse.y != 0) {
-//            this.totalImpulse.add(impulse);
-//            this.numImpulse = ++;
+        totalForce.add(impulse);
+        this.torque += Formulas.cross(contactVec, impulse);
     }
 
     /**
      * Turns a collection of impulses into a resulting force
      */
-    void applyTotalImpulse()
-    {
-        if(numImpulse <= 0 ) return; // if not impulses felt, do nothing
-        // Apply the impulse divided by the number of impulses felt
-        applyForce(totalImpulse.x / (float)numImpulse, totalImpulse.y / (float)numImpulse);
-
-        // Zero out the total impulse and impulse count
-        totalImpulse.zero();
-        numImpulse = 0;
-    }
+//    void applyTotalImpulse()
+//    {
+//        if(numImpulse <= 0 ) return; // if not impulses felt, do nothing
+//        // Apply the impulse divided by the number of impulses felt
+//        applyForce(totalImpulse.x / (float)numImpulse, totalImpulse.y / (float)numImpulse);
+//
+//        // Zero out the total impulse and impulse count
+//        totalImpulse.zero();
+//        numImpulse = 0;
+//    }
 
     /**
      * Checks for a collision between two objects and applies an impulse if one has occurred
@@ -179,7 +176,7 @@ public abstract class PhysicsObject{
      */
     public void applyTorque(float torque)
     {
-        this.torque += torque;
+        this.torque += torque * worldSettings.getForceScaleFactor();
     }
 
     /**
