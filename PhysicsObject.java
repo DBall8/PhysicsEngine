@@ -3,6 +3,9 @@ package physicsEngine;
 import physicsEngine.math.Formulas;
 import physicsEngine.math.Vec2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class for calculation collisions between objects
  */
@@ -42,6 +45,8 @@ public abstract class PhysicsObject{
     float inertia;
     float invertedIntertia;
     float broadPhaseRadius = 0; // Radius at the furthest point from the shape's center
+
+    private List<PhysicsObject> ignoreList = new ArrayList<>();
 
     ShapeType shapeType = ShapeType.INVALID; // Enum for tracking which collision methods to use (circle vs polygon)
     WorldSettings worldSettings; // Contains all the world environment settings for the world the object exists in
@@ -239,6 +244,36 @@ public abstract class PhysicsObject{
                 System.err.println("INVALID OBJECT TYPE in isTouching.");
                 return false;
         }
+    }
+
+    /**
+     * Adds an object to the list of objects to ignore collisions with
+     * @param object
+     */
+    public void ignore(PhysicsObject object)
+    {
+        if(!ignoreList.contains(object)) {
+            ignoreList.add(object);
+        }
+    }
+
+    /**
+     * Removes an object from this object's list of objects to ignore
+     * @param object
+     */
+    public void removeIgnore(PhysicsObject object)
+    {
+        ignoreList.remove(object);
+    }
+
+    /**
+     * Returns true if this object is ignoring the given object
+     * @param object
+     * @return true if this object is ignoring the given object
+     */
+    boolean isIgnoring(PhysicsObject object)
+    {
+        return ignoreList.contains(object);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

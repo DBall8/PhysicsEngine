@@ -334,6 +334,9 @@ public class PhysicsWorld {
 
     boolean broadCheck(PhysicsObject o1, PhysicsObject o2)
     {
+        // If either object is ignoring the other, no collision is found
+        if(o1.isIgnoring(o2) || o2.isIgnoring(o1)) return false;
+
         float radiusSum = o1.broadPhaseRadius + o2.broadPhaseRadius; // distance between the two circles when touching
         float dx = o1.getX() - o2.getX(); // x distance
         float dy = o1.getY() - o2.getY(); // ydistance
