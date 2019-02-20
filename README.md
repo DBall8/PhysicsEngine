@@ -4,11 +4,11 @@ This module provides utilities for the calculation of movement and collisions be
 and convex polygons).
 
 ## Table of Contents ##
-1. [Overview](#1.-overview)
-2. [Included Classes](#2.-included-classes)\
-  2a. [PhysicsObject](#2a.-physicsobject)\
-  2b. [PhysicsWorld](#2b.-physicsworld)\
-  2c. [Material](#2c.-material)
+1. [Overview](#1-overview)
+2. [Included Classes](#2-included-classes)\
+  2a. [PhysicsObject](#2a-physicsobject)\
+  2b. [PhysicsWorld](#2b-physicsworld)\
+  2c. [Material](#2c-material)
 
 ## 1. Overview ##
 The basic usage follows the following steps:
