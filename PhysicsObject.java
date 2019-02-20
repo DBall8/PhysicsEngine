@@ -291,13 +291,14 @@ public abstract class PhysicsObject{
 
     // Getters and setters ---------------------------------------------------------------------------------------------
 
-    public void setXvelocity(float xvel) { this.xvelocity = xvel; }
-    public void setYvelocity(float yvel) { this.yvelocity = yvel; }
+    public void setXVelocity(float xvel) { this.xvelocity = xvel; }
+    public void setYVelocity(float yvel) { this.yvelocity = yvel; }
     public void setMaterial(Material material)
     {
         this.material = material;
         this.invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
     }
+    public void setOrientation(float o){ this.orientation = o; }
     public void setCollisionCallback(Callback<PhysicsObject> callback)
     {
         this.collisionCallback = callback;
@@ -362,6 +363,5 @@ public abstract class PhysicsObject{
 
     // DEBUG TODO REMOVE
     // TODO DELETE THIS
-    public void setOrientation(float o){ this.orientation = o; }
     public void  setDebug(){ this.debug = true; }
 }
