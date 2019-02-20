@@ -298,6 +298,8 @@ public class PhysicsWorld {
             c = potentialCollision.object1.checkCollision(potentialCollision.object2, 0);
             if(c != null)
             {
+                c.o1.runCollisionCallback(c.o2);
+                c.o2.runCollisionCallback(c.o1);
                 // Find the impulse of the collision and apply it to both objects
                 c.applyImpulse();
             }

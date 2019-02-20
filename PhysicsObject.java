@@ -1,5 +1,6 @@
 package physicsEngine;
 
+import physicsEngine.callback.Callback;
 import physicsEngine.math.Formulas;
 import physicsEngine.math.Vec2;
 
@@ -47,6 +48,8 @@ public abstract class PhysicsObject{
     float broadPhaseRadius = 0; // Radius at the furthest point from the shape's center
 
     private List<PhysicsObject> ignoreList = new ArrayList<>();
+
+    private Callback<PhysicsObject> collisionCallback = null;
 
     ShapeType shapeType = ShapeType.INVALID; // Enum for tracking which collision methods to use (circle vs polygon)
     WorldSettings worldSettings; // Contains all the world environment settings for the world the object exists in
@@ -276,6 +279,14 @@ public abstract class PhysicsObject{
         return ignoreList.contains(object);
     }
 
+    void runCollisionCallback(PhysicsObject object)
+    {
+        if(collisionCallback != null)
+        {
+            collisionCallback.run(object);
+        }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     // Getters and setters ---------------------------------------------------------------------------------------------
@@ -286,6 +297,10 @@ public abstract class PhysicsObject{
     {
         this.material = material;
         this.invertedMass = MASS_SCALING_FACTOR / (material.getDensity() * volume);
+    }
+    public void setCollisionCallback(Callback<PhysicsObject> callback)
+    {
+        this.collisionCallback = callback;
     }
     public String getId(){ return id; }
     public float getX(){ return position.getX(); }

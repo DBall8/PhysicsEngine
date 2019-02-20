@@ -87,4 +87,26 @@ public class Formulas {
     {
         return a > (b * (1 - bias)) + (a * bias);
     }
+
+    public static float getAngle(Point p1, Point p2)
+    {
+        double dx = p2.getX() - p1.getX();
+        double dy = p2.getY() - p1.getY();
+        if(dy == 0)
+        {
+            if(dx > 0)
+            {
+                return (float)(Math.PI / 2);
+            }
+            return (float)(3.0f * Math.PI / 2);
+        }
+
+        double angle = Math.atan(dx / -dy);
+        if(dy > 0)
+        {
+            angle += Math.PI;
+        }
+
+        return (float)angle;
+    }
 }
