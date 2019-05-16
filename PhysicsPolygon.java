@@ -622,4 +622,71 @@ class PhysicsPolygon extends PhysicsObject{
 
         public SeparatingAxisResult(){}
     }
+
+    /**
+     * Applies an air resistance
+     */
+    void applyAirResistance()
+    {
+        if(!isInsideFocusDistance()) return;
+
+        float crossSectionX = getCrossSectionalAreaX();
+        float crossSectionY = getCrossSectionalAreaY();
+
+//        polygon.setTranslation(position.x, position.y);
+//        for (Point p: polygon.getCalculatedPoints())
+//        {
+//            float deltaX = p.getX() - getX();
+//            float deltaY = p.getY() - getY();
+//
+//            float torque = xvelocity * xvelocity * deltaY * (deltaX * deltaX *deltaX) / (Math.abs(deltaX) * 1000);
+//
+//            if(torque != 0)
+//            {
+//                System.out.println("TORQUE: " + torque);
+//            }
+//
+//            applyTorque(torque);
+//        }
+
+        float airForceX = xvelocity * xvelocity * crossSectionX * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
+        float airForceY = yvelocity * yvelocity * crossSectionY * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
+        if(xvelocity > 0) airForceX *= -1;
+        if(yvelocity > 0) airForceY *= -1;
+
+        applyForce(airForceX, airForceY);
+    }
+
+
+    private float getCrossSectionalAreaX()
+    {
+        polygon.setRotation(orientation, true);
+        Point[] points = polygon.getCalculatedPoints();
+        float maxY = -Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE;
+
+        for(Point p: points)
+        {
+            if(p.getY() < minY) minY = p.getY();
+            if(p.getY() > maxY) maxY = p.getY();
+        }
+
+        return maxY - minY;
+    }
+
+    private float getCrossSectionalAreaY()
+    {
+        polygon.setRotation(orientation, true);
+        Point[] points = polygon.getCalculatedPoints();
+        float maxX = -Float.MAX_VALUE;
+        float minX = Float.MAX_VALUE;
+
+        for(Point p: points)
+        {
+            if(p.getX() < minX) minX = p.getX();
+            if(p.getX() > maxX) maxX = p.getX();
+        }
+
+        return maxX - minX;
+    }
 }

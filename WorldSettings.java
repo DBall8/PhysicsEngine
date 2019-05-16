@@ -1,6 +1,7 @@
 package physicsEngine;
 
 import physicsEngine.debug.Debugger;
+import physicsEngine.math.Point;
 import physicsEngine.math.Vec2;
 import javafx.scene.Group;
 
@@ -12,8 +13,11 @@ public class WorldSettings {
     private float timeScaleFactor = 1; // Scale from original update frame rate so scale forces
 
     private boolean friction = true; // true if there is friction between objects
+    private float airResistanceScale = 1;
     private float gravity = 10; // the amount of gravity (10 is normal)
     private Vec2 gravityDirection = new Vec2(0, 1);
+    private Point focusPoint;
+    private int focusDistance = 0;
 
     private Debugger debugger = null;
 
@@ -39,6 +43,10 @@ public class WorldSettings {
         return friction;
     }
 
+    public float getAirResistanceScale() {
+        return airResistanceScale;
+    }
+
     public float getGravity() {
         return gravity;
     }
@@ -50,6 +58,14 @@ public class WorldSettings {
     public Debugger getDebugger(){ return debugger; }
 
     public void addDebugView(Group group){ this.debugger = new Debugger(group); }
+
+    public Point getFocusPoint() {
+        return focusPoint;
+    }
+
+    public int getFocusDistance() {
+        return focusDistance;
+    }
 
     // ------------------------------------------------------------------------------
 
@@ -78,4 +94,10 @@ public class WorldSettings {
     }
 
     void setGravityDirection(Vec2 gravityDirection) { this.gravityDirection = gravityDirection; }
+
+    void setAirResistanceScale(float airResistanceScale){ this.airResistanceScale = airResistanceScale; }
+
+    void setFocusPoint(Point p){ this.focusPoint = p;}
+
+    void setFocusDistance(int distance){ focusDistance = distance; }
 }

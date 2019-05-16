@@ -20,6 +20,8 @@ public abstract class PhysicsObject{
     private final static float MIN_MOVEMENT = 0.1f;
     private final static float MIN_ROTATION = 0.0005f;
 
+    protected final static float AIR_RESISTANCE_DIVISOR = 1000;
+
     private static long idCounter = 0;
 
     private String id;
@@ -88,6 +90,8 @@ public abstract class PhysicsObject{
      */
     void move(float timeStep)
     {
+        if(!isInsideFocusDistance()) return;
+
         float minMovement = MIN_MOVEMENT * worldSettings.getTimeScaleFactor();
 
         // Update position;
@@ -115,6 +119,8 @@ public abstract class PhysicsObject{
      */
     void applyGravity()
     {
+        if(!isInsideFocusDistance()) return;
+
         float strength = worldSettings.getGravity() * GRAVITY_SCALAR * mass / (MASS_SCALING_FACTOR);
         Vec2 gravity = Formulas.vecMult(worldSettings.getGravityDirection(), strength);
         applyForce(gravity.x, gravity.y);
@@ -184,6 +190,17 @@ public abstract class PhysicsObject{
                 System.err.println("INVALID OBJECT TYPE in check collision.");
                 return null;
         }
+    }
+
+    boolean isInsideFocusDistance()
+    {
+        if(worldSettings.getFocusDistance() <= 0) return true;
+
+        boolean validX = Math.abs(worldSettings.getFocusPoint().getX() - position.x) < worldSettings.getFocusDistance();
+
+        boolean validY = Math.abs(worldSettings.getFocusPoint().getY() - position.y) < worldSettings.getFocusDistance();
+
+        return validX && validY;
     }
 
     // Accessible to users ---------------------------------------------------------------------------------------------
@@ -354,6 +371,7 @@ public abstract class PhysicsObject{
     public abstract boolean isTouching(PhysicsCircle circle);
     public abstract boolean isTouching(PhysicsPolygon polygon);
     abstract float findMaxRadius();
+    abstract void applyAirResistance();
 
     protected enum ShapeType{
         POLYGON,

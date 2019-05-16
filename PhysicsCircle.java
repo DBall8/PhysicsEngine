@@ -116,4 +116,21 @@ class PhysicsCircle extends PhysicsObject {
 
     // Store the radius as the broad phase radius
     public float getRadius(){ return broadPhaseRadius; }
+
+    /**
+     * Applies an air resistance
+     */
+    void applyAirResistance()
+    {
+        if(!isInsideFocusDistance()) return;
+
+        float crossSection = getRadius() * 2;
+
+        float airForceX = xvelocity * xvelocity * crossSection * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
+        float airForceY = yvelocity * yvelocity * crossSection * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
+        if(xvelocity > 0) airForceX *= -1;
+        if(yvelocity > 0) airForceY *= -1;
+
+        applyForce(airForceX, airForceY);
+    }
 }

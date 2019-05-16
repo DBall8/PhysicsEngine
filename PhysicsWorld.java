@@ -246,6 +246,9 @@ public class PhysicsWorld {
         // First apply the force of gravity on every object
         applyGravity();
 
+        // Apply air resistance once
+        applyAirResistance();
+
         float timeStep = worldSettings.getTimeStep();
 
         // As long as enough "time" is left in the accumulator "tank", consume a timestep's worth and update the world
@@ -323,6 +326,8 @@ public class PhysicsWorld {
         for(int i=0; i<objects.size(); i++)
         {
             PhysicsObject o1 = objects.get(i);
+            if(!o1.isInsideFocusDistance()) continue;
+
             // Have each polygon check against each polygon further down the list
             for(int j=i+1; j<objects.size(); j++)
             {
@@ -356,6 +361,19 @@ public class PhysicsWorld {
         for(PhysicsObject object: objects)
         {
             object.applyGravity();
+        }
+    }
+
+    /**
+     * Apply air resistance to all objects
+     */
+    private void applyAirResistance()
+    {
+        if(worldSettings.getAirResistanceScale() == 0) return;
+
+        for(PhysicsObject object: objects)
+        {
+            object.applyAirResistance();
         }
     }
 
@@ -495,6 +513,10 @@ public class PhysicsWorld {
 
     public void setGravity(float gravity){ worldSettings.setGravity(gravity); }
     public void setFriction(boolean friction){ worldSettings.setFriction(friction); }
+    public void setAirResistanceScale(float scale){ worldSettings.setAirResistanceScale(scale);}
+
+    public void setFocusPoint(int x, int y){ worldSettings.setFocusPoint(new Point(x, y)); }
+    public void setFocusDistance(int focusDistance){ worldSettings.setFocusDistance(focusDistance); }
 
     private class BroadPair{
         PhysicsObject object1;
