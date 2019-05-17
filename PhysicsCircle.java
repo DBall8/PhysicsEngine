@@ -132,5 +132,6 @@ class PhysicsCircle extends PhysicsObject {
         if(yvelocity > 0) airForceY *= -1;
 
         applyForce(airForceX, airForceY);
+        applyAirResistanceTorque();
     }
 }

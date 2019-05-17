@@ -21,6 +21,7 @@ public abstract class PhysicsObject{
     private final static float MIN_ROTATION = 0.0005f;
 
     protected final static float AIR_RESISTANCE_DIVISOR = 1000;
+    protected final static float AIR_RESISTANCE_TORQUE_DIVISOR = 5000;
 
     private static long idCounter = 0;
 
@@ -190,6 +191,14 @@ public abstract class PhysicsObject{
                 System.err.println("INVALID OBJECT TYPE in check collision.");
                 return null;
         }
+    }
+
+    protected void applyAirResistanceTorque()
+    {
+        float decreasePercent = (broadPhaseRadius * worldSettings.getAirResistanceScale() * worldSettings.getTimeScaleFactor())
+                / AIR_RESISTANCE_TORQUE_DIVISOR;
+        if (decreasePercent > 1) decreasePercent = 1;
+        angularVelocity -= angularVelocity * decreasePercent;
     }
 
     boolean isInsideFocusDistance()
@@ -382,4 +391,5 @@ public abstract class PhysicsObject{
     // DEBUG TODO REMOVE
     // TODO DELETE THIS
     public void  setDebug(){ this.debug = true; }
+    public boolean isDebug(){ return debug; }
 }

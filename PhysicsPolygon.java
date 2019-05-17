@@ -628,65 +628,83 @@ class PhysicsPolygon extends PhysicsObject{
      */
     void applyAirResistance()
     {
-        if(!isInsideFocusDistance()) return;
-
-        float crossSectionX = getCrossSectionalAreaX();
-        float crossSectionY = getCrossSectionalAreaY();
+        if(!isInsideFocusDistance()) return;;
 
 //        polygon.setTranslation(position.x, position.y);
+//        if(debug)
+//        {
+//            System.out.format("Cnce: Xvel: %f, Yvel: %f ---------------\n", xvelocity, yvelocity);
+//        }
 //        for (Point p: polygon.getCalculatedPoints())
 //        {
 //            float deltaX = p.getX() - getX();
 //            float deltaY = p.getY() - getY();
 //
-//            float torque = xvelocity * xvelocity * deltaY * (deltaX * deltaX *deltaX) / (Math.abs(deltaX) * 1000);
+//            // Absolute(velocity in direction) * perpendicular distance from center squared, times parallel distance
+//            // from center, times the sign of the perpendicular distance
+//            float torqueFromX = xvelocity * (deltaY *deltaY) * /*(Math.abs(deltaX) + 1) */ worldSettings.getAirResistanceScale()
+//                    / (10000);
+//            //if (deltaY != 0) torqueFromX *= deltaY / Math.abs(deltaY);
 //
-//            if(torque != 0)
+//            float torqueFromY =  yvelocity * (deltaX *deltaX) * /*(Math.abs(deltaY) + 1) */ worldSettings.getAirResistanceScale()
+//                    / (10000);
+//            //if (deltaX != 0) torqueFromY *= deltaX / Math.abs(deltaX);
+//
+//            if(debug)
 //            {
-//                System.out.println("TORQUE: " + torque);
+//                System.out.format("Delta: (%d, %d)\n", (int)deltaX, (int)deltaY);
+//                System.out.format("Tx: %f, Ty: %f\n", torqueFromX, -torqueFromY);
 //            }
 //
+//            applyTorque(torqueFromX - torqueFromY);
+//        }
+        float crossSection = getCrossSectionalArea();
+
+
+        float airForce = getVelocity() * crossSection * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
+
+        applyForce(new Vec2(-xvelocity, -yvelocity).mult(airForce));
+        applyAirResistanceTorque();
+    }
+
+
+//    private void applyAirResistanceTorque()
+//    {
+//        polygon.setRotation(orientation, true);
+//        Point[] points = polygon.getCalculatedPoints();
+//
+//        float velocity = getVelocity();
+//        Vec2 velocityVec = new Vec2(xvelocity, yvelocity).normalize();
+//        Vec2 velocityTangent = velocityVec.tangent();
+//
+//        for(Point p: points)
+//        {
+//            float tanProjection = Formulas.dotProduct(velocityTangent, p.getVec());
+//            float velProjection = Formulas.dotProduct(velocityVec, p.getVec());
+//            float torque =  velocity * (tanProjection) * worldSettings.getAirResistanceScale()
+//                    / (10000);
 //            applyTorque(torque);
 //        }
+//    }
 
-        float airForceX = xvelocity * xvelocity * crossSectionX * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
-        float airForceY = yvelocity * yvelocity * crossSectionY * worldSettings.getAirResistanceScale() / (2.0f * AIR_RESISTANCE_DIVISOR);
-        if(xvelocity > 0) airForceX *= -1;
-        if(yvelocity > 0) airForceY *= -1;
-
-        applyForce(airForceX, airForceY);
-    }
-
-
-    private float getCrossSectionalAreaX()
+    private float getCrossSectionalArea()
     {
         polygon.setRotation(orientation, true);
         Point[] points = polygon.getCalculatedPoints();
-        float maxY = -Float.MAX_VALUE;
-        float minY = Float.MAX_VALUE;
+        float maxProj = -Float.MAX_VALUE;
+        float minProj = Float.MAX_VALUE;
+
+        Vec2 velocityTangent = new Vec2(xvelocity, yvelocity).tangent().normalize();
 
         for(Point p: points)
         {
-            if(p.getY() < minY) minY = p.getY();
-            if(p.getY() > maxY) maxY = p.getY();
+            float projection = Formulas.dotProduct(velocityTangent, p.getVec());
+            if(projection < minProj) minProj = projection;
+            if(projection > maxProj) maxProj = projection;
         }
 
-        return maxY - minY;
-    }
+//        if(debug) System.out.printf("Proj: %f\n", maxProj-minProj);
 
-    private float getCrossSectionalAreaY()
-    {
-        polygon.setRotation(orientation, true);
-        Point[] points = polygon.getCalculatedPoints();
-        float maxX = -Float.MAX_VALUE;
-        float minX = Float.MAX_VALUE;
-
-        for(Point p: points)
-        {
-            if(p.getX() < minX) minX = p.getX();
-            if(p.getX() > maxX) maxX = p.getX();
-        }
-
-        return maxX - minX;
+        return maxProj - minProj;
     }
 }
